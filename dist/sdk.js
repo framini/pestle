@@ -1344,11 +1344,24 @@
 }).call(this);
 
 },{}],2:[function(require,module,exports){
+var bbExt, c;
+
+c = new NGL.Core();
+
+bbExt = require('./extension/backbone.ext.coffee');
+
+c.addExtension(bbExt);
+
+c.start();
+
+
+
+},{"./extension/backbone.ext.coffee":5}],3:[function(require,module,exports){
 (function(root, factory) {
   var _;
   _ = require('underscore');
-  return module.exports = factory(root, _, exports);
-})(this, function(root, _, Base) {
+  return module.exports = factory(root, _, {});
+})(window, function(root, _, Base) {
   return Base.util = {
     each: $.each,
     extend: $.extend,
@@ -1359,46 +1372,62 @@
 
 
 
-},{"underscore":1}],3:[function(require,module,exports){
+},{"underscore":1}],4:[function(require,module,exports){
 (function(root, factory) {
   var Base, ExtManager;
   Base = require('./base.coffee');
   ExtManager = require('./extmanager.coffee');
-  return factory(root, Base, ExtManager, exports);
+  return module.exports = root.NGL = factory(root, Base, ExtManager, {});
 })(window, function(root, Base, ExtManager, NGL) {
-  var app;
   _.extend(NGL, Backbone.Events);
-  root.Core = (function() {
+  NGL.Core = (function() {
     Core.prototype.version = "0.0.1";
 
     function Core() {
-      this.extManager = new ExtManager.ExtManager();
+      this.extManager = new ExtManager();
     }
 
-    Core.prototype.addExtension = function(ext) {};
+    Core.prototype.addExtension = function(ext) {
+      return this.extManager.add(ext);
+    };
 
     Core.prototype.start = function() {
       console.log("Start de Core");
-      return NGL.trigger("app:extensions:init");
+      return this.extManager.init(this);
     };
 
     return Core;
 
   })();
-  app = new root.Core();
-  app.start();
   return NGL;
 });
 
 
 
-},{"./base.coffee":2,"./extmanager.coffee":4}],4:[function(require,module,exports){
+},{"./base.coffee":3,"./extmanager.coffee":6}],5:[function(require,module,exports){
 (function(root, factory) {
-  return factory(root, exports);
-})(this, function(root, NGL) {
+  return module.exports = factory(root, {});
+})(window, function(root, Ext) {
+  Ext = {
+    initialize: function(app) {
+      return app.extensions.mvc = function() {
+        return console.log("Inicializada la componente de Backbone");
+      };
+    }
+  };
+  return Ext;
+});
+
+
+
+},{}],6:[function(require,module,exports){
+(function(root, factory) {
   var Base;
   Base = require('./base.coffee');
-  return NGL.ExtManager = (function() {
+  return module.exports = factory(root, Base, {});
+})(window, function(root, Base, NGL) {
+  var ExtManager, _initExtension;
+  ExtManager = (function() {
     ExtManager.prototype._extensions = [];
 
     function ExtManager() {}
@@ -1410,13 +1439,17 @@
       return this._extensions.push(ext);
     };
 
-    ExtManager.prototype._initExtension = function(context) {};
+    ExtManager.prototype.init = function(context) {
+      return console.log(this._extensions);
+    };
 
     return ExtManager;
 
   })();
+  _initExtension = function() {};
+  return ExtManager;
 });
 
 
 
-},{"./base.coffee":2}]},{},[2,4,3]);
+},{"./base.coffee":3}]},{},[3,6,4,2]);

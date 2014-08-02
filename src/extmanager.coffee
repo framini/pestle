@@ -1,12 +1,14 @@
 ((root, factory) ->
 
-    factory(root, exports)
-
-)(this, (root, NGL) ->
-
     Base = require('./base.coffee')
 
-    class NGL.ExtManager
+    module.exports = factory(root, Base, {})
+
+)(window, (root, Base, NGL) ->
+
+    
+
+    class ExtManager
 
         _extensions: []
 
@@ -18,5 +20,11 @@
 
             @_extensions.push(ext)
 
-        _initExtension : (context) ->
+        init : (context) ->
+            console.log @_extensions
+
+    _initExtension = () ->
+
+    return ExtManager
+
 )

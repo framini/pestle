@@ -1,14 +1,15 @@
 (function() {
   (function(root, factory) {
-    return factory(root, root.NGL.Base, root.NGL);
-  })(this, function(root, Base, NGL) {
-    NGL.on('app:extensions:init', function() {
-      console.log("HAGO algo?");
-      return NGL.Core.addExtension({
-        init: console.log("Inicializada la componente de Backbone")
-      });
-    });
-    return NGL;
+    return module.exports = factory(root, {});
+  })(window, function(root, Ext) {
+    Ext = {
+      initialize: function(app) {
+        return app.extensions.mvc = function() {
+          return console.log("Inicializada la componente de Backbone");
+        };
+      }
+    };
+    return Ext;
   });
 
 }).call(this);

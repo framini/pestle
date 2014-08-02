@@ -1,10 +1,11 @@
 (function() {
   (function(root, factory) {
-    return factory(root, exports);
-  })(this, function(root, NGL) {
     var Base;
     Base = require('./base.coffee');
-    return NGL.ExtManager = (function() {
+    return module.exports = factory(root, Base, {});
+  })(window, function(root, Base, NGL) {
+    var ExtManager, _initExtension;
+    ExtManager = (function() {
       ExtManager.prototype._extensions = [];
 
       function ExtManager() {}
@@ -16,11 +17,15 @@
         return this._extensions.push(ext);
       };
 
-      ExtManager.prototype._initExtension = function(context) {};
+      ExtManager.prototype.init = function(context) {
+        return console.log(this._extensions);
+      };
 
       return ExtManager;
 
     })();
+    _initExtension = function() {};
+    return ExtManager;
   });
 
 }).call(this);

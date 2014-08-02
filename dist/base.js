@@ -2,8 +2,8 @@
   (function(root, factory) {
     var _;
     _ = require('underscore');
-    return module.exports = factory(root, _, exports);
-  })(this, function(root, _, Base) {
+    return module.exports = factory(root, _, {});
+  })(window, function(root, _, Base) {
     return Base.util = {
       each: $.each,
       extend: $.extend,

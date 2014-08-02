@@ -1,16 +1,13 @@
 ((root, factory) ->
 
-    factory(root, root.NGL.Base, root.NGL)
+    module.exports = factory(root, {})
 
-)(this, (root, Base, NGL) ->
+)(window, (root, Ext) ->
 
-    NGL.on('app:extensions:init', () ->
-        console.log "HAGO algo?"
-        NGL.Core.addExtension
-            init : 
+    Ext = 
+        initialize : (app) ->
+            app.extensions.mvc = () ->
                 console.log "Inicializada la componente de Backbone"
 
-    )
-
-    return NGL
+    return Ext
 )

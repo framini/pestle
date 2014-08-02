@@ -3,29 +3,28 @@
     var Base, ExtManager;
     Base = require('./base.coffee');
     ExtManager = require('./extmanager.coffee');
-    return factory(root, Base, ExtManager, exports);
+    return module.exports = root.NGL = factory(root, Base, ExtManager, {});
   })(window, function(root, Base, ExtManager, NGL) {
-    var app;
     _.extend(NGL, Backbone.Events);
-    root.Core = (function() {
+    NGL.Core = (function() {
       Core.prototype.version = "0.0.1";
 
       function Core() {
-        this.extManager = new ExtManager.ExtManager();
+        this.extManager = new ExtManager();
       }
 
-      Core.prototype.addExtension = function(ext) {};
+      Core.prototype.addExtension = function(ext) {
+        return this.extManager.add(ext);
+      };
 
       Core.prototype.start = function() {
         console.log("Start de Core");
-        return NGL.trigger("app:extensions:init");
+        return this.extManager.init(this);
       };
 
       return Core;
 
     })();
-    app = new root.Core();
-    app.start();
     return NGL;
   });
 
