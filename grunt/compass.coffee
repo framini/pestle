@@ -6,3 +6,6 @@ module.exports =
             imageDir: '<%= ng.rootFolder %>/etc/designs/lodges/global/images/',
             generatedImagesDir: 'etc/designs/lodges/global/images/',
             require: 'breakpoint'
+    server:
+        options:
+            debugInfo: true

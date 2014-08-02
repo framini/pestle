@@ -1,40 +1,31 @@
 (function() {
   (function(root, factory) {
-    if (typeof define === "function" && define.amd) {
-      return define(["underscore", "backbone", "jquery", "exports"], function(_, backbone, $, exports) {
-        return factory(root, _, backbone, $, exports);
-      });
-    } else {
-      return root.NGL = factory(root, root._, root.Backbone, root.$, {});
-    }
-  })(this, function(root, _, Backbone, $, NGL) {
-    NGL.version = "0.0.1";
-    NGL.view = NGL.view || {};
-    NGL.model = NGL.model || {};
-    NGL.collection = NGL.collection || {};
+    var Base, ExtManager;
+    Base = require('./base.coffee');
+    ExtManager = require('./extmanager.coffee');
+    return factory(root, Base, ExtManager, exports);
+  })(window, function(root, Base, ExtManager, NGL) {
+    var app;
     _.extend(NGL, Backbone.Events);
-    NGL.ViewItem = Backbone.View.extend({
-      serializeData: function() {
-        var data;
-        data = {};
-        if (this.model) {
-          data = this.model.toJSON();
-        } else if (this.collection) {
-          data = {
-            items: this.collection.toJSON()
-          };
-        }
-        return data;
-      },
-      destroy: function() {
-        this.undelegateEvents();
-        if (this.$el) {
-          this.$el.removeData().unbind();
-        }
-        this.remove();
-        return Backbone.View.prototype.remove.call(this);
+    root.Core = (function() {
+      Core.prototype.version = "0.0.1";
+
+      function Core() {
+        this.extManager = new ExtManager.ExtManager();
       }
-    });
+
+      Core.prototype.addExtension = function(ext) {};
+
+      Core.prototype.start = function() {
+        console.log("Start de Core");
+        return NGL.trigger("app:extensions:init");
+      };
+
+      return Core;
+
+    })();
+    app = new root.Core();
+    app.start();
     return NGL;
   });
 

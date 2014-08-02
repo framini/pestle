@@ -19,3 +19,13 @@ module.exports = (grunt) ->
     grunt.registerTask 'test', [
         'coffeelint'
     ]
+
+    grunt.registerTask 'server', (target) ->
+
+        grunt.task.run [
+            'browserify'
+            'compass:server'
+            'handlebars:compile'
+            'connect:livereload'
+            'watch'
+        ]

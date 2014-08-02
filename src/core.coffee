@@ -1,63 +1,34 @@
 ((root, factory) ->
 
-    # Definition for AMD
-    if typeof define is "function" and define.amd
-        define [
-            "underscore"
-            "backbone"
-            "jquery"
-            "exports"
-        ], (_, backbone, $, exports) ->
+    Base = require('./base.coffee')
+    ExtManager = require('./extmanager.coffee')
 
-            factory(root, _, backbone, $, exports)
+    factory(root, Base, ExtManager, exports)
 
-
-    # Definition as a global variable in case we dont use requirejs 
-    else
-        root.NGL = factory(root, root._, root.Backbone, root.$, {})
-
-)(this, (root, _, Backbone, $, NGL) ->
-
-    # current version of the library
-    NGL.version = "0.0.1"
-
-    # Default namespaces
-    NGL.view = NGL.view or {}
-    NGL.model = NGL.model or {}
-    NGL.collection = NGL.collection or {}
+)(window, (root, Base, ExtManager, NGL) ->
 
     # we'll use the NGL object as the global Event bus
     _.extend NGL, Backbone.Events
 
-    # Default view that is gonna serve as the default view to every component
-    # This view should extended instead of the Backbone.View
-    NGL.ViewItem = Backbone.View.extend
+    class root.Core
+        # current version of the library
+        version: "0.0.1"
 
-        # Method to ensure that the data is always passed to the template in the same way
-        serializeData : () ->
+        constructor: () ->
+            @extManager = new ExtManager.ExtManager()
 
-            data = {}
+        addExtension: (ext) ->
+            # @extManager.add(ext)
 
-            if @model
-                data = @model.toJSON()
-            else if @collection
-                # this way we normalize the property we'll use to iterate
-                # the collection inside the hbs 
-                data = items : @collection.toJSON()
-            
-            return data
+        start: () ->
+            console.log("Start de Core")
 
-        # Ensures that events are removed before the View is removed from the DOM
-        destroy : () ->
+            NGL.trigger("app:extensions:init")
 
-            # unbind events
-            @undelegateEvents()
-            @$el.removeData().unbind() if @$el
-
-            #Remove view from DOM
-            @remove()
-            Backbone.View.prototype.remove.call(this)
-
+    # This shouldn't be here
+    app = new root.Core()
+    app.start()
+    ##
 
     return NGL
 )
