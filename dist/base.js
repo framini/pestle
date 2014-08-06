@@ -1,9 +1,9 @@
 (function() {
   (function(root, factory) {
+    return module.exports = factory(root, {});
+  })(window, function(root, Base) {
     var _;
     _ = require('underscore');
-    return module.exports = factory(root, _, {});
-  })(window, function(root, _, Base) {
     return Base.util = {
       each: $.each,
       extend: $.extend,

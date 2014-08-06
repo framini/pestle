@@ -1,12 +1,13 @@
 (function() {
   (function(root, factory) {
-    var Base;
+    return module.exports = factory(root, {});
+  })(window, function(root, NGL) {
+    var Base, ExtManager;
     Base = require('./base.coffee');
-    return module.exports = factory(root, Base, {});
-  })(window, function(root, Base, NGL) {
-    var ExtManager, _initExtension;
     ExtManager = (function() {
       ExtManager.prototype._extensions = [];
+
+      ExtManager.prototype._initializedExtensions = [];
 
       function ExtManager() {}
 
@@ -18,13 +19,22 @@
       };
 
       ExtManager.prototype.init = function(context) {
-        return console.log(this._extensions);
+        console.log(this._extensions);
+        return this._initExtension(this._extensions, context);
+      };
+
+      ExtManager.prototype._initExtension = function(extensions, context) {
+        var xt;
+        if (extensions.length > 0) {
+          xt = extensions.shift();
+          this._initializedExtensions.push(xt.initialize(context));
+          return this._initExtension(extensions, context);
+        }
       };
 
       return ExtManager;
 
     })();
-    _initExtension = function() {};
     return ExtManager;
   });
 

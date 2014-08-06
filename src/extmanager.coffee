@@ -1,16 +1,16 @@
 ((root, factory) ->
 
+    module.exports = factory(root, {})
+
+)(window, (root, NGL) ->
+
     Base = require('./base.coffee')
-
-    module.exports = factory(root, Base, {})
-
-)(window, (root, Base, NGL) ->
-
-    
 
     class ExtManager
 
         _extensions: []
+
+        _initializedExtensions: []
 
         constructor: () ->
 
@@ -23,7 +23,18 @@
         init : (context) ->
             console.log @_extensions
 
-    _initExtension = () ->
+            @_initExtension(@_extensions, context)
+    
+        _initExtension : (extensions, context) ->
+
+            if extensions.length > 0
+
+                xt = extensions.shift()
+
+                # Keep track of the initialized extensions for future reference
+                @_initializedExtensions.push xt.initialize(context)
+
+                @_initExtension(extensions, context)
 
     return ExtManager
 

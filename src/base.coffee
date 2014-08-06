@@ -1,11 +1,10 @@
 ((root, factory) ->
 
+    module.exports = factory(root, {})
+
+)(window, (root, Base) ->
+
     _ = require('underscore')
-
-    module.exports = factory(root, _, {})
-
-)(window, (root, _, Base) ->
-
 
     # Promise abstraction
 
