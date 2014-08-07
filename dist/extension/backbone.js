@@ -27,6 +27,7 @@
     });
     return {
       initialize: function(app) {
+        console.log("Inicializada la componente de Backbone");
         app.sandbox.mvc = function() {
           return console.log("Inicializada la componente de MVC");
         };

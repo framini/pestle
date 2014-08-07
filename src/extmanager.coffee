@@ -31,10 +31,16 @@
 
                 xt = extensions.shift()
 
+                # Call extensions constructor
+                xt.initialize(context)
+
                 # Keep track of the initialized extensions for future reference
-                @_initializedExtensions.push xt.initialize(context)
+                @_initializedExtensions.push xt
 
                 @_initExtension(extensions, context)
+
+        getInitializedExtensions : () ->
+            return @_initializedExtensions
 
     return ExtManager
 

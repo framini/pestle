@@ -1362,12 +1362,13 @@ c.start();
 })(window, function(root, Base) {
   var _;
   _ = require('underscore');
-  return Base.util = {
+  Base.util = {
     each: $.each,
     extend: $.extend,
     uniq: _.uniq,
     _: _
   };
+  return Base;
 });
 
 
@@ -1393,8 +1394,16 @@ c.start();
     };
 
     Core.prototype.start = function() {
+      var Components;
       console.log("Start de Core");
-      return this.extManager.init(this);
+      Components = require('./extension/components.coffee');
+      this.extManager.add(Components);
+      this.extManager.init(this);
+      return Base.util.each(this.extManager.getInitializedExtensions(), function(i, ext) {
+        if (ext && typeof ext.afterAppStarted === 'function') {
+          return ext.afterAppStarted(this);
+        }
+      });
     };
 
     return Core;
@@ -1405,7 +1414,7 @@ c.start();
 
 
 
-},{"./base.coffee":3,"./extmanager.coffee":6}],5:[function(require,module,exports){
+},{"./base.coffee":3,"./extension/components.coffee":6,"./extmanager.coffee":7}],5:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Ext) {
@@ -1434,6 +1443,7 @@ c.start();
   });
   return {
     initialize: function(app) {
+      console.log("Inicializada la componente de Backbone");
       app.sandbox.mvc = function() {
         return console.log("Inicializada la componente de MVC");
       };
@@ -1445,6 +1455,34 @@ c.start();
 
 
 },{}],6:[function(require,module,exports){
+(function(root, factory) {
+  return module.exports = factory(root, {});
+})(window, function(root, Ext) {
+  var Component;
+  Component = (function() {
+    function Component() {}
+
+    Component.startAll = function(components) {};
+
+    Component.parseList = function(components) {};
+
+    return Component;
+
+  })();
+  return {
+    initialize: function(app) {
+      console.log("Inicializada la componente de Componentes");
+      return app.sandbox.startComponents = function(list) {};
+    },
+    afterAppStarted: function(app) {
+      return console.log("Llamando al afterAppStarted");
+    }
+  };
+});
+
+
+
+},{}],7:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, NGL) {
@@ -1473,9 +1511,14 @@ c.start();
       var xt;
       if (extensions.length > 0) {
         xt = extensions.shift();
-        this._initializedExtensions.push(xt.initialize(context));
+        xt.initialize(context);
+        this._initializedExtensions.push(xt);
         return this._initExtension(extensions, context);
       }
+    };
+
+    ExtManager.prototype.getInitializedExtensions = function() {
+      return this._initializedExtensions;
     };
 
     return ExtManager;
@@ -1486,4 +1529,4 @@ c.start();
 
 
 
-},{"./base.coffee":3}]},{},[3,6,4,2]);
+},{"./base.coffee":3}]},{},[3,7,4,2]);

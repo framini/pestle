@@ -16,4 +16,6 @@
         extend: $.extend,
         uniq: _.uniq,
         _: _
+
+    return Base
 )

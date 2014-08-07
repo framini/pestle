@@ -4,12 +4,13 @@
   })(window, function(root, Base) {
     var _;
     _ = require('underscore');
-    return Base.util = {
+    Base.util = {
       each: $.each,
       extend: $.extend,
       uniq: _.uniq,
       _: _
     };
+    return Base;
   });
 
 }).call(this);

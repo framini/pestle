@@ -19,8 +19,16 @@
       };
 
       Core.prototype.start = function() {
+        var Components;
         console.log("Start de Core");
-        return this.extManager.init(this);
+        Components = require('./extension/components.coffee');
+        this.extManager.add(Components);
+        this.extManager.init(this);
+        return Base.util.each(this.extManager.getInitializedExtensions(), function(i, ext) {
+          if (ext && typeof ext.afterAppStarted === 'function') {
+            return ext.afterAppStarted(this);
+          }
+        });
       };
 
       return Core;

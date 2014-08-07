@@ -37,6 +37,8 @@
     # returns an object with the initialize method that will init the extension
     initialize : (app) ->
 
+        console.log "Inicializada la componente de Backbone"
+
         app.sandbox.mvc = () ->
             console.log "Inicializada la componente de MVC"
 

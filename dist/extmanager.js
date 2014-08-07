@@ -27,9 +27,14 @@
         var xt;
         if (extensions.length > 0) {
           xt = extensions.shift();
-          this._initializedExtensions.push(xt.initialize(context));
+          xt.initialize(context);
+          this._initializedExtensions.push(xt);
           return this._initExtension(extensions, context);
         }
+      };
+
+      ExtManager.prototype.getInitializedExtensions = function() {
+        return this._initializedExtensions;
       };
 
       return ExtManager;
