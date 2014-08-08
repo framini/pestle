@@ -38,7 +38,7 @@
             # from each extension
             # Note: This method will let each extension to automatically execute some code
             #       once the app has started. 
-            Base.util.each @extManager.getInitializedExtensions(), (i, ext) ->
+            Base.util.each @extManager.getInitializedExtensions(), (i, ext) =>
                 # Since this method is not required lets check if it's defined
                 if ext && typeof ext.afterAppStarted == 'function'
                     ext.afterAppStarted(@)
