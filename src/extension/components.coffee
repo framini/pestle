@@ -14,7 +14,8 @@
          * @param  {[type]} selector = 'body'. CSS selector to tell the app where to look for components
          * @return {[type]}
         ###
-        @startAll: (selector = 'body') ->
+        @startAll: (selector = 'body', app) ->
+            console.log app
             components = Component.parseList(selector)
 
             console.log "ESTAS SERIAN LAS COMPONENTES PARSEADAS"
@@ -89,9 +90,9 @@
 
         console.log "Inicializada la componente de Componentes"
 
-        app.sandbox.startComponents = (list) ->
+        app.sandbox.startComponents = (list, app) ->
 
-            Component.startAll()
+            Component.startAll(list, app)
 
 
     # this method will be called once all the extensions have been loaded
@@ -99,5 +100,5 @@
 
         console.log "Llamando al afterAppStarted"
 
-        app.sandbox.startComponents()
+        app.sandbox.startComponents("", app)
 )

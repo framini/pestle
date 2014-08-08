@@ -1473,11 +1473,12 @@ c.start();
      * @return {[type]}
      */
 
-    Component.startAll = function(selector) {
+    Component.startAll = function(selector, app) {
       var components;
       if (selector == null) {
         selector = 'body';
       }
+      console.log(app);
       components = Component.parseList(selector);
       console.log("ESTAS SERIAN LAS COMPONENTES PARSEADAS");
       return console.log(components);
@@ -1528,13 +1529,13 @@ c.start();
   return {
     initialize: function(app) {
       console.log("Inicializada la componente de Componentes");
-      return app.sandbox.startComponents = function(list) {
-        return Component.startAll();
+      return app.sandbox.startComponents = function(list, app) {
+        return Component.startAll(list, app);
       };
     },
     afterAppStarted: function(app) {
       console.log("Llamando al afterAppStarted");
-      return app.sandbox.startComponents();
+      return app.sandbox.startComponents("", app);
     }
   };
 });
