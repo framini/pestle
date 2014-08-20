@@ -23,7 +23,8 @@
         console.log(app);
         components = Component.parseList(selector);
         console.log("ESTAS SERIAN LAS COMPONENTES PARSEADAS");
-        return console.log(components);
+        console.log(components);
+        return Component.instantiate(components, app);
       };
 
       Component.parseList = function(selector) {
@@ -65,6 +66,21 @@
         return options;
       };
 
+      Component.instantiate = function(components, app) {
+        return _.each(components, function(m, i) {
+          var mod, sb;
+          if (NGL.modules[m.name] && m.options) {
+            mod = NGL.modules[m.name];
+            sb = app.createSandbox(m.name);
+            _.extend(mod, {
+              sandbox: sb,
+              options: m.options
+            });
+            return mod.initialize();
+          }
+        });
+      };
+
       return Component;
 
     })();
@@ -77,7 +93,7 @@
       },
       afterAppStarted: function(app) {
         console.log("Llamando al afterAppStarted");
-        return app.sandbox.startComponents("", app);
+        return app.sandbox.startComponents(null, app);
       }
     };
   });

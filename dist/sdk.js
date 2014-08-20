@@ -1344,19 +1344,6 @@
 }).call(this);
 
 },{}],2:[function(require,module,exports){
-var bbExt, c;
-
-c = new NGL.Core();
-
-bbExt = require('./extension/backbone.ext.coffee');
-
-c.addExtension(bbExt);
-
-c.start();
-
-
-
-},{"./extension/backbone.ext.coffee":5}],3:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Base) {
@@ -1373,7 +1360,7 @@ c.start();
 
 
 
-},{"underscore":1}],4:[function(require,module,exports){
+},{"underscore":1}],3:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = root.NGL = factory(root, {});
 })(window, function(root, NGL) {
@@ -1381,12 +1368,14 @@ c.start();
   Base = require('./base.coffee');
   ExtManager = require('./extmanager.coffee');
   _.extend(NGL, Backbone.Events);
+  NGL.modules = {};
   NGL.Core = (function() {
     Core.prototype.version = "0.0.1";
 
     function Core() {
       this.extManager = new ExtManager();
       this.sandbox = Object.create(Base);
+      this.sandboxes = {};
     }
 
     Core.prototype.addExtension = function(ext) {
@@ -1394,10 +1383,12 @@ c.start();
     };
 
     Core.prototype.start = function() {
-      var Components;
+      var BackboneExt, Components;
       console.log("Start de Core");
       Components = require('./extension/components.coffee');
+      BackboneExt = require('./extension/backbone.ext.coffee');
       this.extManager.add(Components);
+      this.extManager.add(BackboneExt);
       this.extManager.init(this);
       return Base.util.each(this.extManager.getInitializedExtensions(), (function(_this) {
         return function(i, ext) {
@@ -1408,6 +1399,10 @@ c.start();
       })(this));
     };
 
+    Core.prototype.createSandbox = function(name, opts) {
+      return this.sandboxes[name] = Object.create(this.sandbox);
+    };
+
     return Core;
 
   })();
@@ -1416,7 +1411,7 @@ c.start();
 
 
 
-},{"./base.coffee":3,"./extension/components.coffee":6,"./extmanager.coffee":7}],5:[function(require,module,exports){
+},{"./base.coffee":2,"./extension/backbone.ext.coffee":4,"./extension/components.coffee":5,"./extmanager.coffee":6}],4:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Ext) {
@@ -1456,7 +1451,7 @@ c.start();
 
 
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Ext) {
@@ -1481,7 +1476,8 @@ c.start();
       console.log(app);
       components = Component.parseList(selector);
       console.log("ESTAS SERIAN LAS COMPONENTES PARSEADAS");
-      return console.log(components);
+      console.log(components);
+      return Component.instantiate(components, app);
     };
 
     Component.parseList = function(selector) {
@@ -1523,6 +1519,21 @@ c.start();
       return options;
     };
 
+    Component.instantiate = function(components, app) {
+      return _.each(components, function(m, i) {
+        var mod, sb;
+        if (NGL.modules[m.name] && m.options) {
+          mod = NGL.modules[m.name];
+          sb = app.createSandbox(m.name);
+          _.extend(mod, {
+            sandbox: sb,
+            options: m.options
+          });
+          return mod.initialize();
+        }
+      });
+    };
+
     return Component;
 
   })();
@@ -1535,14 +1546,14 @@ c.start();
     },
     afterAppStarted: function(app) {
       console.log("Llamando al afterAppStarted");
-      return app.sandbox.startComponents("", app);
+      return app.sandbox.startComponents(null, app);
     }
   };
 });
 
 
 
-},{"./../base.coffee":3}],7:[function(require,module,exports){
+},{"./../base.coffee":2}],6:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, NGL) {
@@ -1589,4 +1600,4 @@ c.start();
 
 
 
-},{"./base.coffee":3}]},{},[3,7,4,2]);
+},{"./base.coffee":2}]},{},[2,6,3]);

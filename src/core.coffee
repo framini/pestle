@@ -10,6 +10,9 @@
     # we'll use the NGL object as the global Event bus
     _.extend NGL, Backbone.Events
 
+    # Namespace for module definition
+    NGL.modules = {}
+
     class NGL.Core
         # current version of the library
         version: "0.0.1"
@@ -19,6 +22,9 @@
 
             @sandbox = Object.create(Base)
 
+            # namespace to hold all the sandboxes
+            @sandboxes = {}
+
         addExtension: (ext) ->
             @extManager.add(ext)
 
@@ -27,9 +33,11 @@
 
             # Require core extensions
             Components = require('./extension/components.coffee')
+            BackboneExt = require('./extension/backbone.ext.coffee')
 
             # Add core extensions to the app
             @extManager.add(Components)
+            @extManager.add(BackboneExt)
 
             # Init all the extensions
             @extManager.init(@)
@@ -54,6 +62,10 @@
             #     console.log pepe.mvc.BaseView
 
             # NGL.trigger("app:extensions:init")
+
+        createSandbox: (name, opts) ->
+            @sandboxes[name] = Object.create(@.sandbox)
+
 
     return NGL
 )

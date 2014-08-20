@@ -22,6 +22,7 @@
             console.log components
 
             # TODO: Proximo paso inicializar las componentes
+            Component.instantiate(components, app)
 
         @parseList: (selector) ->
 
@@ -79,6 +80,23 @@
 
             return options
 
+        @instantiate: (components, app) ->
+            # TODO: access this utils function through Base
+            _.each(components, (m, i) ->
+                if NGL.modules[m.name] and m.options
+                    mod = NGL.modules[m.name]
+
+                    # create a new sandbox for this module
+                    sb = app.createSandbox(m.name)
+
+                    # inject the sandbox and the options in the module proto
+                    _.extend mod, sandbox : sb, options: m.options
+
+                    # init the module
+                    mod.initialize()
+            )
+
+
 
 
     ##
@@ -100,5 +118,5 @@
 
         console.log "Llamando al afterAppStarted"
 
-        app.sandbox.startComponents("", app)
+        app.sandbox.startComponents(null, app)
 )
