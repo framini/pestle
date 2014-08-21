@@ -83,7 +83,10 @@
         @instantiate: (components, app) ->
             # TODO: access this utils function through Base
             _.each(components, (m, i) ->
-                if NGL.modules[m.name] and m.options
+                # Check if the modules are defined using the modules namespace
+                # TODO: Provide an alternate way to define which is gonna be 
+                # this global object that is gonna hold the module definition
+                if not _.isEmpty(NGL.modules) and NGL.modules[m.name] and m.options
                     mod = NGL.modules[m.name]
 
                     # create a new sandbox for this module

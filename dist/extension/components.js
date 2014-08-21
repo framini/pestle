@@ -69,7 +69,7 @@
       Component.instantiate = function(components, app) {
         return _.each(components, function(m, i) {
           var mod, sb;
-          if (NGL.modules[m.name] && m.options) {
+          if (!_.isEmpty(NGL.modules) && NGL.modules[m.name] && m.options) {
             mod = NGL.modules[m.name];
             sb = app.createSandbox(m.name);
             _.extend(mod, {
