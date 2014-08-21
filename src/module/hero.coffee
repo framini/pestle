@@ -1,3 +1,8 @@
+Hero = Backbone.View.extend
+
+    initialize: () ->
+        console.log "initialize del Hero"
+
 ##
 # returns an object with the initialize method that will init the module
 # Note: This is an example on how to define a component outside a browserify
@@ -17,12 +22,11 @@ NGL.modules.Hero =
         console.log "ESTO SERIA LAS OPCIONES DEL MODULO HERO"
         console.log this.options
 
-        class Hero extends this.sandbox.mvc.BaseView
+        # merge our view with the default "view" object that will
+        # abstract some common behavior to all views
+        @sandbox.mvc.mixin(Hero, @sandbox.mvc.BaseView)
 
-            constructor : () ->
-                console.log "Constructor de la clase Hero"
-
-        H = new Hero()
+        H = new Hero
 
         console.log "ESTO SERIA la CLASE HERO EXTENDIDA"
         console.log H

@@ -1,12 +1,18 @@
+###*
+ * This extension should probably be defined at a project level, not here
+###
 ((root, factory) ->
 
     module.exports = factory(root, {})
 
 )(window, (root, Ext) ->
 
-    # Default view that is gonna serve as the default view to every component
-    # This view should extended instead of the Backbone.View
-    BaseView = Backbone.View.extend
+    # Default base object that is gonna be used as the default object to be mixed
+    # into other views
+    BaseView =
+
+        initialize: () ->
+            console.log "initialize del BaseView"
 
         # Method to ensure that the data is always passed to the template in the same way
         serializeData : () ->
@@ -31,10 +37,11 @@
 
             #Remove view from DOM
             @remove()
-            Backbone.View.prototype.remove.call(this)
+            Backbone.View::remove.call(this)
 
 
-    # returns an object with the initialize method that will init the extension
+    # returns an object with the initialize method that will be used to 
+    # init the extension
     initialize : (app) ->
 
         console.log "Inicializada la componente de Backbone"
@@ -42,5 +49,23 @@
         app.sandbox.mvc = () ->
             console.log "Inicializada la componente de MVC"
 
+        # this gives access to BaseView from the outside
         app.sandbox.mvc.BaseView = BaseView
+
+        ###*
+         * This method allows to mix a backbone view with an object
+         * @author Francisco Ramini <francisco.ramini at globant.com>
+         * @param  {[type]} view
+         * @param  {[type]} mixin = BaseView
+         * @return {[type]}
+        ###
+        app.sandbox.mvc.mixin = (view, mixin = BaseView) ->
+            _.defaults view::, mixin
+            _.defaults view::events, mixin.events
+
+            if mixin.initialize isnt `undefined`
+                oldInitialize = view::initialize
+                view::initialize = ->
+                    mixin.initialize.apply this
+                    oldInitialize.apply this
 )
