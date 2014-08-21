@@ -41,6 +41,15 @@
             @remove()
             Backbone.View::remove.call(this)
 
+        render: () ->
+
+            # as a rule, if the template is passed as a parameter for the module
+            # this option will override the default template for the view
+            if model.get('template')
+                tpl = JST[model.get('template')]
+            else
+                tpl = @template
+
 
     # returns an object with the initialize method that will be used to 
     # init the extension

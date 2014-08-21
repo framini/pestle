@@ -32,6 +32,14 @@
         }
         this.remove();
         return Backbone.View.prototype.remove.call(this);
+      },
+      render: function() {
+        var tpl;
+        if (model.get('template')) {
+          return tpl = JST[model.get('template')];
+        } else {
+          return tpl = this.template;
+        }
       }
     };
     return {

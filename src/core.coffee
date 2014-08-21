@@ -19,7 +19,8 @@
 
         cfg:
             debug: 
-                logLevel: 5 #by default the logging is disabled
+                logLevel: 5 # by default the logging is disabled
+                            # values can go from 0 to 5 (5 means disabled)
 
         constructor: (config = {}) ->
 
