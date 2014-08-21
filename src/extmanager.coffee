@@ -21,7 +21,7 @@
             @_extensions.push(ext)
 
         init : (context) ->
-            console.log @_extensions
+            Base.log.info @_extensions
 
             @_initExtension(@_extensions, context)
     

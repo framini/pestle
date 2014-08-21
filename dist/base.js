@@ -2,13 +2,12 @@
   (function(root, factory) {
     return module.exports = factory(root, {});
   })(window, function(root, Base) {
-    var _;
-    _ = require('underscore');
+    Base.log = require('loglevel');
     Base.util = {
       each: $.each,
       extend: $.extend,
-      uniq: _.uniq,
-      _: _
+      uniq: root._.uniq,
+      _: root._
     };
     return Base;
   });

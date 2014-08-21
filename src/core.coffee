@@ -17,19 +17,35 @@
         # current version of the library
         version: "0.0.1"
 
-        constructor: () ->
+        cfg:
+            debug: 
+                logLevel: 5 #by default the logging is disabled
+
+        constructor: (config = {}) ->
+
+            @config = Base.util._.defaults config, @cfg
+
+            # Set the logging level for the app
+            Base.log.setLevel(@config.debug.logLevel)
+
+            # The extension manager will be on charge of loading extensions
+            # and make its functionality available to the stack
             @extManager = new ExtManager()
 
+            # through this object the modules will be accesing the method defined by the 
+            # extensions
             @sandbox = Object.create(Base)
 
             # namespace to hold all the sandboxes
             @sandboxes = {}
 
+
+
         addExtension: (ext) ->
             @extManager.add(ext)
 
         start: () ->
-            console.log("Start de Core")
+            Base.log.info("Start de Core")
 
             # Require core extensions
             Components = require('./extension/components.coffee')
@@ -50,18 +66,6 @@
                 # Since this method is not required lets check if it's defined
                 if ext && typeof ext.afterAppStarted == 'function'
                     ext.afterAppStarted(@)
-
-            # console.log @sandbox.mvc()
-
-            # console.log @sandbox.mvc.BaseView
-
-            # pepe = Object.create(@sandbox)
-
-            # asd = do(pepe) ->
-            #     console.log "sanbox unico"
-            #     console.log pepe.mvc.BaseView
-
-            # NGL.trigger("app:extensions:init")
 
         createSandbox: (name, opts) ->
             @sandboxes[name] = Object.create(@.sandbox)

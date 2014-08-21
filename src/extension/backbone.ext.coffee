@@ -7,12 +7,14 @@
 
 )(window, (root, Ext) ->
 
+    Base = require('./../base.coffee')
+
     # Default base object that is gonna be used as the default object to be mixed
     # into other views
     BaseView =
 
         initialize: () ->
-            console.log "initialize del BaseView"
+            Base.log.info "initialize del BaseView"
 
         # Method to ensure that the data is always passed to the template in the same way
         serializeData : () ->
@@ -44,10 +46,10 @@
     # init the extension
     initialize : (app) ->
 
-        console.log "Inicializada la componente de Backbone"
+        Base.log.info "Inicializada la componente de Backbone"
 
         app.sandbox.mvc = () ->
-            console.log "Inicializada la componente de MVC"
+            Base.log.info "Inicializada la componente de MVC"
 
         # this gives access to BaseView from the outside
         app.sandbox.mvc.BaseView = BaseView

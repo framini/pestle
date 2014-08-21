@@ -1,7 +1,7 @@
 Hero = Backbone.View.extend
 
     initialize: () ->
-        console.log "initialize del Hero"
+        # Base.log.info "initialize del Hero"
 
 ##
 # returns an object with the initialize method that will init the module
@@ -14,13 +14,15 @@ NGL.modules.Hero =
     # constructor
     initialize : () ->
 
-        console.log "Inicializada la componente HERO"
+        @log = @sandbox.log
 
-        console.log "ESTO SERIA EL SANDBOX DEL MODULO HERO"
-        console.log this.sandbox
+        @log.info "Inicializada la componente HERO"
 
-        console.log "ESTO SERIA LAS OPCIONES DEL MODULO HERO"
-        console.log this.options
+        @log.info "ESTO SERIA EL SANDBOX DEL MODULO HERO"
+        @log.debug this.sandbox
+
+        @log.info "ESTO SERIA LAS OPCIONES DEL MODULO HERO"
+        @log.debug this.options
 
         # merge our view with the default "view" object that will
         # abstract some common behavior to all views
@@ -28,10 +30,10 @@ NGL.modules.Hero =
 
         H = new Hero
 
-        console.log "ESTO SERIA la CLASE HERO EXTENDIDA"
-        console.log H
+        @log.info "ESTO SERIA la CLASE HERO EXTENDIDA"
+        @log.debug H
 
         this.render()
 
     render: () ->
-        console.log "ESTOY EN EL METODO RENDER"
+        @log.info "ESTOY EN EL METODO RENDER"

@@ -7,10 +7,11 @@
   (function(root, factory) {
     return module.exports = factory(root, {});
   })(window, function(root, Ext) {
-    var BaseView;
+    var Base, BaseView;
+    Base = require('./../base.coffee');
     BaseView = {
       initialize: function() {
-        return console.log("initialize del BaseView");
+        return Base.log.info("initialize del BaseView");
       },
       serializeData: function() {
         var data;
@@ -35,9 +36,9 @@
     };
     return {
       initialize: function(app) {
-        console.log("Inicializada la componente de Backbone");
+        Base.log.info("Inicializada la componente de Backbone");
         app.sandbox.mvc = function() {
-          return console.log("Inicializada la componente de MVC");
+          return Base.log.info("Inicializada la componente de MVC");
         };
         app.sandbox.mvc.BaseView = BaseView;
         /**

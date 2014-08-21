@@ -10,7 +10,18 @@
     NGL.Core = (function() {
       Core.prototype.version = "0.0.1";
 
-      function Core() {
+      Core.prototype.cfg = {
+        debug: {
+          logLevel: 5
+        }
+      };
+
+      function Core(config) {
+        if (config == null) {
+          config = {};
+        }
+        this.config = Base.util._.defaults(config, this.cfg);
+        Base.log.setLevel(this.config.debug.logLevel);
         this.extManager = new ExtManager();
         this.sandbox = Object.create(Base);
         this.sandboxes = {};
@@ -23,7 +34,7 @@
       Core.prototype.start = function() {
         var BackboneExt, Components,
           _this = this;
-        console.log("Start de Core");
+        Base.log.info("Start de Core");
         Components = require('./extension/components.coffee');
         BackboneExt = require('./extension/backbone.ext.coffee');
         this.extManager.add(Components);

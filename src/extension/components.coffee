@@ -15,11 +15,11 @@
          * @return {[type]}
         ###
         @startAll: (selector = 'body', app) ->
-            console.log app
+
             components = Component.parseList(selector)
 
-            console.log "ESTAS SERIAN LAS COMPONENTES PARSEADAS"
-            console.log components
+            Base.log.info "ESTAS SERIAN LAS COMPONENTES PARSEADAS"
+            Base.log.debug components
 
             # TODO: Proximo paso inicializar las componentes
             Component.instantiate(components, app)
@@ -109,7 +109,7 @@
     # constructor
     initialize : (app) ->
 
-        console.log "Inicializada la componente de Componentes"
+        Base.log.info "Inicializada la componente de Componentes"
 
         app.sandbox.startComponents = (list, app) ->
 
@@ -119,7 +119,7 @@
     # this method will be called once all the extensions have been loaded
     afterAppStarted: (app) ->
 
-        console.log "Llamando al afterAppStarted"
+        Base.log.info "Llamando al afterAppStarted"
 
         app.sandbox.startComponents(null, app)
 )

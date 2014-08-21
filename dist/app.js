@@ -1,7 +1,11 @@
 (function() {
   var c;
 
-  c = new NGL.Core();
+  c = new NGL.Core({
+    debug: {
+      logLevel: 0
+    }
+  });
 
   c.start();
 

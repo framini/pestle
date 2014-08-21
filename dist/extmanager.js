@@ -19,7 +19,7 @@
       };
 
       ExtManager.prototype.init = function(context) {
-        console.log(this._extensions);
+        Base.log.info(this._extensions);
         return this._initExtension(this._extensions, context);
       };
 

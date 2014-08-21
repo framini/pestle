@@ -20,10 +20,9 @@
         if (selector == null) {
           selector = 'body';
         }
-        console.log(app);
         components = Component.parseList(selector);
-        console.log("ESTAS SERIAN LAS COMPONENTES PARSEADAS");
-        console.log(components);
+        Base.log.info("ESTAS SERIAN LAS COMPONENTES PARSEADAS");
+        Base.log.debug(components);
         return Component.instantiate(components, app);
       };
 
@@ -86,13 +85,13 @@
     })();
     return {
       initialize: function(app) {
-        console.log("Inicializada la componente de Componentes");
+        Base.log.info("Inicializada la componente de Componentes");
         return app.sandbox.startComponents = function(list, app) {
           return Component.startAll(list, app);
         };
       },
       afterAppStarted: function(app) {
-        console.log("Llamando al afterAppStarted");
+        Base.log.info("Llamando al afterAppStarted");
         return app.sandbox.startComponents(null, app);
       }
     };
