@@ -1,0 +1,5 @@
+{
+    "name": "platform-sdk",
+    "version": "0.1.0",
+    "main": "dist/sdk.js"
+}
