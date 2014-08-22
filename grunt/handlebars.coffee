@@ -7,8 +7,8 @@ module.exports =
         files: [
             expand: true,
             flatten: false,
-            cwd: '<%= ng.rootFolder %>',
+            cwd: 'src',
             src: ['**/*.handlebars'],
-            dest: '<%= ng.buildFolder %>',
+            dest: 'dist',
             ext: '.js'
         ]

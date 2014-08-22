@@ -100,8 +100,6 @@
             )
 
 
-
-
     ##
     # returns an object with the initialize method that will init the extension
     ##

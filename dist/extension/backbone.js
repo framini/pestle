@@ -7,8 +7,19 @@
   (function(root, factory) {
     return module.exports = factory(root, {});
   })(window, function(root, Ext) {
-    var Base, BaseView;
+    var Base, BaseView, Renderer;
     Base = require('./../base.coffee');
+    Renderer = {
+      render: function(template, data) {
+        if (!template) {
+          Base.log.error("The template passed to the Renderer is not defined");
+          return;
+        }
+        if (_.isFunction(template)) {
+          return template(data);
+        }
+      }
+    };
     BaseView = {
       initialize: function() {
         return Base.log.info("initialize del BaseView");
@@ -34,12 +45,20 @@
         return Backbone.View.prototype.remove.call(this);
       },
       render: function() {
-        var tpl;
-        if (model.get('template')) {
-          return tpl = JST[model.get('template')];
+        var data, html, tpl;
+        if (this.model.get('template')) {
+          tpl = JST[this.model.get('template')];
         } else {
-          return tpl = this.template;
+          tpl = this.template;
         }
+        data = this.serializeData();
+        html = Renderer.render(tpl, data);
+        this.attachElContent(html);
+        return this;
+      },
+      attachElContent: function(html) {
+        this.$el.html(html);
+        return this;
       }
     };
     return {
@@ -62,7 +81,7 @@
           if (mixin == null) {
             mixin = BaseView;
           }
-          _.defaults(view.prototype, mixin);
+          _.extend(view.prototype, mixin);
           _.defaults(view.prototype.events, mixin.events);
           if (mixin.initialize !== undefined) {
             oldInitialize = view.prototype.initialize;

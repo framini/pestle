@@ -9,6 +9,19 @@
 
     Base = require('./../base.coffee')
 
+    Renderer =
+
+        render: (template, data) ->
+
+            unless template
+                Base.log.error "The template passed to the Renderer is not defined"
+                return
+
+            if _.isFunction template
+                return template data
+
+
+
     # Default base object that is gonna be used as the default object to be mixed
     # into other views
     BaseView =
@@ -44,11 +57,26 @@
         render: () ->
 
             # as a rule, if the template is passed as a parameter for the module
-            # this option will override the default template for the view
-            if model.get('template')
-                tpl = JST[model.get('template')]
+            # this option will override the default template of the view
+            if @model.get('template')
+                tpl = JST[@model.get('template')]
             else
                 tpl = @template
+
+            data = @serializeData()
+
+            html = Renderer.render(tpl, data)
+
+            @attachElContent html
+
+            @
+
+        attachElContent: (html) ->
+
+            @$el.html(html)
+  
+            @
+
 
 
     # returns an object with the initialize method that will be used to 
@@ -71,7 +99,7 @@
          * @return {[type]}
         ###
         app.sandbox.mvc.mixin = (view, mixin = BaseView) ->
-            _.defaults view::, mixin
+            _.extend view::, mixin
             _.defaults view::events, mixin.events
 
             if mixin.initialize isnt `undefined`

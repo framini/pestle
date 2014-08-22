@@ -1,5 +1,7 @@
 Hero = Backbone.View.extend
 
+    template: JST['herotmpl']
+
     initialize: () ->
         # Base.log.info "initialize del Hero"
 
@@ -28,12 +30,19 @@ NGL.modules.Hero =
         # abstract some common behavior to all views
         @sandbox.mvc.mixin(Hero, @sandbox.mvc.BaseView)
 
-        H = new Hero
+        # creates a backbone model based on the parameters passed to the module
+        m = new Backbone.Model this.options
+
+        # TODO: add an attribute "type" to give the chance to select
+        # between a model, collection or both
+        @H = new Hero model : m
 
         @log.info "ESTO SERIA la CLASE HERO EXTENDIDA"
-        @log.debug H
+        @log.debug @H
 
         this.render()
 
     render: () ->
         @log.info "ESTOY EN EL METODO RENDER"
+
+        $('body').append(@H.render().$el)
