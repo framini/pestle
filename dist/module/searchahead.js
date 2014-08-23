@@ -2,6 +2,8 @@
   var Dataset, Lodge, LodgeDatum, SearchResults;
 
   Lodge = Backbone.View.extend({
+    tagName: 'div',
+    className: 'searchahead-selectedlodges',
     template: JST['lodge'],
     initialize: function() {}
   });
@@ -40,6 +42,8 @@
 
 
   SearchResults = Backbone.View.extend({
+    tagName: 'div',
+    className: 'searchahead-selectedlodgeslist',
     initialize: function() {
       _.bindAll(this, "renderItem", "processSelection", "attachItem");
       return Backbone.on('selected', this.processSelection);
@@ -58,7 +62,7 @@
       }
     },
     attachItem: function(item) {
-      return $('body').append(item.render().$el);
+      return this.$el.append(item.render().$el);
     }
   });
 
@@ -67,11 +71,14 @@
       var c, sr;
       this.sandbox.mvc.mixin(Lodge, this.sandbox.mvc.BaseView);
       c = new Dataset(this.options.dataset);
-      return sr = new SearchResults({
+      sr = new SearchResults({
         collection: c
       });
+      return this.render(sr);
     },
-    render: function(sa) {}
+    render: function(sa) {
+      return $('body').append(sa.render().$el);
+    }
   };
 
 }).call(this);

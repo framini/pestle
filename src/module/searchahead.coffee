@@ -1,5 +1,8 @@
 Lodge = Backbone.View.extend
 
+    tagName: 'div'
+    className: 'searchahead-selectedlodges'
+
     template: JST['lodge']
 
     initialize: () ->
@@ -32,6 +35,9 @@ Dataset = Backbone.Collection.extend
 ###
 SearchResults = Backbone.View.extend
 
+    tagName: 'div'
+    className: 'searchahead-selectedlodgeslist'
+
     initialize: () ->
 
         _.bindAll @, "renderItem",
@@ -55,7 +61,7 @@ SearchResults = Backbone.View.extend
 
     attachItem: (item) ->
 
-        $('body').append(item.render().$el)
+        @$el.append(item.render().$el)
 
 
 
@@ -77,8 +83,8 @@ NGL.modules.Searchahead =
 
         sr = new SearchResults(collection : c)
 
-        # @render(sa)
+        @render(sr)
 
     render: (sa) ->
 
-        # $('body').append(sa.render().$el)
+        $('body').append(sa.render().$el)
