@@ -334,7 +334,7 @@
     },
     render: function() {
       var data, html, tpl;
-      if (this.model.get('template')) {
+      if (this.model && this.model.get('template')) {
         tpl = JST[this.model.get('template')];
       } else {
         tpl = this.template;

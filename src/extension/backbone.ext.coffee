@@ -58,7 +58,7 @@
 
             # as a rule, if the template is passed as a parameter for the module
             # this option will override the default template of the view
-            if @model.get('template')
+            if @model and @model.get('template')
                 tpl = JST[@model.get('template')]
             else
                 tpl = @template
