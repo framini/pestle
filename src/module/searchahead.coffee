@@ -68,23 +68,32 @@ Lodge = Backbone.View.extend
         @remove()
 
     getRoomTypes: () ->
-        rooms = new RoomTypesDataset()
-        rooms.on 'reset', @renderRoomTypes
+        @rooms = new RoomTypesDataset()
+        @rooms.on 'reset', @renderRoomTypes, @
 
-        rooms.fetch(
+        @rooms.fetch(
             reset: true
             data:
                 itemId: @model.get('itemId')
         )
 
     renderRoomTypes: () ->
-        console.log "ESTOS SERIAN LOS ROOMTYPES"
-
-        roomTypes = new RoomTypes(
-            collection: @
+        # generates an array of number to render a dropdown menu
+        @rooms.each( (roomType)->
+            numberOfRooms = roomType.get('numberOfRooms')
+            numberOfRoomsArray = (item: num for num in [0..numberOfRooms])
+            roomType.set('numberOfRoomsArray', numberOfRoomsArray)
         )
         
-        $('body').append(roomTypes.render().$el)
+        roomTypes = new RoomTypes(
+            collection: @rooms
+        )
+
+        @attachItem(roomTypes.render().$el)
+
+    attachItem: (item, elem = '.searchahead-roomtypes') ->
+        @$(elem).html(item)
+
 
 RoomTypes = Backbone.View.extend
 

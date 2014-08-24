@@ -69,10 +69,9 @@
       return this.remove();
     },
     getRoomTypes: function() {
-      var rooms;
-      rooms = new RoomTypesDataset();
-      rooms.on('reset', this.renderRoomTypes);
-      return rooms.fetch({
+      this.rooms = new RoomTypesDataset();
+      this.rooms.on('reset', this.renderRoomTypes, this);
+      return this.rooms.fetch({
         reset: true,
         data: {
           itemId: this.model.get('itemId')
@@ -81,11 +80,31 @@
     },
     renderRoomTypes: function() {
       var roomTypes;
-      console.log("ESTOS SERIAN LOS ROOMTYPES");
-      roomTypes = new RoomTypes({
-        collection: this
+      this.rooms.each(function(roomType) {
+        var num, numberOfRooms, numberOfRoomsArray;
+        numberOfRooms = roomType.get('numberOfRooms');
+        numberOfRoomsArray = (function() {
+          var _i, _results;
+          _results = [];
+          for (num = _i = 0; 0 <= numberOfRooms ? _i <= numberOfRooms : _i >= numberOfRooms; num = 0 <= numberOfRooms ? ++_i : --_i) {
+            _results.push({
+              item: num
+            });
+          }
+          return _results;
+        })();
+        return roomType.set('numberOfRoomsArray', numberOfRoomsArray);
       });
-      return $('body').append(roomTypes.render().$el);
+      roomTypes = new RoomTypes({
+        collection: this.rooms
+      });
+      return this.attachItem(roomTypes.render().$el);
+    },
+    attachItem: function(item, elem) {
+      if (elem == null) {
+        elem = '.searchahead-roomtypes';
+      }
+      return this.$(elem).html(item);
     }
   });
 

@@ -25,7 +25,7 @@ module.exports =
             livereload: true
 
     handlebars:
-        files: 'src/*.handlebars'
+        files: 'src/**/*.handlebars'
         tasks: [
             'handlebars:compile'
         ]
