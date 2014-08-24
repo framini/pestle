@@ -54,7 +54,6 @@ Lodge = Backbone.View.extend
     template: JST['lodge']
 
     initialize: () ->
-        debugger
         _.bindAll @, 'getRoomTypes'
 
     events: 
@@ -99,7 +98,9 @@ Lodge = Backbone.View.extend
 # of room types
 RoomTypes = Backbone.View.extend
 
-    tagName: 'ul'
+    template: JST['roomtypes']
+
+    title: "Selected Lodges"
 
     initialize: () ->
 
@@ -108,15 +109,13 @@ RoomTypes = Backbone.View.extend
         # Array to keep track of the subviews
         @subViews = []
 
-    render: () ->
+    afterRender: () ->
 
         @collection.each (roomType) =>
 
             rt = new RoomType(model: roomType)
-
             @subViews.push( rt )
-
-            @$el.append(rt.render().$el)
+            @$('.searchahead-roomtypeslist').append(rt.render().$el)
 
         @
 
@@ -125,7 +124,7 @@ RoomType = Backbone.View.extend
 
     tagName: 'li'
 
-    template: JST['roomtypes']
+    template: JST['roomtype']
 
     events: 
         'change .searchahead-roomtypes': 'updateRoomtypes'
@@ -216,6 +215,7 @@ NGL.modules.Searchahead =
         # abstract some common behavior to all views
         @sandbox.mvc.mixin(Lodge, @sandbox.mvc.BaseView)
         @sandbox.mvc.mixin(RoomType, @sandbox.mvc.BaseView)
+        @sandbox.mvc.mixin(RoomTypes, @sandbox.mvc.BaseView)
 
         # creates a backbone model based on the parameters passed to the module
         c = new Dataset @options.dataset

@@ -58,7 +58,6 @@
     className: 'searchahead-selectedlodges',
     template: JST['lodge'],
     initialize: function() {
-      debugger;
       return _.bindAll(this, 'getRoomTypes');
     },
     events: {
@@ -110,12 +109,13 @@
   });
 
   RoomTypes = Backbone.View.extend({
-    tagName: 'ul',
+    template: JST['roomtypes'],
+    title: "Selected Lodges",
     initialize: function() {
       console.log("Room types View initialized");
       return this.subViews = [];
     },
-    render: function() {
+    afterRender: function() {
       var _this = this;
       this.collection.each(function(roomType) {
         var rt;
@@ -123,7 +123,7 @@
           model: roomType
         });
         _this.subViews.push(rt);
-        return _this.$el.append(rt.render().$el);
+        return _this.$('.searchahead-roomtypeslist').append(rt.render().$el);
       });
       return this;
     }
@@ -131,7 +131,7 @@
 
   RoomType = Backbone.View.extend({
     tagName: 'li',
-    template: JST['roomtypes'],
+    template: JST['roomtype'],
     events: {
       'change .searchahead-roomtypes': 'updateRoomtypes'
     },
@@ -191,6 +191,7 @@
       var c, sr;
       this.sandbox.mvc.mixin(Lodge, this.sandbox.mvc.BaseView);
       this.sandbox.mvc.mixin(RoomType, this.sandbox.mvc.BaseView);
+      this.sandbox.mvc.mixin(RoomTypes, this.sandbox.mvc.BaseView);
       c = new Dataset(this.options.dataset);
       sr = new SearchResults({
         collection: c
