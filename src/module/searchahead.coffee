@@ -1,24 +1,6 @@
-Lodge = Backbone.View.extend
-
-    tagName: 'div'
-
-    className: 'searchahead-selectedlodges'
-
-    template: JST['lodge']
-
-    initialize: () ->
-
-    events: 
-        'click .searchahead-removeitem': 'removeItem'
-
-    removeItem: (e) ->
-        e.preventDefault()
-
-        # TODO: Replace this with PostalJS
-        Backbone.trigger('remove', @model)
-
-        @remove()
-
+###
+# Models and Collections
+###
 
 ###*
  * Model for a Lodge
@@ -34,6 +16,14 @@ LodgeDatum = Backbone.Model.extend
         "leadImage": ""
         "path": ""
 
+RoomTypeDatum = Backbone.Model.extend
+
+    defaults:
+        abstract: "",
+        leadImage: "",
+        numberOfRooms: "0",
+        title: ""
+
 ###*
  * Set of Lodges
  * @type {[type]}
@@ -43,6 +33,65 @@ Dataset = Backbone.Collection.extend
     model: LodgeDatum
 
 
+RoomTypesDataset = Backbone.Collection.extend
+
+    model: RoomTypeDatum
+
+    url: () ->
+        'http://localhost:7878' + '/rooms'
+
+###
+# Views
+###
+
+Lodge = Backbone.View.extend
+
+    tagName: 'div'
+
+    className: 'searchahead-selectedlodges'
+
+    template: JST['lodge']
+
+    initialize: () ->
+
+        _.bindAll @, 'getRoomTypes'
+
+    events: 
+        'click .searchahead-removeitem': 'removeItem'
+
+    removeItem: (e) ->
+        e.preventDefault()
+
+        # TODO: Replace this with PostalJS
+        Backbone.trigger('remove', @model)
+
+        @remove()
+
+    getRoomTypes: () ->
+        rooms = new RoomTypesDataset()
+        rooms.on 'reset', @renderRoomTypes
+
+        rooms.fetch(
+            reset: true
+            data:
+                itemId: @model.get('itemId')
+        )
+
+    renderRoomTypes: () ->
+        console.log "ESTOS SERIAN LOS ROOMTYPES"
+
+        roomTypes = new RoomTypes(
+            collection: @
+        )
+        
+        $('body').append(roomTypes.render().$el)
+
+RoomTypes = Backbone.View.extend
+
+    template: JST['roomtypes']
+
+    initialize: () ->
+        console.log "Room types View initialized"
 ###*
  * This view is gonna be listening for "select" events
  * on the searchahead module and displaying the selected result/(s)
@@ -85,8 +134,8 @@ SearchResults = Backbone.View.extend
 
         lodgeDatum = @collection.get(idLodge)
 
-        # we are gonna take advantage on Backbones functionality
-        # that prevents duplicate models on the same collection.
+        # we are gonna to take advantage on Backbone's default functionality
+        # that prevents duplicate models to be added the same collection.
         # When a new Lodge is added to the collection, the 'add'
         # event will fire and the element is gonna be rendered
         @selectedLodges.add(lodgeDatum)
@@ -94,6 +143,11 @@ SearchResults = Backbone.View.extend
     renderItem: (lodge) ->
 
         s = new Lodge( model: lodge )
+
+        s.getRoomTypes()
+
+        # we need to ask the associated room types
+
         @attachItem(s)
 
     attachItem: (item) ->
@@ -114,6 +168,7 @@ NGL.modules.Searchahead =
         # merge our view with the default "view" object that will
         # abstract some common behavior to all views
         @sandbox.mvc.mixin(Lodge, @sandbox.mvc.BaseView)
+        @sandbox.mvc.mixin(RoomTypes, @sandbox.mvc.BaseView)
 
         # creates a backbone model based on the parameters passed to the module
         c = new Dataset @options.dataset

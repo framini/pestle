@@ -1,26 +1,16 @@
+/*
+# Models and Collections
+*/
+
+
+/**
+ * Model for a Lodge
+ * @type {[type]}
+*/
+
+
 (function() {
-  var Dataset, Lodge, LodgeDatum, SearchResults;
-
-  Lodge = Backbone.View.extend({
-    tagName: 'div',
-    className: 'searchahead-selectedlodges',
-    template: JST['lodge'],
-    initialize: function() {},
-    events: {
-      'click .searchahead-removeitem': 'removeItem'
-    },
-    removeItem: function(e) {
-      e.preventDefault();
-      Backbone.trigger('remove', this.model);
-      return this.remove();
-    }
-  });
-
-  /**
-   * Model for a Lodge
-   * @type {[type]}
-  */
-
+  var Dataset, Lodge, LodgeDatum, RoomTypeDatum, RoomTypes, RoomTypesDataset, SearchResults;
 
   LodgeDatum = Backbone.Model.extend({
     idAttribute: "itemId",
@@ -32,6 +22,15 @@
     }
   });
 
+  RoomTypeDatum = Backbone.Model.extend({
+    defaults: {
+      abstract: "",
+      leadImage: "",
+      numberOfRooms: "0",
+      title: ""
+    }
+  });
+
   /**
    * Set of Lodges
    * @type {[type]}
@@ -40,6 +39,61 @@
 
   Dataset = Backbone.Collection.extend({
     model: LodgeDatum
+  });
+
+  RoomTypesDataset = Backbone.Collection.extend({
+    model: RoomTypeDatum,
+    url: function() {
+      return 'http://localhost:7878' + '/rooms';
+    }
+  });
+
+  /*
+  # Views
+  */
+
+
+  Lodge = Backbone.View.extend({
+    tagName: 'div',
+    className: 'searchahead-selectedlodges',
+    template: JST['lodge'],
+    initialize: function() {
+      return _.bindAll(this, 'getRoomTypes');
+    },
+    events: {
+      'click .searchahead-removeitem': 'removeItem'
+    },
+    removeItem: function(e) {
+      e.preventDefault();
+      Backbone.trigger('remove', this.model);
+      return this.remove();
+    },
+    getRoomTypes: function() {
+      var rooms;
+      rooms = new RoomTypesDataset();
+      rooms.on('reset', this.renderRoomTypes);
+      return rooms.fetch({
+        reset: true,
+        data: {
+          itemId: this.model.get('itemId')
+        }
+      });
+    },
+    renderRoomTypes: function() {
+      var roomTypes;
+      console.log("ESTOS SERIAN LOS ROOMTYPES");
+      roomTypes = new RoomTypes({
+        collection: this
+      });
+      return $('body').append(roomTypes.render().$el);
+    }
+  });
+
+  RoomTypes = Backbone.View.extend({
+    template: JST['roomtypes'],
+    initialize: function() {
+      return console.log("Room types View initialized");
+    }
   });
 
   /**
@@ -75,6 +129,7 @@
       s = new Lodge({
         model: lodge
       });
+      s.getRoomTypes();
       return this.attachItem(s);
     },
     attachItem: function(item) {
@@ -86,6 +141,7 @@
     initialize: function() {
       var c, sr;
       this.sandbox.mvc.mixin(Lodge, this.sandbox.mvc.BaseView);
+      this.sandbox.mvc.mixin(RoomTypes, this.sandbox.mvc.BaseView);
       c = new Dataset(this.options.dataset);
       sr = new SearchResults({
         collection: c
