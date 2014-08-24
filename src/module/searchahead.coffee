@@ -149,13 +149,19 @@ SearchResults = Backbone.View.extend
 
     className: 'searchahead-selectedlodgeslist'
 
-    initialize: () ->
+    initialize: (options) ->
 
         _.bindAll @, 'renderItem',
                      'processSelection',
                      'addItem',
                      'attachItem',
-                     'updateCollection'
+                     'updateCollection',
+                     '_isLodgeAdditionAllowed'
+
+        # if single is true, the list of selected lodges would
+        # be limited to one. If false (for custom trips) the user
+        # could generate list composed of more than 1 lodge
+        @single = options.single
 
         # TODO: Replace this with Postaljs
         Backbone.on('selected', @processSelection)
@@ -169,8 +175,17 @@ SearchResults = Backbone.View.extend
         @selectedLodges.on 'add', @renderItem
 
     processSelection: (idLodge) ->
+        if @_isLodgeAdditionAllowed()
+            @addItem(idLodge)
 
-        @addItem(idLodge)
+    # this method will serve as the limiter to set a maximun
+    # ammount of selected lodges.
+    _isLodgeAdditionAllowed: () ->
+        if @single and @selectedLodges.length == 0 or not @single
+            return true
+        else
+            return false
+
 
     updateCollection: (lodge) ->
 
@@ -220,7 +235,10 @@ NGL.modules.Searchahead =
         # creates a backbone model based on the parameters passed to the module
         c = new Dataset @options.dataset
 
-        sr = new SearchResults(collection : c)
+        sr = new SearchResults(
+            collection : c
+            single: if @options.single == "no" then false else true
+        )
 
         @render(sr)
 

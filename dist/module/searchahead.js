@@ -155,15 +155,25 @@
   SearchResults = Backbone.View.extend({
     tagName: 'div',
     className: 'searchahead-selectedlodgeslist',
-    initialize: function() {
-      _.bindAll(this, 'renderItem', 'processSelection', 'addItem', 'attachItem', 'updateCollection');
+    initialize: function(options) {
+      _.bindAll(this, 'renderItem', 'processSelection', 'addItem', 'attachItem', 'updateCollection', '_isLodgeAdditionAllowed');
+      this.single = options.single;
       Backbone.on('selected', this.processSelection);
       Backbone.on('remove', this.updateCollection);
       this.selectedLodges = new Dataset();
       return this.selectedLodges.on('add', this.renderItem);
     },
     processSelection: function(idLodge) {
-      return this.addItem(idLodge);
+      if (this._isLodgeAdditionAllowed()) {
+        return this.addItem(idLodge);
+      }
+    },
+    _isLodgeAdditionAllowed: function() {
+      if (this.single && this.selectedLodges.length === 0 || !this.single) {
+        return true;
+      } else {
+        return false;
+      }
     },
     updateCollection: function(lodge) {
       return this.selectedLodges.remove(lodge);
@@ -194,7 +204,8 @@
       this.sandbox.mvc.mixin(RoomTypes, this.sandbox.mvc.BaseView);
       c = new Dataset(this.options.dataset);
       sr = new SearchResults({
-        collection: c
+        collection: c,
+        single: this.options.single === "no" ? false : true
       });
       return this.render(sr);
     },
