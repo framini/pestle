@@ -13,6 +13,10 @@ Lodge = Backbone.View.extend
 
     removeItem: (e) ->
         e.preventDefault()
+
+        # TODO: Replace this with PostalJS
+        Backbone.trigger('remove', @model)
+
         @remove()
 
 
@@ -55,10 +59,12 @@ SearchResults = Backbone.View.extend
         _.bindAll @, 'renderItem',
                      'processSelection',
                      'addItem',
-                     'attachItem'
+                     'attachItem',
+                     'updateCollection'
 
         # TODO: Replace this with Postaljs
         Backbone.on('selected', @processSelection)
+        Backbone.on('remove', @updateCollection)
 
         # collection to keep track of selected lodges
         @selectedLodges = new Dataset()
@@ -70,6 +76,10 @@ SearchResults = Backbone.View.extend
     processSelection: (idLodge) ->
 
         @addItem(idLodge)
+
+    updateCollection: (lodge) ->
+
+        @selectedLodges.remove(lodge)
 
     addItem: (idLodge) ->
 

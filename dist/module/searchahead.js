@@ -11,6 +11,7 @@
     },
     removeItem: function(e) {
       e.preventDefault();
+      Backbone.trigger('remove', this.model);
       return this.remove();
     }
   });
@@ -52,13 +53,17 @@
     tagName: 'div',
     className: 'searchahead-selectedlodgeslist',
     initialize: function() {
-      _.bindAll(this, 'renderItem', 'processSelection', 'addItem', 'attachItem');
+      _.bindAll(this, 'renderItem', 'processSelection', 'addItem', 'attachItem', 'updateCollection');
       Backbone.on('selected', this.processSelection);
+      Backbone.on('remove', this.updateCollection);
       this.selectedLodges = new Dataset();
       return this.selectedLodges.on('add', this.renderItem);
     },
     processSelection: function(idLodge) {
       return this.addItem(idLodge);
+    },
+    updateCollection: function(lodge) {
+      return this.selectedLodges.remove(lodge);
     },
     addItem: function(idLodge) {
       var lodgeDatum;
