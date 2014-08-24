@@ -5,7 +5,14 @@
     tagName: 'div',
     className: 'searchahead-selectedlodges',
     template: JST['lodge'],
-    initialize: function() {}
+    initialize: function() {},
+    events: {
+      'click .searchahead-removeitem': 'removeItem'
+    },
+    removeItem: function(e) {
+      e.preventDefault();
+      return this.remove();
+    }
   });
 
   /**
@@ -45,21 +52,25 @@
     tagName: 'div',
     className: 'searchahead-selectedlodgeslist',
     initialize: function() {
-      _.bindAll(this, "renderItem", "processSelection", "attachItem");
-      return Backbone.on('selected', this.processSelection);
+      _.bindAll(this, 'renderItem', 'processSelection', 'addItem', 'attachItem');
+      Backbone.on('selected', this.processSelection);
+      this.selectedLodges = new Dataset();
+      return this.selectedLodges.on('add', this.renderItem);
     },
     processSelection: function(idLodge) {
-      return this.renderItem(idLodge);
+      return this.addItem(idLodge);
     },
-    renderItem: function(idLodge) {
-      var lodgeDatum, s;
+    addItem: function(idLodge) {
+      var lodgeDatum;
       lodgeDatum = this.collection.get(idLodge);
-      if (lodgeDatum) {
-        s = new Lodge({
-          model: lodgeDatum
-        });
-        return this.attachItem(s);
-      }
+      return this.selectedLodges.add(lodgeDatum);
+    },
+    renderItem: function(lodge) {
+      var s;
+      s = new Lodge({
+        model: lodge
+      });
+      return this.attachItem(s);
     },
     attachItem: function(item) {
       return this.$el.append(item.render().$el);

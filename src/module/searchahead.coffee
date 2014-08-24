@@ -1,11 +1,19 @@
 Lodge = Backbone.View.extend
 
     tagName: 'div'
+
     className: 'searchahead-selectedlodges'
 
     template: JST['lodge']
 
     initialize: () ->
+
+    events: 
+        'click .searchahead-removeitem': 'removeItem'
+
+    removeItem: (e) ->
+        e.preventDefault()
+        @remove()
 
 
 ###*
@@ -13,7 +21,9 @@ Lodge = Backbone.View.extend
  * @type {[type]}
 ###
 LodgeDatum = Backbone.Model.extend
+
     idAttribute: "itemId"
+
     defaults:
         "title": ""
         "nearby": ""
@@ -25,6 +35,7 @@ LodgeDatum = Backbone.Model.extend
  * @type {[type]}
 ###
 Dataset = Backbone.Collection.extend
+
     model: LodgeDatum
 
 
@@ -36,28 +47,44 @@ Dataset = Backbone.Collection.extend
 SearchResults = Backbone.View.extend
 
     tagName: 'div'
+
     className: 'searchahead-selectedlodgeslist'
 
     initialize: () ->
 
-        _.bindAll @, "renderItem",
-                     "processSelection",
-                     "attachItem"
+        _.bindAll @, 'renderItem',
+                     'processSelection',
+                     'addItem',
+                     'attachItem'
 
         # TODO: Replace this with Postaljs
         Backbone.on('selected', @processSelection)
 
+        # collection to keep track of selected lodges
+        @selectedLodges = new Dataset()
+
+        # we only render an item when the lodge is new to
+        # the collection
+        @selectedLodges.on 'add', @renderItem
+
     processSelection: (idLodge) ->
 
-        @renderItem(idLodge)
+        @addItem(idLodge)
 
-    renderItem: (idLodge) ->
+    addItem: (idLodge) ->
 
         lodgeDatum = @collection.get(idLodge)
 
-        if lodgeDatum
-            s = new Lodge( model: lodgeDatum )
-            @attachItem(s)
+        # we are gonna take advantage on Backbones functionality
+        # that prevents duplicate models on the same collection.
+        # When a new Lodge is added to the collection, the 'add'
+        # event will fire and the element is gonna be rendered
+        @selectedLodges.add(lodgeDatum)
+
+    renderItem: (lodge) ->
+
+        s = new Lodge( model: lodge )
+        @attachItem(s)
 
     attachItem: (item) ->
 
