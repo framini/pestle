@@ -23,6 +23,7 @@ module.exports = (grunt) ->
     grunt.registerTask 'server', (target) ->
 
         grunt.task.run [
+            'apimocker'
             'browserify'
             'compass:server'
             'handlebars:compile'

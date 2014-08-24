@@ -1,0 +1,20 @@
+{
+  "mockDirectory": "/home/likewise-open/GLOBANT/francisco.ramini/dev/projects/platform-sdk/mocks",
+  "quiet": false,
+  "port": "7878",
+  "latency": 50,
+  "allowedDomains": ["abc.com"],
+  "allowedHeaders": ["Content-Type", "my-custom-header"],
+  "webServices": {
+    "rooms": {
+      "mockFile": "rooms.json",
+      "latency": 20,
+      "verbs": ["get"]
+    },
+    "rooms/:itemId": {
+      "mockFile": "rooms.json",
+      "verbs": ["all"],
+      "switch": "itemId"
+    }
+  }
+}
