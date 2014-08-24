@@ -99,11 +99,14 @@
          * @return {[type]}
         ###
         app.sandbox.mvc.mixin = (view, mixin = BaseView) ->
-            _.extend view::, mixin
-            _.defaults view::events, mixin.events
 
             if mixin.initialize isnt `undefined`
                 oldInitialize = view::initialize
+
+            _.extend view::, mixin
+            _.defaults view::events, mixin.events
+
+            if oldInitialize
                 view::initialize = ->
                     mixin.initialize.apply this
                     oldInitialize.apply this

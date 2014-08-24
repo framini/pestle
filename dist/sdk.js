@@ -369,10 +369,12 @@
         if (mixin == null) {
           mixin = BaseView;
         }
-        _.extend(view.prototype, mixin);
-        _.defaults(view.prototype.events, mixin.events);
         if (mixin.initialize !== undefined) {
           oldInitialize = view.prototype.initialize;
+        }
+        _.extend(view.prototype, mixin);
+        _.defaults(view.prototype.events, mixin.events);
+        if (oldInitialize) {
           return view.prototype.initialize = function() {
             mixin.initialize.apply(this);
             return oldInitialize.apply(this);

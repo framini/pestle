@@ -1,16 +1,10 @@
-<ul>
-    {{#each items}}
-        <li>
-            <img src="{{leadImage}}" alt="" />
-            <h4>
-                {{title}}
-                <select>
-                    {{#each numberOfRoomsArray}}
-                    <option value="{{item}}">{{item}}</option>
-                    {{/each}}
-                </select>
-            </h4>
-            <p>{{abstract}}</p>
-        </li>
-    {{/each}}
-</ul>
+<img src="{{leadImage}}" alt="" />
+<h4>
+    {{title}}
+    <select class="searchahead-roomtypes">
+        {{#each numberOfRoomsArray}}
+        <option value="{{item}}">{{item}}</option>
+        {{/each}}
+    </select>
+</h4>
+<p>{{abstract}}</p>

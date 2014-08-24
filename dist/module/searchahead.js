@@ -10,7 +10,7 @@
 
 
 (function() {
-  var Dataset, Lodge, LodgeDatum, RoomTypeDatum, RoomTypes, RoomTypesDataset, SearchResults;
+  var Dataset, Lodge, LodgeDatum, RoomType, RoomTypeDatum, RoomTypes, RoomTypesDataset, SearchResults;
 
   LodgeDatum = Backbone.Model.extend({
     idAttribute: "itemId",
@@ -58,6 +58,7 @@
     className: 'searchahead-selectedlodges',
     template: JST['lodge'],
     initialize: function() {
+      debugger;
       return _.bindAll(this, 'getRoomTypes');
     },
     events: {
@@ -109,15 +110,44 @@
   });
 
   RoomTypes = Backbone.View.extend({
+    tagName: 'ul',
+    initialize: function() {
+      console.log("Room types View initialized");
+      return this.subViews = [];
+    },
+    render: function() {
+      var _this = this;
+      this.collection.each(function(roomType) {
+        var rt;
+        rt = new RoomType({
+          model: roomType
+        });
+        _this.subViews.push(rt);
+        return _this.$el.append(rt.render().$el);
+      });
+      return this;
+    }
+  });
+
+  RoomType = Backbone.View.extend({
+    tagName: 'li',
     template: JST['roomtypes'],
+    events: {
+      'change .searchahead-roomtypes': 'updateRoomtypes'
+    },
     initialize: function() {
       return console.log("Room types View initialized");
+    },
+    updateRoomtypes: function(e) {
+      console.log("Cambio el roomtype");
+      return console.log(e);
     }
   });
 
   /**
    * This view is gonna be listening for "select" events
    * on the searchahead module and displaying the selected result/(s)
+   * (i.e adds a new lodge to the list)
    * @type {[type]}
   */
 
@@ -160,7 +190,7 @@
     initialize: function() {
       var c, sr;
       this.sandbox.mvc.mixin(Lodge, this.sandbox.mvc.BaseView);
-      this.sandbox.mvc.mixin(RoomTypes, this.sandbox.mvc.BaseView);
+      this.sandbox.mvc.mixin(RoomType, this.sandbox.mvc.BaseView);
       c = new Dataset(this.options.dataset);
       sr = new SearchResults({
         collection: c

@@ -44,6 +44,7 @@ RoomTypesDataset = Backbone.Collection.extend
 # Views
 ###
 
+# this view is gonna be used to represent a Lodge
 Lodge = Backbone.View.extend
 
     tagName: 'div'
@@ -53,7 +54,7 @@ Lodge = Backbone.View.extend
     template: JST['lodge']
 
     initialize: () ->
-
+        debugger
         _.bindAll @, 'getRoomTypes'
 
     events: 
@@ -84,7 +85,7 @@ Lodge = Backbone.View.extend
             numberOfRoomsArray = (item: num for num in [0..numberOfRooms])
             roomType.set('numberOfRoomsArray', numberOfRoomsArray)
         )
-        
+
         roomTypes = new RoomTypes(
             collection: @rooms
         )
@@ -94,16 +95,53 @@ Lodge = Backbone.View.extend
     attachItem: (item, elem = '.searchahead-roomtypes') ->
         @$(elem).html(item)
 
-
+# this view is gonna be used to create the list
+# of room types
 RoomTypes = Backbone.View.extend
+
+    tagName: 'ul'
+
+    initialize: () ->
+
+        console.log "Room types View initialized"
+
+        # Array to keep track of the subviews
+        @subViews = []
+
+    render: () ->
+
+        @collection.each (roomType) =>
+
+            rt = new RoomType(model: roomType)
+
+            @subViews.push( rt )
+
+            @$el.append(rt.render().$el)
+
+        @
+
+# This view is gonna be created for each room type
+RoomType = Backbone.View.extend
+
+    tagName: 'li'
 
     template: JST['roomtypes']
 
+    events: 
+        'change .searchahead-roomtypes': 'updateRoomtypes'
+
     initialize: () ->
         console.log "Room types View initialized"
+
+    updateRoomtypes: (e) ->
+        console.log "Cambio el roomtype"
+        console.log e
+
+
 ###*
  * This view is gonna be listening for "select" events
  * on the searchahead module and displaying the selected result/(s)
+ * (i.e adds a new lodge to the list)
  * @type {[type]}
 ###
 SearchResults = Backbone.View.extend
@@ -177,7 +215,7 @@ NGL.modules.Searchahead =
         # merge our view with the default "view" object that will
         # abstract some common behavior to all views
         @sandbox.mvc.mixin(Lodge, @sandbox.mvc.BaseView)
-        @sandbox.mvc.mixin(RoomTypes, @sandbox.mvc.BaseView)
+        @sandbox.mvc.mixin(RoomType, @sandbox.mvc.BaseView)
 
         # creates a backbone model based on the parameters passed to the module
         c = new Dataset @options.dataset
