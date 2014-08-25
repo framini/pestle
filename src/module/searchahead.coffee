@@ -63,7 +63,7 @@ Lodge = Backbone.View.extend
         e.preventDefault()
 
         # TODO: Replace this with PostalJS
-        Backbone.trigger('remove', @model)
+        Backbone.trigger('searchahead:remove', @model)
 
         @remove()
 
@@ -168,8 +168,8 @@ SearchResults = Backbone.View.extend
         @views = []
 
         # TODO: Replace this with Postaljs
-        Backbone.on('selected', @processSelection)
-        Backbone.on('remove', @updateCollection)
+        Backbone.on('searchahead:selected', @processSelection)
+        Backbone.on('searchahead:remove', @updateCollection)
 
         # collection to keep track of selected lodges
         @selectedLodges = new Dataset()

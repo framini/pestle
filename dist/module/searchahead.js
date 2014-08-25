@@ -65,7 +65,7 @@
     },
     removeItem: function(e) {
       e.preventDefault();
-      Backbone.trigger('remove', this.model);
+      Backbone.trigger('searchahead:remove', this.model);
       return this.remove();
     },
     getRoomTypes: function() {
@@ -159,8 +159,8 @@
       _.bindAll(this, 'renderItem', 'processSelection', 'addItem', 'attachItem', 'updateCollection', '_isLodgeAdditionAllowed', 'removeViews');
       this.single = options.single;
       this.views = [];
-      Backbone.on('selected', this.processSelection);
-      Backbone.on('remove', this.updateCollection);
+      Backbone.on('searchahead:selected', this.processSelection);
+      Backbone.on('searchahead:remove', this.updateCollection);
       this.selectedLodges = new Dataset();
       return this.selectedLodges.on('add', this.renderItem);
     },
