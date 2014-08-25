@@ -57,7 +57,7 @@
     tagName: 'div',
     className: 'searchahead-selectedlodges',
     template: JST['lodge'],
-    initialize: function() {
+    initialize: function(options) {
       return _.bindAll(this, 'getRoomTypes');
     },
     events: {
@@ -110,7 +110,7 @@
 
   RoomTypes = Backbone.View.extend({
     template: JST['roomtypes'],
-    title: "Selected Lodges",
+    title: "Select Rooms",
     initialize: function() {
       console.log("Room types View initialized");
       return this.subViews = [];
@@ -156,20 +156,23 @@
     tagName: 'div',
     className: 'searchahead-selectedlodgeslist',
     initialize: function(options) {
-      _.bindAll(this, 'renderItem', 'processSelection', 'addItem', 'attachItem', 'updateCollection', '_isLodgeAdditionAllowed');
+      _.bindAll(this, 'renderItem', 'processSelection', 'addItem', 'attachItem', 'updateCollection', '_isLodgeAdditionAllowed', 'removeViews');
       this.single = options.single;
+      this.views = [];
       Backbone.on('selected', this.processSelection);
       Backbone.on('remove', this.updateCollection);
       this.selectedLodges = new Dataset();
       return this.selectedLodges.on('add', this.renderItem);
     },
     processSelection: function(idLodge) {
-      if (this._isLodgeAdditionAllowed()) {
+      if (this._isLodgeAdditionAllowed(idLodge)) {
         return this.addItem(idLodge);
       }
     },
-    _isLodgeAdditionAllowed: function() {
+    _isLodgeAdditionAllowed: function(idLodge) {
       if (this.single && this.selectedLodges.length === 0 || !this.single) {
+        return true;
+      } else if (this.single && !this.selectedLodges.get(idLodge)) {
         return true;
       } else {
         return false;
@@ -181,6 +184,8 @@
     addItem: function(idLodge) {
       var lodgeDatum;
       lodgeDatum = this.collection.get(idLodge);
+      lodgeDatum.set('single', this.single);
+      lodgeDatum.set('closebutton', !this.single);
       return this.selectedLodges.add(lodgeDatum);
     },
     renderItem: function(lodge) {
@@ -188,11 +193,25 @@
       s = new Lodge({
         model: lodge
       });
-      s.getRoomTypes();
+      this.views.push(s);
+      if (this.single) {
+        s.getRoomTypes();
+      }
       return this.attachItem(s);
     },
+    removeViews: function() {
+      var _this = this;
+      return _.each(this.views, function(view) {
+        return view.remove();
+      });
+    },
     attachItem: function(item) {
-      return this.$el.append(item.render().$el);
+      if (this.single) {
+        this.removeViews();
+        return this.$el.html(item.render().$el);
+      } else {
+        return this.$el.append(item.render().$el);
+      }
     }
   });
 

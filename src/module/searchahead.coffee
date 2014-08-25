@@ -53,7 +53,7 @@ Lodge = Backbone.View.extend
 
     template: JST['lodge']
 
-    initialize: () ->
+    initialize: (options) ->
         _.bindAll @, 'getRoomTypes'
 
     events: 
@@ -100,7 +100,7 @@ RoomTypes = Backbone.View.extend
 
     template: JST['roomtypes']
 
-    title: "Selected Lodges"
+    title: "Select Rooms"
 
     initialize: () ->
 
@@ -156,12 +156,16 @@ SearchResults = Backbone.View.extend
                      'addItem',
                      'attachItem',
                      'updateCollection',
-                     '_isLodgeAdditionAllowed'
+                     '_isLodgeAdditionAllowed',
+                     'removeViews'
 
         # if single is true, the list of selected lodges would
         # be limited to one. If false (for custom trips) the user
         # could generate list composed of more than 1 lodge
         @single = options.single
+
+        # array to hold references to child views
+        @views = []
 
         # TODO: Replace this with Postaljs
         Backbone.on('selected', @processSelection)
@@ -175,13 +179,16 @@ SearchResults = Backbone.View.extend
         @selectedLodges.on 'add', @renderItem
 
     processSelection: (idLodge) ->
-        if @_isLodgeAdditionAllowed()
+        if @_isLodgeAdditionAllowed(idLodge)
             @addItem(idLodge)
 
     # this method will serve as the limiter to set a maximun
     # ammount of selected lodges.
-    _isLodgeAdditionAllowed: () ->
+    _isLodgeAdditionAllowed: (idLodge) ->
+
         if @single and @selectedLodges.length == 0 or not @single
+            return true
+        else if @single and not @selectedLodges.get(idLodge)
             return true
         else
             return false
@@ -195,6 +202,11 @@ SearchResults = Backbone.View.extend
 
         lodgeDatum = @collection.get(idLodge)
 
+        # add a couple of properties to the model so we can have control
+        # on what to display inside the template
+        lodgeDatum.set('single', @single)
+        lodgeDatum.set('closebutton', not @single)
+
         # we are gonna to take advantage on Backbone's default functionality
         # that prevents duplicate models to be added the same collection.
         # When a new Lodge is added to the collection, the 'add'
@@ -205,15 +217,30 @@ SearchResults = Backbone.View.extend
 
         s = new Lodge( model: lodge )
 
-        s.getRoomTypes()
+        # save a reference to the view
+        @views.push(s)
+
+        # we are only going to display the associated room types if 
+        # the list is limited to just one lodge
+        s.getRoomTypes() if @single
 
         # we need to ask the associated room types
 
         @attachItem(s)
 
-    attachItem: (item) ->
+    removeViews: () ->
+        _.each @views, (view) =>
+            view.remove()
 
-        @$el.append(item.render().$el)
+
+    attachItem: (item) ->
+        if @single
+            # Delete previous generated views
+            @removeViews()
+
+            @$el.html(item.render().$el)
+        else
+            @$el.append(item.render().$el)
 
 
 
