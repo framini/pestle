@@ -23,7 +23,7 @@ module.exports = (grunt) ->
     grunt.registerTask 'server', (target) ->
 
         grunt.task.run [
-            'browserify'
+            'browserify:dev'
             'compass:server'
             'handlebars:compile'
             'connect:livereload'
