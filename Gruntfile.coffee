@@ -24,6 +24,7 @@ module.exports = (grunt) ->
 
         grunt.task.run [
             'browserify:dev'
+            'apimocker'
             'compass:server'
             'handlebars:compile'
             'connect:livereload'

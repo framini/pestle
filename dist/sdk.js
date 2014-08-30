@@ -310,7 +310,15 @@
   };
   BaseView = {
     initialize: function() {
-      return Base.log.info("initialize del BaseView");
+      Base.log.info("initialize del BaseView");
+      _.bindAll(this, 'render', 'renderWrapper');
+      if (Base.util._.isFunction(this.beforeRender)) {
+        _.bindAll(this, 'beforeRender');
+      }
+      if (Base.util._.isFunction(this.afterRender)) {
+        _.bindAll(this, 'afterRender');
+      }
+      return this.render = Base.util._.wrap(this.render, this.renderWrapper);
     },
     serializeData: function() {
       var data;
@@ -322,6 +330,9 @@
           items: this.collection.toJSON()
         };
       }
+      if (this.title) {
+        data.title = this.title;
+      }
       return data;
     },
     destroy: function() {
@@ -332,9 +343,21 @@
       this.remove();
       return Backbone.View.prototype.remove.call(this);
     },
+    renderWrapper: function(originalRender) {
+      if (Base.util._.isFunction(this.beforeRender)) {
+        this.beforeRender();
+      }
+      if (Base.util._.isFunction(originalRender)) {
+        originalRender();
+      }
+      if (Base.util._.isFunction(this.afterRender)) {
+        this.afterRender();
+      }
+      return this;
+    },
     render: function() {
       var data, html, tpl;
-      if (this.model.get('template')) {
+      if (this.model && this.model.get('template')) {
         tpl = JST[this.model.get('template')];
       } else {
         tpl = this.template;
@@ -345,7 +368,7 @@
       return this;
     },
     attachElContent: function(html) {
-      this.$el.html(html);
+      this.$el.append(html);
       return this;
     }
   };
@@ -369,10 +392,12 @@
         if (mixin == null) {
           mixin = BaseView;
         }
-        _.extend(view.prototype, mixin);
-        _.defaults(view.prototype.events, mixin.events);
         if (mixin.initialize !== undefined) {
           oldInitialize = view.prototype.initialize;
+        }
+        _.extend(view.prototype, mixin);
+        _.defaults(view.prototype.events, mixin.events);
+        if (oldInitialize) {
           return view.prototype.initialize = function() {
             mixin.initialize.apply(this);
             return oldInitialize.apply(this);

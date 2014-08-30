@@ -29,6 +29,17 @@
         initialize: () ->
             Base.log.info "initialize del BaseView"
 
+            _.bindAll @, 'render',
+                         'renderWrapper'
+
+            if Base.util._.isFunction @beforeRender
+                _.bindAll @, 'beforeRender'
+
+            if Base.util._.isFunction @afterRender
+                _.bindAll @, 'afterRender'
+
+            @render = Base.util._.wrap @render, @renderWrapper
+
         # Method to ensure that the data is always passed to the template in the same way
         serializeData : () ->
 
@@ -40,6 +51,11 @@
                 # this way we normalize the property we'll use to iterate
                 # the collection inside the hbs 
                 data = items : @collection.toJSON()
+
+            # this will be helpfull in views which renders collections
+            # and needs to display a customizable title on top
+            if @title
+                data.title = @title
             
             return data
 
@@ -54,11 +70,21 @@
             @remove()
             Backbone.View::remove.call(this)
 
+        # Wrapper to add "beforeRender" and "afterRender" methods.
+        renderWrapper: (originalRender) ->
+            @beforeRender() if Base.util._.isFunction @beforeRender
+
+            originalRender() if Base.util._.isFunction originalRender
+
+            @afterRender() if Base.util._.isFunction @afterRender
+
+            @
+
         render: () ->
 
             # as a rule, if the template is passed as a parameter for the module
             # this option will override the default template of the view
-            if @model.get('template')
+            if @model and @model.get('template')
                 tpl = JST[@model.get('template')]
             else
                 tpl = @template
@@ -73,7 +99,7 @@
 
         attachElContent: (html) ->
 
-            @$el.html(html)
+            @$el.append(html)
   
             @
 
@@ -99,11 +125,14 @@
          * @return {[type]}
         ###
         app.sandbox.mvc.mixin = (view, mixin = BaseView) ->
-            _.extend view::, mixin
-            _.defaults view::events, mixin.events
 
             if mixin.initialize isnt `undefined`
                 oldInitialize = view::initialize
+
+            _.extend view::, mixin
+            _.defaults view::events, mixin.events
+
+            if oldInitialize
                 view::initialize = ->
                     mixin.initialize.apply this
                     oldInitialize.apply this
