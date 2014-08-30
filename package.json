@@ -23,15 +23,10 @@
     "grunt-contrib-jst": "~0.5.0",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-open": "~0.2.2",
-    "grunt-urequire": "^0.6.0",
-    "handlebars": "~1.0.12",
     "load-grunt-config": "^0.10.0",
     "loglevel": "^1.0.0",
     "matchdep": "~0.3.0",
-    "minimatch": "~0.2.14",
-    "postal": "^0.10.3",
-    "underscore": "^1.6.0",
-    "urequire": "^0.6.18"
+    "minimatch": "~0.2.14"
   },
   "engines": {
     "node": ">=0.8.0"

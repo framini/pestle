@@ -18,7 +18,7 @@
         version: "0.0.1"
 
         cfg:
-            debug: 
+            debug:
                 logLevel: 5 # by default the logging is disabled
                             # values can go from 0 to 5 (5 means disabled)
 
@@ -33,7 +33,7 @@
             # and make its functionality available to the stack
             @extManager = new ExtManager()
 
-            # through this object the modules will be accesing the method defined by the 
+            # through this object the modules will be accesing the method defined by the
             # extensions
             @sandbox = Object.create(Base)
 
@@ -45,7 +45,7 @@
         addExtension: (ext) ->
             @extManager.add(ext)
 
-        start: () ->
+        start: (options) ->
             Base.log.info("Start de Core")
 
             # Require core extensions
@@ -59,10 +59,10 @@
             # Init all the extensions
             @extManager.init(@)
 
-            # Once the extensions have been initialized, lets call the afterAppStarted 
+            # Once the extensions have been initialized, lets call the afterAppStarted
             # from each extension
             # Note: This method will let each extension to automatically execute some code
-            #       once the app has started. 
+            #       once the app has started.
             Base.util.each @extManager.getInitializedExtensions(), (i, ext) =>
                 # Since this method is not required lets check if it's defined
                 if ext && typeof ext.afterAppStarted == 'function'

@@ -1,5 +1,5 @@
 c = new NGL.Core(
-    debug: 
+    debug:
         logLevel: 0
 )
 
@@ -9,4 +9,3 @@ c = new NGL.Core(
 # c.addExtension(bbExt)
 
 c.start()
-

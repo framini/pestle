@@ -5,7 +5,8 @@ module.exports =
         ]
         tasks: [
             'coffee:compile',
-            'browserify'
+            'browserify',
+            'coffeelint'
         ]
         options:
             livereload: true

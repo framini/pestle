@@ -104,7 +104,7 @@
           if (mixin == null) {
             mixin = BaseView;
           }
-          if (mixin.initialize !== undefined) {
+          if (mixin.initialize !== 'undefined') {
             oldInitialize = view.prototype.initialize;
           }
           _.extend(view.prototype, mixin);

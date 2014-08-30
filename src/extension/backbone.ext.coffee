@@ -49,7 +49,7 @@
                 data = @model.toJSON()
             else if @collection
                 # this way we normalize the property we'll use to iterate
-                # the collection inside the hbs 
+                # the collection inside the hbs
                 data = items : @collection.toJSON()
 
             # this will be helpfull in views which renders collections
@@ -105,7 +105,7 @@
 
 
 
-    # returns an object with the initialize method that will be used to 
+    # returns an object with the initialize method that will be used to
     # init the extension
     initialize : (app) ->
 
@@ -126,7 +126,7 @@
         ###
         app.sandbox.mvc.mixin = (view, mixin = BaseView) ->
 
-            if mixin.initialize isnt `undefined`
+            if mixin.initialize isnt 'undefined'
                 oldInitialize = view::initialize
 
             _.extend view::, mixin

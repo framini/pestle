@@ -39,7 +39,7 @@
             $(selector).find(cssSelector.join(',')).each (i, comp) ->
 
                 # options will hold all the data-* related to the component
-                options = Component.parseComponentOptions(@, "lodges");
+                options = Component.parseComponentOptions(@, "lodges")
 
                 list.push({ name: options.name, options: options })
 
@@ -61,7 +61,7 @@
                 k = k.replace(new RegExp("^" + namespace), "")
 
                 # decamelize the option name
-                k = k.charAt(0).toLowerCase() + k.slice(1);
+                k = k.charAt(0).toLowerCase() + k.slice(1)
 
                 # if the key is different from "component" it means it is
                 # an option value
@@ -84,7 +84,7 @@
             # TODO: access this utils function through Base
             _.each(components, (m, i) ->
                 # Check if the modules are defined using the modules namespace
-                # TODO: Provide an alternate way to define which is gonna be 
+                # TODO: Provide an alternate way to define which is gonna be
                 # this global object that is gonna hold the module definition
                 if not _.isEmpty(NGL.modules) and NGL.modules[m.name] and m.options
                     mod = NGL.modules[m.name]

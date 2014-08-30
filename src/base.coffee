@@ -15,7 +15,7 @@
     # Utils
     # Libraris like underscore, backbone, will be loaded by the project
     # as hard dependencies for this layer
-    Base.util = 
+    Base.util =
         each: $.each,
         extend: $.extend,
         uniq: root._.uniq,

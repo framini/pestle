@@ -56,7 +56,7 @@ Lodge = Backbone.View.extend
     initialize: (options) ->
         _.bindAll @, 'getRoomTypes'
 
-    events: 
+    events:
         'click .searchahead-removeitem': 'removeItem'
 
     removeItem: (e) ->
@@ -79,7 +79,7 @@ Lodge = Backbone.View.extend
 
     renderRoomTypes: () ->
         # generates an array of number to render a dropdown menu
-        @rooms.each( (roomType)->
+        @rooms.each( (roomType) ->
             numberOfRooms = roomType.get('numberOfRooms')
             numberOfRoomsArray = (item: num for num in [0..numberOfRooms])
             roomType.set('numberOfRoomsArray', numberOfRoomsArray)
@@ -126,7 +126,7 @@ RoomType = Backbone.View.extend
 
     template: JST['roomtype']
 
-    events: 
+    events:
         'change .searchahead-roomtypes': 'updateRoomtypes'
 
     initialize: () ->
@@ -220,7 +220,7 @@ SearchResults = Backbone.View.extend
         # save a reference to the view
         @views.push(s)
 
-        # we are only going to display the associated room types if 
+        # we are only going to display the associated room types if
         # the list is limited to just one lodge
         s.getRoomTypes() if @single
 

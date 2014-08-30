@@ -31,7 +31,7 @@
         return this.extManager.add(ext);
       };
 
-      Core.prototype.start = function() {
+      Core.prototype.start = function(options) {
         var BackboneExt, Components,
           _this = this;
         Base.log.info("Start de Core");

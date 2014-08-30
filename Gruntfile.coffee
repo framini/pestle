@@ -27,6 +27,7 @@ module.exports = (grunt) ->
             'apimocker'
             'compass:server'
             'handlebars:compile'
+            'coffeelint'
             'connect:livereload'
             'watch'
         ]
