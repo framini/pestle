@@ -215,26 +215,27 @@ ExtManager = require('../../src/extmanager.coffee');
 Core = require('../../src/core.coffee');
 
 describe('Core', function() {
-  beforeEach(function() {
-    this.core = new NGL.Core();
-    this.ext = {
-      initialize: sinon.spy(function(app) {
-        return app.sandbox.bar = 'foo';
-      }),
-      afterAppStarted: sinon.spy()
-    };
-    this.core.addExtension(this.ext);
-    return this.core.start();
+  var core, ext;
+  core = new NGL.Core();
+  ext = {
+    initialize: sinon.spy(function(app) {
+      return app.sandbox.bar = 'foo';
+    }),
+    afterAppStarted: sinon.spy()
+  };
+  core.addExtension(ext);
+  core.start();
+  it('should have a start Method', function() {
+    return core.start.should.be.a('function');
   });
-  it('should have a public API', function() {
-    this.core.start.should.be.a('function');
-    return this.core.addExtension.should.be.a('function');
+  it('should have a addExtension Method', function() {
+    return core.addExtension.should.be.a('function');
   });
   it('should throw an error if an extensions is added after the Core has been started', function() {
     var state;
     state = (function(_this) {
       return function() {
-        return _this.core.addExtension({
+        return core.addExtension({
           initialize: function() {}
         });
       };
@@ -243,16 +244,16 @@ describe('Core', function() {
   });
   describe('Extension Manager', function() {
     it('should have an instance of the extension manager', function() {
-      return this.core.extManager.should.be.an.instanceOf(ExtManager);
+      return core.extManager.should.be.an.instanceOf(ExtManager);
     });
     it('should call the initialize method for each extension', function() {
-      return this.ext.initialize.should.have.been.called;
+      return ext.initialize.should.have.been.called;
     });
     it('should pass the core as an argument to the initialize method for extensions', function() {
-      return this.ext.initialize.should.have.been.calledWith(this.core);
+      return ext.initialize.should.have.been.calledWith(core);
     });
     return it('should call the after afterAppStarted on each extension', function() {
-      return this.ext.afterAppStarted.should.have.been.called;
+      return ext.afterAppStarted.should.have.been.called;
     });
   });
   return describe('Base libraries', function() {
@@ -265,7 +266,7 @@ describe('Core', function() {
       });
       it('should available within sandboxes', function() {
         var sb;
-        sb = this.core.createSandbox('test');
+        sb = core.createSandbox('test');
         return sb.log.should.be.defined;
       });
       it('should provide a function to log trace messages', function() {
@@ -289,7 +290,77 @@ describe('Core', function() {
 
 
 
-},{"../../src/base.coffee":3,"../../src/core.coffee":4,"../../src/extmanager.coffee":7}],3:[function(require,module,exports){
+},{"../../src/base.coffee":4,"../../src/core.coffee":5,"../../src/extmanager.coffee":8}],3:[function(require,module,exports){
+var ExtManager;
+
+ExtManager = require('../../src/extmanager.coffee');
+
+describe('ExtManager', function() {
+  var extManager;
+  extManager = new ExtManager();
+  it('should be a constructor', function() {
+    return ExtManager.should.be.a('function');
+  });
+  it('should have an Add method', function() {
+    return extManager.add.should.be.a('function');
+  });
+  it('should have an Init method', function() {
+    return extManager.init.should.be.a('function');
+  });
+  it('should have a getInitializedExtensions method', function() {
+    return extManager.getInitializedExtensions.should.be.a('function');
+  });
+  return describe('adding extensions', function() {
+    it('should be possible to add new extensions', function() {
+      var context, ext1, ext2;
+      ext1 = {
+        initialize: sinon.spy(function(app) {
+          return app.sandbox.foo = 'bar';
+        }),
+        afterAppStarted: sinon.spy()
+      };
+      ext2 = {
+        initialize: sinon.spy(function(app) {
+          return app.sandbox.bar = 'foo';
+        }),
+        afterAppStarted: sinon.spy()
+      };
+      context = {
+        sandbox: {}
+      };
+      extManager.add(ext1);
+      extManager.add(ext2);
+      extManager.init(context);
+      ext1.initialize.should.have.been.calledWith(context);
+      return ext1.initialize.should.have.been.calledWith(context);
+    });
+    it('should not be possible to add the same extension twice', function() {
+      var ext1, state;
+      ext1 = {
+        initialize: sinon.spy(function(app) {
+          return app.sandbox.foo = 'bar';
+        }),
+        afterAppStarted: sinon.spy()
+      };
+      extManager.add(ext1);
+      state = (function(_this) {
+        return function() {
+          return extManager.add(ext1);
+        };
+      })(this);
+      return state.should["throw"](Error);
+    });
+    return it('should be possible to retrieve added extensions', function() {
+      var extensions;
+      extensions = extManager.getInitializedExtensions();
+      return extensions.should.be.an('array');
+    });
+  });
+});
+
+
+
+},{"../../src/extmanager.coffee":8}],4:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Base) {
@@ -305,7 +376,7 @@ describe('Core', function() {
 
 
 
-},{"loglevel":1}],4:[function(require,module,exports){
+},{"loglevel":1}],5:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = root.NGL = factory(root, {});
 })(window, function(root, NGL) {
@@ -374,7 +445,7 @@ describe('Core', function() {
 
 
 
-},{"./base.coffee":3,"./extension/backbone.ext.coffee":5,"./extension/components.coffee":6,"./extmanager.coffee":7}],5:[function(require,module,exports){
+},{"./base.coffee":4,"./extension/backbone.ext.coffee":6,"./extension/components.coffee":7,"./extmanager.coffee":8}],6:[function(require,module,exports){
 
 /**
  * This extension should probably be defined at a project level, not here
@@ -491,13 +562,14 @@ describe('Core', function() {
           };
         }
       };
-    }
+    },
+    name: 'Backbone Extension'
   };
 });
 
 
 
-},{"./../base.coffee":3}],6:[function(require,module,exports){
+},{"./../base.coffee":4}],7:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Ext) {
@@ -592,13 +664,14 @@ describe('Core', function() {
     afterAppStarted: function(app) {
       Base.log.info("Llamando al afterAppStarted");
       return app.sandbox.startComponents(null, app);
-    }
+    },
+    name: 'Component Extension'
   };
 });
 
 
 
-},{"./../base.coffee":3}],7:[function(require,module,exports){
+},{"./../base.coffee":4}],8:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, NGL) {
@@ -612,8 +685,13 @@ describe('Core', function() {
     function ExtManager() {}
 
     ExtManager.prototype.add = function(ext) {
+      var msg;
+      if (!ext.name) {
+        msg = "The extension doesn't have a name associated. It will be hepfull " + "if you have assing all of your extensions a name for better debugging";
+        Base.log.warn(msg);
+      }
       if (_.include(this._extensions, ext)) {
-        throw new Error("Extension: " + ext + " already exists.");
+        throw new Error("Extension: " + ext.name + " already exists.");
       }
       return this._extensions.push(ext);
     };
@@ -645,4 +723,4 @@ describe('Core', function() {
 
 
 
-},{"./base.coffee":3}]},{},[2]);
+},{"./base.coffee":4}]},{},[2,3]);

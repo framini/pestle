@@ -4,42 +4,44 @@ Core = require '../../src/core.coffee'
 
 describe 'Core', ->
    
-    beforeEach ->
-        @core = new NGL.Core()
+    core = new NGL.Core()
 
-        @ext =
-            initialize: sinon.spy (app) ->
-                
-                app.sandbox.bar = 'foo'
+    ext =
+        initialize: sinon.spy (app) ->
+            
+            app.sandbox.bar = 'foo'
 
-            afterAppStarted: sinon.spy()
+        afterAppStarted: sinon.spy()
 
-        @core.addExtension(@ext)
+    core.addExtension(ext)
 
-        @core.start()
+    core.start()
 
-    it 'should have a public API', ->
-        @core.start.should.be.a 'function'
-        @core.addExtension.should.be.a 'function'
+
+    it 'should have a start Method', ->
+        core.start.should.be.a 'function'
+
+    it 'should have a addExtension Method', ->
+        core.addExtension.should.be.a 'function'
 
     it 'should throw an error if an extensions is added after the Core has been started', ->
-        state = () => @core.addExtension( initialize: () -> )
+        state = () => core.addExtension( initialize: () -> )
         state.should.throw(Error)
 
     describe 'Extension Manager', ->
 
         it 'should have an instance of the extension manager', ->
-            @core.extManager.should.be.an.instanceOf(ExtManager)
+            core.extManager.should.be.an.instanceOf(ExtManager)
 
         it 'should call the initialize method for each extension', ->
-            @ext.initialize.should.have.been.called
+            ext.initialize.should.have.been.called
 
         it 'should pass the core as an argument to the initialize method for extensions', ->
-            @ext.initialize.should.have.been.calledWith(@core)
+            ext.initialize.should.have.been.calledWith(core)
 
 
         it 'should call the after afterAppStarted on each extension', ->
-            @ext.afterAppStarted.should.have.been.called
+            ext.afterAppStarted.should.have.been.called
 
 
     describe 'Base libraries', ->
@@ -53,7 +55,7 @@ describe 'Core', ->
                 Base.log.setLevel.should.be.a('function')
 
             it 'should available within sandboxes', ->
-                sb = @core.createSandbox('test')
+                sb = core.createSandbox('test')
                 sb.log.should.be.defined
 
             it 'should provide a function to log trace messages', ->

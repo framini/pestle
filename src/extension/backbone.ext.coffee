@@ -136,4 +136,6 @@
                 view::initialize = ->
                     mixin.initialize.apply this
                     oldInitialize.apply this
+
+    name: 'Backbone Extension'
 )

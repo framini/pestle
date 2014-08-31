@@ -12,8 +12,13 @@
       function ExtManager() {}
 
       ExtManager.prototype.add = function(ext) {
+        var msg;
+        if (!ext.name) {
+          msg = "The extension doesn't have a name associated. It will be hepfull " + "if you have assing all of your extensions a name for better debugging";
+          Base.log.warn(msg);
+        }
         if (_.include(this._extensions, ext)) {
-          throw new Error("Extension: " + ext + " already exists.");
+          throw new Error("Extension: " + ext.name + " already exists.");
         }
         return this._extensions.push(ext);
       };

@@ -93,7 +93,8 @@
       afterAppStarted: function(app) {
         Base.log.info("Llamando al afterAppStarted");
         return app.sandbox.startComponents(null, app);
-      }
+      },
+      name: 'Component Extension'
     };
   });
 

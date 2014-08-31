@@ -120,4 +120,6 @@
         Base.log.info "Llamando al afterAppStarted"
 
         app.sandbox.startComponents(null, app)
+
+    name: 'Component Extension'
 )

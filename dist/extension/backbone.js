@@ -116,7 +116,8 @@
             };
           }
         };
-      }
+      },
+      name: 'Backbone Extension'
     };
   });
 
