@@ -26,6 +26,10 @@
 
             @config = Base.util._.defaults config, @cfg
 
+            # this will track the state of the Core. When it is
+            # true, it means the "start()" has been called
+            @started = false
+
             # Set the logging level for the app
             Base.log.setLevel(@config.debug.logLevel)
 
@@ -43,10 +47,19 @@
 
 
         addExtension: (ext) ->
-            @extManager.add(ext)
+            # we'll only allow to add new extensions before
+            # the Core get started
+            unless @started
+                @extManager.add(ext)
+            else
+                Base.log.error("The Core has already been started. You could not add new extensions at this point.")
+                throw new Error('You could not add extensions when the Core has already been started.')
 
         start: (options) ->
+
             Base.log.info("Start de Core")
+
+            @started = true
 
             # Require core extensions
             Components = require('./extension/components.coffee')

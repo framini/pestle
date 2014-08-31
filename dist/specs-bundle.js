@@ -206,28 +206,90 @@
 }));
 
 },{}],2:[function(require,module,exports){
-var Base;
+var Base, Core, ExtManager;
 
 Base = require('../../src/base.coffee');
 
-describe('Base', function() {
+ExtManager = require('../../src/extmanager.coffee');
+
+Core = require('../../src/core.coffee');
+
+describe('Core', function() {
   beforeEach(function() {
-    return this.pepe = fixture.load('test.html');
+    this.core = new NGL.Core();
+    this.ext = {
+      initialize: sinon.spy(function(app) {
+        return app.sandbox.bar = 'foo';
+      }),
+      afterAppStarted: sinon.spy()
+    };
+    this.core.addExtension(this.ext);
+    return this.core.start();
   });
-  afterEach(function() {
-    return fixture.cleanup();
+  it('should have a public API', function() {
+    this.core.start.should.be.a('function');
+    return this.core.addExtension.should.be.a('function');
   });
-  it('plays with the html fixture', function() {
-    return expect(fixture.el.firstChild).to.equal(this.pepe[0]);
+  it('should throw an error if an extensions is added after the Core has been started', function() {
+    var state;
+    state = (function(_this) {
+      return function() {
+        return _this.core.addExtension({
+          initialize: function() {}
+        });
+      };
+    })(this);
+    return state.should["throw"](Error);
   });
-  return it('should provide', function() {
-    return expect(Base).to.have.property('log');
+  describe('Extension Manager', function() {
+    it('should have an instance of the extension manager', function() {
+      return this.core.extManager.should.be.an.instanceOf(ExtManager);
+    });
+    it('should call the initialize method for each extension', function() {
+      return this.ext.initialize.should.have.been.called;
+    });
+    it('should pass the core as an argument to the initialize method for extensions', function() {
+      return this.ext.initialize.should.have.been.calledWith(this.core);
+    });
+    return it('should call the after afterAppStarted on each extension', function() {
+      return this.ext.afterAppStarted.should.have.been.called;
+    });
+  });
+  return describe('Base libraries', function() {
+    return describe('Logger', function() {
+      it('should have a Logger available', function() {
+        return Base.should.have.property('log');
+      });
+      it('should provide a way to set logging levels', function() {
+        return Base.log.setLevel.should.be.a('function');
+      });
+      it('should available within sandboxes', function() {
+        var sb;
+        sb = this.core.createSandbox('test');
+        return sb.log.should.be.defined;
+      });
+      it('should provide a function to log trace messages', function() {
+        return Base.log.trace.should.be.a('function');
+      });
+      it('should provide a function to log debug messages', function() {
+        return Base.log.debug.should.be.a('function');
+      });
+      it('should provide a function to log info messages', function() {
+        return Base.log.info.should.be.a('function');
+      });
+      it('should provide a function to log warning messages', function() {
+        return Base.log.warn.should.be.a('function');
+      });
+      return it('should provide a function to log error messages', function() {
+        return Base.log.error.should.be.a('function');
+      });
+    });
   });
 });
 
 
 
-},{"../../src/base.coffee":3}],3:[function(require,module,exports){
+},{"../../src/base.coffee":3,"../../src/core.coffee":4,"../../src/extmanager.coffee":7}],3:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Base) {
@@ -243,4 +305,344 @@ describe('Base', function() {
 
 
 
-},{"loglevel":1}]},{},[2]);
+},{"loglevel":1}],4:[function(require,module,exports){
+(function(root, factory) {
+  return module.exports = root.NGL = factory(root, {});
+})(window, function(root, NGL) {
+  var Base, ExtManager;
+  Base = require('./base.coffee');
+  ExtManager = require('./extmanager.coffee');
+  _.extend(NGL, Backbone.Events);
+  NGL.modules = {};
+  NGL.Core = (function() {
+    Core.prototype.version = "0.0.1";
+
+    Core.prototype.cfg = {
+      debug: {
+        logLevel: 5
+      }
+    };
+
+    function Core(config) {
+      if (config == null) {
+        config = {};
+      }
+      this.config = Base.util._.defaults(config, this.cfg);
+      this.started = false;
+      Base.log.setLevel(this.config.debug.logLevel);
+      this.extManager = new ExtManager();
+      this.sandbox = Object.create(Base);
+      this.sandboxes = {};
+    }
+
+    Core.prototype.addExtension = function(ext) {
+      if (!this.started) {
+        return this.extManager.add(ext);
+      } else {
+        Base.log.error("The Core has already been started. You could not add new extensions at this point.");
+        throw new Error('You could not add extensions when the Core has already been started.');
+      }
+    };
+
+    Core.prototype.start = function(options) {
+      var BackboneExt, Components;
+      Base.log.info("Start de Core");
+      this.started = true;
+      Components = require('./extension/components.coffee');
+      BackboneExt = require('./extension/backbone.ext.coffee');
+      this.extManager.add(Components);
+      this.extManager.add(BackboneExt);
+      this.extManager.init(this);
+      return Base.util.each(this.extManager.getInitializedExtensions(), (function(_this) {
+        return function(i, ext) {
+          if (ext && typeof ext.afterAppStarted === 'function') {
+            return ext.afterAppStarted(_this);
+          }
+        };
+      })(this));
+    };
+
+    Core.prototype.createSandbox = function(name, opts) {
+      return this.sandboxes[name] = Object.create(this.sandbox);
+    };
+
+    return Core;
+
+  })();
+  return NGL;
+});
+
+
+
+},{"./base.coffee":3,"./extension/backbone.ext.coffee":5,"./extension/components.coffee":6,"./extmanager.coffee":7}],5:[function(require,module,exports){
+
+/**
+ * This extension should probably be defined at a project level, not here
+ */
+(function(root, factory) {
+  return module.exports = factory(root, {});
+})(window, function(root, Ext) {
+  var Base, BaseView, Renderer;
+  Base = require('./../base.coffee');
+  Renderer = {
+    render: function(template, data) {
+      if (!template) {
+        Base.log.error("The template passed to the Renderer is not defined");
+        return;
+      }
+      if (_.isFunction(template)) {
+        return template(data);
+      }
+    }
+  };
+  BaseView = {
+    initialize: function() {
+      Base.log.info("initialize del BaseView");
+      _.bindAll(this, 'render', 'renderWrapper');
+      if (Base.util._.isFunction(this.beforeRender)) {
+        _.bindAll(this, 'beforeRender');
+      }
+      if (Base.util._.isFunction(this.afterRender)) {
+        _.bindAll(this, 'afterRender');
+      }
+      return this.render = Base.util._.wrap(this.render, this.renderWrapper);
+    },
+    serializeData: function() {
+      var data;
+      data = {};
+      if (this.model) {
+        data = this.model.toJSON();
+      } else if (this.collection) {
+        data = {
+          items: this.collection.toJSON()
+        };
+      }
+      if (this.title) {
+        data.title = this.title;
+      }
+      return data;
+    },
+    destroy: function() {
+      this.undelegateEvents();
+      if (this.$el) {
+        this.$el.removeData().unbind();
+      }
+      this.remove();
+      return Backbone.View.prototype.remove.call(this);
+    },
+    renderWrapper: function(originalRender) {
+      if (Base.util._.isFunction(this.beforeRender)) {
+        this.beforeRender();
+      }
+      if (Base.util._.isFunction(originalRender)) {
+        originalRender();
+      }
+      if (Base.util._.isFunction(this.afterRender)) {
+        this.afterRender();
+      }
+      return this;
+    },
+    render: function() {
+      var data, html, tpl;
+      if (this.model && this.model.get('template')) {
+        tpl = JST[this.model.get('template')];
+      } else {
+        tpl = this.template;
+      }
+      data = this.serializeData();
+      html = Renderer.render(tpl, data);
+      this.attachElContent(html);
+      return this;
+    },
+    attachElContent: function(html) {
+      this.$el.append(html);
+      return this;
+    }
+  };
+  return {
+    initialize: function(app) {
+      Base.log.info("Inicializada la componente de Backbone");
+      app.sandbox.mvc = function() {
+        return Base.log.info("Inicializada la componente de MVC");
+      };
+      app.sandbox.mvc.BaseView = BaseView;
+
+      /**
+       * This method allows to mix a backbone view with an object
+       * @author Francisco Ramini <francisco.ramini at globant.com>
+       * @param  {[type]} view
+       * @param  {[type]} mixin = BaseView
+       * @return {[type]}
+       */
+      return app.sandbox.mvc.mixin = function(view, mixin) {
+        var oldInitialize;
+        if (mixin == null) {
+          mixin = BaseView;
+        }
+        if (mixin.initialize !== 'undefined') {
+          oldInitialize = view.prototype.initialize;
+        }
+        _.extend(view.prototype, mixin);
+        _.defaults(view.prototype.events, mixin.events);
+        if (oldInitialize) {
+          return view.prototype.initialize = function() {
+            mixin.initialize.apply(this);
+            return oldInitialize.apply(this);
+          };
+        }
+      };
+    }
+  };
+});
+
+
+
+},{"./../base.coffee":3}],6:[function(require,module,exports){
+(function(root, factory) {
+  return module.exports = factory(root, {});
+})(window, function(root, Ext) {
+  var Base, Component;
+  Base = require('./../base.coffee');
+  Component = (function() {
+    function Component() {}
+
+
+    /**
+     * [startAll description]
+     * @author Francisco Ramini <francisco.ramini at globant.com>
+     * @param  {[type]} selector = 'body'. CSS selector to tell the app where to look for components
+     * @return {[type]}
+     */
+
+    Component.startAll = function(selector, app) {
+      var components;
+      if (selector == null) {
+        selector = 'body';
+      }
+      components = Component.parseList(selector);
+      Base.log.info("ESTAS SERIAN LAS COMPONENTES PARSEADAS");
+      Base.log.debug(components);
+      return Component.instantiate(components, app);
+    };
+
+    Component.parseList = function(selector) {
+      var cssSelector, list, namespace;
+      list = [];
+      namespace = "lodges";
+      cssSelector = ["[data-lodges-component]"];
+      $(selector).find(cssSelector.join(',')).each(function(i, comp) {
+        var options;
+        options = Component.parseComponentOptions(this, "lodges");
+        return list.push({
+          name: options.name,
+          options: options
+        });
+      });
+      return list;
+    };
+
+    Component.parseComponentOptions = function(el, namespace, opts) {
+      var data, name, options;
+      options = _.clone(opts || {});
+      options.el = el;
+      data = $(el).data();
+      name = '';
+      $.each(data, function(k, v) {
+        k = k.replace(new RegExp("^" + namespace), "");
+        k = k.charAt(0).toLowerCase() + k.slice(1);
+        if (k !== "component") {
+          return options[k] = v;
+        } else {
+          return name = v;
+        }
+      });
+      return Component.buildOptionsObject(name, options);
+    };
+
+    Component.buildOptionsObject = function(name, options) {
+      options.name = name;
+      return options;
+    };
+
+    Component.instantiate = function(components, app) {
+      return _.each(components, function(m, i) {
+        var mod, sb;
+        if (!_.isEmpty(NGL.modules) && NGL.modules[m.name] && m.options) {
+          mod = NGL.modules[m.name];
+          sb = app.createSandbox(m.name);
+          _.extend(mod, {
+            sandbox: sb,
+            options: m.options
+          });
+          return mod.initialize();
+        }
+      });
+    };
+
+    return Component;
+
+  })();
+  return {
+    initialize: function(app) {
+      Base.log.info("Inicializada la componente de Componentes");
+      return app.sandbox.startComponents = function(list, app) {
+        return Component.startAll(list, app);
+      };
+    },
+    afterAppStarted: function(app) {
+      Base.log.info("Llamando al afterAppStarted");
+      return app.sandbox.startComponents(null, app);
+    }
+  };
+});
+
+
+
+},{"./../base.coffee":3}],7:[function(require,module,exports){
+(function(root, factory) {
+  return module.exports = factory(root, {});
+})(window, function(root, NGL) {
+  var Base, ExtManager;
+  Base = require('./base.coffee');
+  ExtManager = (function() {
+    ExtManager.prototype._extensions = [];
+
+    ExtManager.prototype._initializedExtensions = [];
+
+    function ExtManager() {}
+
+    ExtManager.prototype.add = function(ext) {
+      if (_.include(this._extensions, ext)) {
+        throw new Error("Extension: " + ext + " already exists.");
+      }
+      return this._extensions.push(ext);
+    };
+
+    ExtManager.prototype.init = function(context) {
+      Base.log.info(this._extensions);
+      return this._initExtension(this._extensions, context);
+    };
+
+    ExtManager.prototype._initExtension = function(extensions, context) {
+      var xt;
+      if (extensions.length > 0) {
+        xt = extensions.shift();
+        xt.initialize(context);
+        this._initializedExtensions.push(xt);
+        return this._initExtension(extensions, context);
+      }
+    };
+
+    ExtManager.prototype.getInitializedExtensions = function() {
+      return this._initializedExtensions;
+    };
+
+    return ExtManager;
+
+  })();
+  return ExtManager;
+});
+
+
+
+},{"./base.coffee":3}]},{},[2]);

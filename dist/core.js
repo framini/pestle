@@ -21,6 +21,7 @@
           config = {};
         }
         this.config = Base.util._.defaults(config, this.cfg);
+        this.started = false;
         Base.log.setLevel(this.config.debug.logLevel);
         this.extManager = new ExtManager();
         this.sandbox = Object.create(Base);
@@ -28,13 +29,19 @@
       }
 
       Core.prototype.addExtension = function(ext) {
-        return this.extManager.add(ext);
+        if (!this.started) {
+          return this.extManager.add(ext);
+        } else {
+          Base.log.error("The Core has already been started. You could not add new extensions at this point.");
+          throw new Error('You could not add extensions when the Core has already been started.');
+        }
       };
 
       Core.prototype.start = function(options) {
         var BackboneExt, Components,
           _this = this;
         Base.log.info("Start de Core");
+        this.started = true;
         Components = require('./extension/components.coffee');
         BackboneExt = require('./extension/backbone.ext.coffee');
         this.extManager.add(Components);
