@@ -16,30 +16,44 @@
         ###
         @startAll: (selector = 'body', app) ->
 
-            components = Component.parseList(selector)
+            components = Component.parseList(selector, app.config.namespace)
 
-            Base.log.info "ESTAS SERIAN LAS COMPONENTES PARSEADAS"
+            Base.log.info "Parsed components"
             Base.log.debug components
 
             # TODO: Proximo paso inicializar las componentes
             Component.instantiate(components, app)
 
-        @parseList: (selector) ->
-
+        @parseList: (selector, namespace) ->
+            # array to hold parsed components
             list = []
 
-            # here we could define the default data-*a attributes
-            # defined to define a component
-            # TODO: Make the namespace "lodges" configurable
-            namespace = "lodges"
-            cssSelector = ["[data-lodges-component]"]
+            namespaces = ['platform']
 
+            # TODO: Add the ability to pass an array/object of namespaces instead of just one
+            namespaces.push namespace if namespace isnt 'platform'
+
+            cssSelectors = []
+
+            # TODO: access this utils function through Base
+            _.each namespaces, (ns, i) ->
+                # if a new namespace has been provided lets add it to the list
+                cssSelectors.push "[data-" + ns + "-component]"
 
             # TODO: Access these DOM functionality through Base
-            $(selector).find(cssSelector.join(',')).each (i, comp) ->
+            $(selector).find(cssSelectors.join(',')).each (i, comp) ->
+
+                ns = do () ->
+                    namespace = ""
+                    _.each namespaces, (ns, i) ->
+                        # This way we obtain the namespace of the current component
+                        if $(comp).data(ns + "-component")
+                            namespace = ns
+
+                    return namespace
 
                 # options will hold all the data-* related to the component
-                options = Component.parseComponentOptions(@, "lodges")
+                options = Component.parseComponentOptions(@, ns)
 
                 list.push({ name: options.name, options: options })
 
