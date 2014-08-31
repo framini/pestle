@@ -24,10 +24,12 @@ module.exports = (grunt) ->
 
         grunt.task.run [
             'browserify:dev'
+            'browserify:karma'
             'apimocker'
             'compass:server'
             'handlebars:compile'
             'coffeelint'
+            'karma:dev'
             'connect:livereload'
             'watch'
         ]

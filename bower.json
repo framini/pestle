@@ -1,5 +1,11 @@
 {
-    "name": "platform-sdk",
-    "version": "0.1.0",
-    "main": "dist/sdk.js"
+  "name": "platform-sdk",
+  "version": "0.1.0",
+  "main": "dist/sdk.js",
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "handlebars": "~1.3.0",
+    "underscore": "~1.7.0",
+    "backbone": "~1.1.2"
+  }
 }

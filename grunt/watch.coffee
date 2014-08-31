@@ -1,7 +1,8 @@
 module.exports =
     coffee:
         files: [
-            'src/**/*.coffee'
+            'src/**/*.coffee',
+            'test/**/*.coffee'
         ]
         tasks: [
             'coffee:compile',
@@ -32,3 +33,7 @@ module.exports =
         ]
         options:
             livereload: true
+
+    karma:
+        files: ['dist/specs-bundle.js', 'karma.conf.js']
+        tasks: ['karma:dev:run']

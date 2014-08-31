@@ -18,3 +18,11 @@ module.exports =
             extensions: ['.coffee']
             browserifyOptions:
                 debug : true
+
+    karma:
+        dest: 'dist/specs-bundle.js'
+        src: 'test/**/*.coffee'
+        options:
+            transform: ['coffeeify']
+            debug: false
+            multifile: true
