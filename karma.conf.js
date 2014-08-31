@@ -10,17 +10,20 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha', 'chai'],
+    frameworks: ['mocha', 'chai', 'fixture'],
 
 
     // list of files / patterns to load in the browser
     files: [
+      {
+        pattern: 'spec/fixtures/**/*',
+      },
       'bower_components/jquery/dist/jquery.js',
       'bower_components/underscore/underscore.js',
       'bower_components/backbone/backbone.js',
       'bower_components/handlebars/handlebars.js',
       'dist/sdk.js',
-      'test/unit/**.js',
+      'spec/unit/**.js',
       'dist/specs-bundle.js'
     ],
 
@@ -33,7 +36,9 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '**/*.coffee': ['coffee']
+      '**/*.coffee': ['coffee'],
+      '**/*.html'   : ['html2js'],
+      '**/*.json'   : ['html2js']
     },
 
 

@@ -2,7 +2,7 @@ module.exports =
     coffee:
         files: [
             'src/**/*.coffee',
-            'test/**/*.coffee'
+            'spec/**/*.coffee'
         ]
         tasks: [
             'coffee:compile',

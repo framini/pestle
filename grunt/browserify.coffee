@@ -21,7 +21,7 @@ module.exports =
 
     karma:
         dest: 'dist/specs-bundle.js'
-        src: 'test/**/*.coffee'
+        src: 'spec/**/*.coffee'
         options:
             transform: ['coffeeify']
             debug: false

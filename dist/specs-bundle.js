@@ -206,6 +206,28 @@
 }));
 
 },{}],2:[function(require,module,exports){
+var Base;
+
+Base = require('../../src/base.coffee');
+
+describe('Base', function() {
+  beforeEach(function() {
+    return this.pepe = fixture.load('test.html');
+  });
+  afterEach(function() {
+    return fixture.cleanup();
+  });
+  it('plays with the html fixture', function() {
+    return expect(fixture.el.firstChild).to.equal(this.pepe[0]);
+  });
+  return it('should provide', function() {
+    return expect(Base).to.have.property('log');
+  });
+});
+
+
+
+},{"../../src/base.coffee":3}],3:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Base) {
@@ -221,17 +243,4 @@
 
 
 
-},{"loglevel":1}],3:[function(require,module,exports){
-var Base;
-
-Base = require('../../src/base.coffee');
-
-describe('Base', function() {
-  return it('should provide', function() {
-    return expect(Base).to.have.property('log');
-  });
-});
-
-
-
-},{"../../src/base.coffee":2}]},{},[3]);
+},{"loglevel":1}]},{},[2]);
