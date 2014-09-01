@@ -21,6 +21,7 @@
             debug:
                 logLevel: 5 # by default the logging is disabled
                             # values can go from 0 to 5 (5 means disabled)
+            namespace: 'lodges' # TODO: change this to 'platform'
 
         constructor: (config = {}) ->
 
@@ -82,7 +83,7 @@
                     ext.afterAppStarted(@)
 
         createSandbox: (name, opts) ->
-            @sandboxes[name] = Object.create(@.sandbox)
+            @sandboxes[name] = _.extend Object.create(@.sandbox), name : name
 
 
     return NGL

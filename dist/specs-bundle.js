@@ -206,6 +206,112 @@
 }));
 
 },{}],2:[function(require,module,exports){
+var Component, Core;
+
+Component = require('../../src/extension/components.coffee');
+
+Core = require('../../src/core.coffee');
+
+describe('Components Extension', function() {
+  before(function() {
+    this.dummycomponent = fixture.load('dummycomponent.html');
+    return $('body').append(this.dummycomponent);
+  });
+  after(function() {
+    return fixture.cleanup();
+  });
+  it('should have an initialize method', function() {
+    return Component.initialize.should.be.a('function');
+  });
+  it('should have a afterAppStarted method', function() {
+    return Component.afterAppStarted.should.be.a('function');
+  });
+  it('should have a name defined', function() {
+    return Component.name.should.be.a('string');
+  });
+  it('should have the class that gives the behavior to the extension exposed', function() {
+    return Component.classes.should.be.defined;
+  });
+  return describe('is accessing the Component class', function() {
+    var cmp;
+    cmp = Component.classes;
+    it('should have a startAll method', function() {
+      return cmp.startAll.should.be.a('function');
+    });
+    it.skip('should have a start method to initialize one component', function() {
+      return cmp.start.should.be.a('function');
+    });
+    return describe('and starting multiple components', function() {
+      before(function() {
+        NGL.modules.dummy = {
+          initialize: sinon.spy(function(app) {}),
+          afterAppStarted: sinon.spy()
+        };
+        NGL.modules.dummy2 = {
+          initialize: sinon.spy(function(app) {}),
+          afterAppStarted: sinon.spy()
+        };
+        NGL.modules.dummy3 = {
+          initialize: sinon.spy(function(app) {}),
+          afterAppStarted: sinon.spy()
+        };
+        return cmp.startAll('body', new NGL.Core());
+      });
+      after(function() {
+        return delete NGL.modules.dummy;
+      });
+      it('should call the initialize method defined in the component', function() {
+        NGL.modules.dummy.initialize.should.have.been.called;
+        NGL.modules.dummy2.initialize.should.have.been.called;
+        return NGL.modules.dummy3.initialize.should.have.been.called;
+      });
+      it('should give each component access to a sandbox', function() {
+        NGL.modules.dummy.sandbox.should.be.an('object');
+        NGL.modules.dummy2.sandbox.should.be.an('object');
+        return NGL.modules.dummy3.sandbox.should.be.an('object');
+      });
+      it('should give each component access to a options object containing the options passed data-* attributes', function() {
+        NGL.modules.dummy.options.should.be.an('object');
+        NGL.modules.dummy2.options.should.be.an('object');
+        return NGL.modules.dummy3.options.should.be.an('object');
+      });
+      it('should give access to the "el" element used to define the component', function() {
+        NGL.modules.dummy.options.el.should.be.defined;
+        $(NGL.modules.dummy.options.el).should.exist;
+        NGL.modules.dummy2.options.el.should.be.defined;
+        $(NGL.modules.dummy2.options.el).should.exist;
+        NGL.modules.dummy3.options.el.should.be.defined;
+        return $(NGL.modules.dummy3.options.el).should.exist;
+      });
+      it('should give access to each attr listed as data-NAMESPACE-* (different from data-NAMESPACE-component)', function() {
+        $(NGL.modules.dummy.options.el).should.have.data('lodgesDataset');
+        $(NGL.modules.dummy.options.el).should.have.data('lodgesObject');
+        $(NGL.modules.dummy.options.el).should.have.data('lodgesString');
+        NGL.modules.dummy.options.dataset.should.be.an('array');
+        NGL.modules.dummy.options.object.should.be.an('object');
+        NGL.modules.dummy.options.string.should.be.an('string');
+        NGL.modules.dummy.options.length.should.be.equal(4);
+        $(NGL.modules.dummy2.options.el).should.have.data('lodgesObject2');
+        $(NGL.modules.dummy2.options.el).should.have.data('lodgesString2');
+        NGL.modules.dummy2.options.object2.should.be.an('object');
+        NGL.modules.dummy2.options.string2.should.be.an('string');
+        NGL.modules.dummy2.options.length.should.be.equal(3);
+        $(NGL.modules.dummy3.options.el).should.have.data('lodgesDataset');
+        NGL.modules.dummy3.options.dataset.should.be.an('array');
+        return NGL.modules.dummy3.options.length.should.be.equal(2);
+      });
+      return it('should give each component an unique sandbox', function() {
+        NGL.modules.dummy.sandbox.should.not.deep.equal(NGL.modules.dummy2.sandbox);
+        NGL.modules.dummy2.sandbox.should.not.deep.equal(NGL.modules.dummy3.sandbox);
+        return NGL.modules.dummy3.sandbox.should.not.deep.equal(NGL.modules.dummy.sandbox);
+      });
+    });
+  });
+});
+
+
+
+},{"../../src/core.coffee":6,"../../src/extension/components.coffee":8}],3:[function(require,module,exports){
 var Base, Core, ExtManager;
 
 Base = require('../../src/base.coffee');
@@ -227,6 +333,9 @@ describe('Core', function() {
   core.start();
   it('should have a start Method', function() {
     return core.start.should.be.a('function');
+  });
+  it.skip('should have a stop Method', function() {
+    return core.stop.should.be.a('function');
   });
   it('should have a addExtension Method', function() {
     return core.addExtension.should.be.a('function');
@@ -290,7 +399,7 @@ describe('Core', function() {
 
 
 
-},{"../../src/base.coffee":4,"../../src/core.coffee":5,"../../src/extmanager.coffee":8}],3:[function(require,module,exports){
+},{"../../src/base.coffee":5,"../../src/core.coffee":6,"../../src/extmanager.coffee":9}],4:[function(require,module,exports){
 var ExtManager;
 
 ExtManager = require('../../src/extmanager.coffee');
@@ -360,7 +469,7 @@ describe('ExtManager', function() {
 
 
 
-},{"../../src/extmanager.coffee":8}],4:[function(require,module,exports){
+},{"../../src/extmanager.coffee":9}],5:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Base) {
@@ -376,7 +485,7 @@ describe('ExtManager', function() {
 
 
 
-},{"loglevel":1}],5:[function(require,module,exports){
+},{"loglevel":1}],6:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = root.NGL = factory(root, {});
 })(window, function(root, NGL) {
@@ -391,7 +500,8 @@ describe('ExtManager', function() {
     Core.prototype.cfg = {
       debug: {
         logLevel: 5
-      }
+      },
+      namespace: 'lodges'
     };
 
     function Core(config) {
@@ -434,7 +544,9 @@ describe('ExtManager', function() {
     };
 
     Core.prototype.createSandbox = function(name, opts) {
-      return this.sandboxes[name] = Object.create(this.sandbox);
+      return this.sandboxes[name] = _.extend(Object.create(this.sandbox), {
+        name: name
+      });
     };
 
     return Core;
@@ -445,7 +557,7 @@ describe('ExtManager', function() {
 
 
 
-},{"./base.coffee":4,"./extension/backbone.ext.coffee":6,"./extension/components.coffee":7,"./extmanager.coffee":8}],6:[function(require,module,exports){
+},{"./base.coffee":5,"./extension/backbone.ext.coffee":7,"./extension/components.coffee":8,"./extmanager.coffee":9}],7:[function(require,module,exports){
 
 /**
  * This extension should probably be defined at a project level, not here
@@ -569,7 +681,7 @@ describe('ExtManager', function() {
 
 
 
-},{"./../base.coffee":4}],7:[function(require,module,exports){
+},{"./../base.coffee":5}],8:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Ext) {
@@ -591,20 +703,35 @@ describe('ExtManager', function() {
       if (selector == null) {
         selector = 'body';
       }
-      components = Component.parseList(selector);
-      Base.log.info("ESTAS SERIAN LAS COMPONENTES PARSEADAS");
+      components = Component.parseList(selector, app.config.namespace);
+      Base.log.info("Parsed components");
       Base.log.debug(components);
       return Component.instantiate(components, app);
     };
 
-    Component.parseList = function(selector) {
-      var cssSelector, list, namespace;
+    Component.parseList = function(selector, namespace) {
+      var cssSelectors, list, namespaces;
       list = [];
-      namespace = "lodges";
-      cssSelector = ["[data-lodges-component]"];
-      $(selector).find(cssSelector.join(',')).each(function(i, comp) {
-        var options;
-        options = Component.parseComponentOptions(this, "lodges");
+      namespaces = ['platform'];
+      if (namespace !== 'platform') {
+        namespaces.push(namespace);
+      }
+      cssSelectors = [];
+      _.each(namespaces, function(ns, i) {
+        return cssSelectors.push("[data-" + ns + "-component]");
+      });
+      $(selector).find(cssSelectors.join(',')).each(function(i, comp) {
+        var ns, options;
+        ns = (function() {
+          namespace = "";
+          _.each(namespaces, function(ns, i) {
+            if ($(comp).data(ns + "-component")) {
+              return namespace = ns;
+            }
+          });
+          return namespace;
+        })();
+        options = Component.parseComponentOptions(this, ns);
         return list.push({
           name: options.name,
           options: options
@@ -614,20 +741,23 @@ describe('ExtManager', function() {
     };
 
     Component.parseComponentOptions = function(el, namespace, opts) {
-      var data, name, options;
+      var data, length, name, options;
       options = _.clone(opts || {});
       options.el = el;
       data = $(el).data();
       name = '';
+      length = 0;
       $.each(data, function(k, v) {
         k = k.replace(new RegExp("^" + namespace), "");
         k = k.charAt(0).toLowerCase() + k.slice(1);
         if (k !== "component") {
-          return options[k] = v;
+          options[k] = v;
+          return length++;
         } else {
           return name = v;
         }
       });
+      options.length = length + 1;
       return Component.buildOptionsObject(name, options);
     };
 
@@ -665,13 +795,14 @@ describe('ExtManager', function() {
       Base.log.info("Llamando al afterAppStarted");
       return app.sandbox.startComponents(null, app);
     },
-    name: 'Component Extension'
+    name: 'Component Extension',
+    classes: Component
   };
 });
 
 
 
-},{"./../base.coffee":4}],8:[function(require,module,exports){
+},{"./../base.coffee":5}],9:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, NGL) {
@@ -723,4 +854,4 @@ describe('ExtManager', function() {
 
 
 
-},{"./base.coffee":4}]},{},[2,3]);
+},{"./base.coffee":5}]},{},[2,3,4]);

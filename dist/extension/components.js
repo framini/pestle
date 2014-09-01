@@ -20,20 +20,35 @@
         if (selector == null) {
           selector = 'body';
         }
-        components = Component.parseList(selector);
-        Base.log.info("ESTAS SERIAN LAS COMPONENTES PARSEADAS");
+        components = Component.parseList(selector, app.config.namespace);
+        Base.log.info("Parsed components");
         Base.log.debug(components);
         return Component.instantiate(components, app);
       };
 
-      Component.parseList = function(selector) {
-        var cssSelector, list, namespace;
+      Component.parseList = function(selector, namespace) {
+        var cssSelectors, list, namespaces;
         list = [];
-        namespace = "lodges";
-        cssSelector = ["[data-lodges-component]"];
-        $(selector).find(cssSelector.join(',')).each(function(i, comp) {
-          var options;
-          options = Component.parseComponentOptions(this, "lodges");
+        namespaces = ['platform'];
+        if (namespace !== 'platform') {
+          namespaces.push(namespace);
+        }
+        cssSelectors = [];
+        _.each(namespaces, function(ns, i) {
+          return cssSelectors.push("[data-" + ns + "-component]");
+        });
+        $(selector).find(cssSelectors.join(',')).each(function(i, comp) {
+          var ns, options;
+          ns = (function() {
+            namespace = "";
+            _.each(namespaces, function(ns, i) {
+              if ($(comp).data(ns + "-component")) {
+                return namespace = ns;
+              }
+            });
+            return namespace;
+          })();
+          options = Component.parseComponentOptions(this, ns);
           return list.push({
             name: options.name,
             options: options
@@ -43,20 +58,23 @@
       };
 
       Component.parseComponentOptions = function(el, namespace, opts) {
-        var data, name, options;
+        var data, length, name, options;
         options = _.clone(opts || {});
         options.el = el;
         data = $(el).data();
         name = '';
+        length = 0;
         $.each(data, function(k, v) {
           k = k.replace(new RegExp("^" + namespace), "");
           k = k.charAt(0).toLowerCase() + k.slice(1);
           if (k !== "component") {
-            return options[k] = v;
+            options[k] = v;
+            return length++;
           } else {
             return name = v;
           }
         });
+        options.length = length + 1;
         return Component.buildOptionsObject(name, options);
       };
 
@@ -94,7 +112,8 @@
         Base.log.info("Llamando al afterAppStarted");
         return app.sandbox.startComponents(null, app);
       },
-      name: 'Component Extension'
+      name: 'Component Extension',
+      classes: Component
     };
   });
 

@@ -13,7 +13,8 @@
       Core.prototype.cfg = {
         debug: {
           logLevel: 5
-        }
+        },
+        namespace: 'lodges'
       };
 
       function Core(config) {
@@ -55,7 +56,9 @@
       };
 
       Core.prototype.createSandbox = function(name, opts) {
-        return this.sandboxes[name] = Object.create(this.sandbox);
+        return this.sandboxes[name] = _.extend(Object.create(this.sandbox), {
+          name: name
+        });
       };
 
       return Core;

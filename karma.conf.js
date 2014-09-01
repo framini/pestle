@@ -19,6 +19,7 @@ module.exports = function(config) {
         pattern: 'spec/fixtures/**/*',
       },
       'bower_components/jquery/dist/jquery.js',
+      'bower_components/chai-jquery/chai-jquery.js',
       'bower_components/underscore/underscore.js',
       'bower_components/backbone/backbone.js',
       'bower_components/handlebars/handlebars.js',

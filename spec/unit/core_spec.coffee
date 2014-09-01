@@ -17,9 +17,11 @@ describe 'Core', ->
 
     core.start()
 
-
     it 'should have a start Method', ->
         core.start.should.be.a 'function'
+
+    it.skip 'should have a stop Method', ->
+        core.stop.should.be.a 'function'
 
     it 'should have a addExtension Method', ->
         core.addExtension.should.be.a 'function'

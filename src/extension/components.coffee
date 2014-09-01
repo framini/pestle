@@ -67,6 +67,7 @@
             # TODO: access this DOM function through Base
             data = $(el).data()
             name = ''
+            length = 0
 
             # TODO: access this utils function through Base
             $.each data, (k, v) ->
@@ -81,8 +82,12 @@
                 # an option value
                 if k != "component"
                     options[k] = v
+                    length++
                 else
                     name = v
+
+            # add one because we've added 'el' automatically as an extra option
+            options.length = length + 1
 
             # build ad return the option object
             Component.buildOptionsObject(name, options)
@@ -136,4 +141,8 @@
         app.sandbox.startComponents(null, app)
 
     name: 'Component Extension'
+
+    # this property will be used for testing purposes
+    # to validate the Component class in isolation
+    classes : Component
 )
