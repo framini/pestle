@@ -17,6 +17,13 @@ describe 'Core', ->
 
     core.start()
 
+    # right now is setted to "lodges". It needs to be changed
+    it.skip 'shoul provide "platform" as the default namespace', ->
+        core.config.namespace.should.be.equal 'platform'
+
+    it 'shoul provide a default logging level between 0 and 5', ->
+        core.config.debug.logLevel.should.be.at.least(0).and.below(6)
+
     it 'should have a start Method', ->
         core.start.should.be.a 'function'
 

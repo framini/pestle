@@ -331,6 +331,12 @@ describe('Core', function() {
   };
   core.addExtension(ext);
   core.start();
+  it.skip('shoul provide "platform" as the default namespace', function() {
+    return core.config.namespace.should.be.equal('platform');
+  });
+  it('shoul provide a default logging level between 0 and 5', function() {
+    return core.config.debug.logLevel.should.be.at.least(0).and.below(6);
+  });
   it('should have a start Method', function() {
     return core.start.should.be.a('function');
   });
