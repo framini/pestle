@@ -9,8 +9,10 @@
     # DOM manipulation
 
     # Logger
-    # loglevel is small enough to be part of the dist
     Base.log = require('loglevel')
+
+    # Device detection
+    Base.device = require('ismobilejs')
 
     # Utils
     # Libraris like underscore, backbone, will be loaded by the project
