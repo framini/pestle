@@ -17,6 +17,9 @@
     # Cookies API
     Base.cookies = require './cookies.coffee'
 
+    # Viewport detection
+    Base.vp = require './viewportdetection.coffee'
+
     # Utils
     # Libraries like underscore, backbone, will be loaded by the project
     # as hard dependencies for this layer

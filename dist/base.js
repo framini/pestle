@@ -5,6 +5,7 @@
     Base.log = require('./logger.coffee');
     Base.device = require('./devicedetection.coffee');
     Base.cookies = require('./cookies.coffee');
+    Base.vp = require('./viewportdetection.coffee');
     Base.util = {
       each: $.each,
       extend: $.extend,

@@ -145,10 +145,46 @@ describe 'Core', ->
                 Base.cookies.get.should.be.a('function')
 
             it 'should provide a expire method', ->
-                Base.cookies.expire.should.be.a('function') 
+                Base.cookies.expire.should.be.a('function')
 
+        describe 'Viewport detection', ->
 
+            it 'should have Viewport detector available', ->
+                Base.should.have.property('vp')
 
+            it 'should be available within sandboxes', ->
+                sb = core.createSandbox 'test'
+                sb.should.have.property 'vp'
 
+            it 'should provide a viewportW method', ->
+                Base.vp.viewportW.should.be.a('function')
 
+            it 'should provide a viewportH method', ->
+                Base.vp.viewportH.should.be.a('function')
 
+            it 'should provide a viewport method', ->
+                Base.vp.viewport.should.be.a('function')
+
+            it 'should provide a inViewport method', ->
+                Base.vp.inViewport.should.be.a('function')
+
+            it 'should provide a inX method', ->
+                Base.vp.inX.should.be.a('function')
+
+            it 'should provide a inY method', ->
+                Base.vp.inY.should.be.a('function')
+
+            it 'should provide a scrollX method', ->
+                Base.vp.scrollX.should.be.a('function')
+
+            it 'should provide a scrollY method', ->
+                Base.vp.scrollY.should.be.a('function')
+
+            it 'should provide a mq method', ->
+                Base.vp.mq.should.be.a('function')
+
+            it 'should provide a rectangle method', ->
+                Base.vp.rectangle.should.be.a('function')
+
+            it 'should provide a aspect method', ->
+                Base.vp.aspect.should.be.a('function')

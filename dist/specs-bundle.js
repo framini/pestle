@@ -255,212 +255,378 @@
 
 },{}],3:[function(require,module,exports){
 /*
-* loglevel - https://github.com/pimterry/loglevel
-*
-* Copyright (c) 2013 Tim Perry
-* Licensed under the MIT license.
-*/
-(function (root, definition) {
-    if (typeof module === 'object' && module.exports && typeof require === 'function') {
-        module.exports = definition();
-    } else if (typeof define === 'function' && typeof define.amd === 'object') {
-        define(definition);
-    } else {
-        root.log = definition();
-    }
-}(this, function () {
-    var self = {};
-    var noop = function() {};
+ * loglevel - https://github.com/pimterry/loglevel
+ *
+ * Copyright (c) 2013 Tim Perry
+ * Licensed under the MIT license.
+ */
+
+;(function (undefined) {
     var undefinedType = "undefined";
 
-    function realMethod(methodName) {
-        if (typeof console === undefinedType) {
-            return noop;
-        } else if (console[methodName] === undefined) {
-            if (console.log !== undefined) {
-                return boundToConsole(console, 'log');
-            } else {
-                return noop;
-            }
+    (function (name, definition) {
+        if (typeof module === 'object' && module.exports && typeof require === 'function') {
+            module.exports = definition();
+        } else if (typeof define === 'function' && typeof define.amd === 'object') {
+            define(definition);
         } else {
-            return boundToConsole(console, methodName);
+            this[name] = definition();
         }
-    }
+    }('log', function () {
+        var self = {};
+        var noop = function() {};
 
-    function boundToConsole(console, methodName) {
-        var method = console[methodName];
-        if (method.bind === undefined) {
-            if (Function.prototype.bind === undefined) {
-                return functionBindingWrapper(method, console);
+        function realMethod(methodName) {
+            if (typeof console === undefinedType) {
+                return noop;
+            } else if (console[methodName] === undefined) {
+                if (console.log !== undefined) {
+                    return boundToConsole(console, 'log');
+                } else {
+                    return noop;
+                }
             } else {
-                try {
-                    return Function.prototype.bind.call(console[methodName], console);
-                } catch (e) {
-                    // In IE8 + Modernizr, the bind shim will reject the above, so we fall back to wrapping
+                return boundToConsole(console, methodName);
+            }
+        }
+
+        function boundToConsole(console, methodName) {
+            var method = console[methodName];
+            if (method.bind === undefined) {
+                if (Function.prototype.bind === undefined) {
                     return functionBindingWrapper(method, console);
+                } else {
+                    try {
+                        return Function.prototype.bind.call(console[methodName], console);
+                    } catch (e) {
+                        // In IE8 + Modernizr, the bind shim will reject the above, so we fall back to wrapping
+                        return functionBindingWrapper(method, console);
+                    }
+                }
+            } else {
+                return console[methodName].bind(console);
+            }
+        }
+
+        function functionBindingWrapper(f, context) {
+            return function() {
+                Function.prototype.apply.apply(f, [context, arguments]);
+            };
+        }
+
+        var logMethods = [
+            "trace",
+            "debug",
+            "info",
+            "warn",
+            "error"
+        ];
+
+        function replaceLoggingMethods(methodFactory) {
+            for (var ii = 0; ii < logMethods.length; ii++) {
+                self[logMethods[ii]] = methodFactory(logMethods[ii]);
+            }
+        }
+
+        function cookiesAvailable() {
+            return (typeof window !== undefinedType &&
+                    window.document !== undefined &&
+                    window.document.cookie !== undefined);
+        }
+
+        function localStorageAvailable() {
+            try {
+                return (typeof window !== undefinedType &&
+                        window.localStorage !== undefined &&
+                        window.localStorage !== null);
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function persistLevelIfPossible(levelNum) {
+            var localStorageFail = false,
+                levelName;
+
+            for (var key in self.levels) {
+                if (self.levels.hasOwnProperty(key) && self.levels[key] === levelNum) {
+                    levelName = key;
+                    break;
                 }
             }
-        } else {
-            return console[methodName].bind(console);
-        }
-    }
 
-    function functionBindingWrapper(f, context) {
-        return function() {
-            Function.prototype.apply.apply(f, [context, arguments]);
-        };
-    }
-
-    var logMethods = [
-        "trace",
-        "debug",
-        "info",
-        "warn",
-        "error"
-    ];
-
-    function replaceLoggingMethods(methodFactory) {
-        for (var ii = 0; ii < logMethods.length; ii++) {
-            self[logMethods[ii]] = methodFactory(logMethods[ii]);
-        }
-    }
-
-    function cookiesAvailable() {
-        return (typeof window !== undefinedType &&
-                window.document !== undefined &&
-                window.document.cookie !== undefined);
-    }
-
-    function localStorageAvailable() {
-        try {
-            return (typeof window !== undefinedType &&
-                    window.localStorage !== undefined &&
-                    window.localStorage !== null);
-        } catch (e) {
-            return false;
-        }
-    }
-
-    function persistLevelIfPossible(levelNum) {
-        var localStorageFail = false,
-            levelName;
-
-        for (var key in self.levels) {
-            if (self.levels.hasOwnProperty(key) && self.levels[key] === levelNum) {
-                levelName = key;
-                break;
-            }
-        }
-
-        if (localStorageAvailable()) {
-            /*
-             * Setting localStorage can create a DOM 22 Exception if running in Private mode
-             * in Safari, so even if it is available we need to catch any errors when trying
-             * to write to it
-             */
-            try {
-                window.localStorage['loglevel'] = levelName;
-            } catch (e) {
+            if (localStorageAvailable()) {
+                /*
+                 * Setting localStorage can create a DOM 22 Exception if running in Private mode
+                 * in Safari, so even if it is available we need to catch any errors when trying
+                 * to write to it
+                 */
+                try {
+                    window.localStorage['loglevel'] = levelName;
+                } catch (e) {
+                    localStorageFail = true;
+                }
+            } else {
                 localStorageFail = true;
             }
-        } else {
-            localStorageFail = true;
-        }
 
-        if (localStorageFail && cookiesAvailable()) {
-            window.document.cookie = "loglevel=" + levelName + ";";
-        }
-    }
-
-    var cookieRegex = /loglevel=([^;]+)/;
-
-    function loadPersistedLevel() {
-        var storedLevel;
-
-        if (localStorageAvailable()) {
-            storedLevel = window.localStorage['loglevel'];
-        }
-
-        if (storedLevel === undefined && cookiesAvailable()) {
-            var cookieMatch = cookieRegex.exec(window.document.cookie) || [];
-            storedLevel = cookieMatch[1];
-        }
-        
-        if (self.levels[storedLevel] === undefined) {
-            storedLevel = "WARN";
-        }
-
-        self.setLevel(self.levels[storedLevel]);
-    }
-
-    /*
-     *
-     * Public API
-     *
-     */
-
-    self.levels = { "TRACE": 0, "DEBUG": 1, "INFO": 2, "WARN": 3,
-        "ERROR": 4, "SILENT": 5};
-
-    self.setLevel = function (level) {
-        if (typeof level === "number" && level >= 0 && level <= self.levels.SILENT) {
-            persistLevelIfPossible(level);
-
-            if (level === self.levels.SILENT) {
-                replaceLoggingMethods(function () {
-                    return noop;
-                });
-                return;
-            } else if (typeof console === undefinedType) {
-                replaceLoggingMethods(function (methodName) {
-                    return function () {
-                        if (typeof console !== undefinedType) {
-                            self.setLevel(level);
-                            self[methodName].apply(self, arguments);
-                        }
-                    };
-                });
-                return "No console available for logging";
-            } else {
-                replaceLoggingMethods(function (methodName) {
-                    if (level <= self.levels[methodName.toUpperCase()]) {
-                        return realMethod(methodName);
-                    } else {
-                        return noop;
-                    }
-                });
+            if (localStorageFail && cookiesAvailable()) {
+                window.document.cookie = "loglevel=" + levelName + ";";
             }
-        } else if (typeof level === "string" && self.levels[level.toUpperCase()] !== undefined) {
-            self.setLevel(self.levels[level.toUpperCase()]);
-        } else {
-            throw "log.setLevel() called with invalid level: " + level;
-        }
-    };
-
-    self.enableAll = function() {
-        self.setLevel(self.levels.TRACE);
-    };
-
-    self.disableAll = function() {
-        self.setLevel(self.levels.SILENT);
-    };
-
-    // Grab the current global log variable in case of overwrite
-    var _log = (typeof window !== undefinedType) ? window.log : undefined;
-    self.noConflict = function() {
-        if (typeof window !== undefinedType &&
-               window.log === self) {
-            window.log = _log;
         }
 
+        var cookieRegex = /loglevel=([^;]+)/;
+
+        function loadPersistedLevel() {
+            var storedLevel;
+
+            if (localStorageAvailable()) {
+                storedLevel = window.localStorage['loglevel'];
+            }
+
+            if (storedLevel === undefined && cookiesAvailable()) {
+                var cookieMatch = cookieRegex.exec(window.document.cookie) || [];
+                storedLevel = cookieMatch[1];
+            }
+            
+            if (self.levels[storedLevel] === undefined) {
+                storedLevel = "WARN";
+            }
+
+            self.setLevel(self.levels[storedLevel]);
+        }
+
+        /*
+         *
+         * Public API
+         *
+         */
+
+        self.levels = { "TRACE": 0, "DEBUG": 1, "INFO": 2, "WARN": 3,
+            "ERROR": 4, "SILENT": 5};
+
+        self.setLevel = function (level) {
+            if (typeof level === "number" && level >= 0 && level <= self.levels.SILENT) {
+                persistLevelIfPossible(level);
+
+                if (level === self.levels.SILENT) {
+                    replaceLoggingMethods(function () {
+                        return noop;
+                    });
+                    return;
+                } else if (typeof console === undefinedType) {
+                    replaceLoggingMethods(function (methodName) {
+                        return function () {
+                            if (typeof console !== undefinedType) {
+                                self.setLevel(level);
+                                self[methodName].apply(self, arguments);
+                            }
+                        };
+                    });
+                    return "No console available for logging";
+                } else {
+                    replaceLoggingMethods(function (methodName) {
+                        if (level <= self.levels[methodName.toUpperCase()]) {
+                            return realMethod(methodName);
+                        } else {
+                            return noop;
+                        }
+                    });
+                }
+            } else if (typeof level === "string" && self.levels[level.toUpperCase()] !== undefined) {
+                self.setLevel(self.levels[level.toUpperCase()]);
+            } else {
+                throw "log.setLevel() called with invalid level: " + level;
+            }
+        };
+
+        self.enableAll = function() {
+            self.setLevel(self.levels.TRACE);
+        };
+
+        self.disableAll = function() {
+            self.setLevel(self.levels.SILENT);
+        };
+
+        // Grab the current global log variable in case of overwrite
+        var _log = (typeof window !== undefinedType) ? window.log : undefined;
+        self.noConflict = function() {
+            if (typeof window !== undefinedType &&
+                   window.log === self) {
+                window.log = _log;
+            }
+
+            return self;
+        };
+
+        loadPersistedLevel();
         return self;
-    };
-
-    loadPersistedLevel();
-    return self;
-}));
+    }));
+})();
 
 },{}],4:[function(require,module,exports){
+/*!
+ * verge 1.9.1+201402130803
+ * https://github.com/ryanve/verge
+ * MIT License 2013 Ryan Van Etten
+ */
+
+(function(root, name, make) {
+  if (typeof module != 'undefined' && module['exports']) module['exports'] = make();
+  else root[name] = make();
+}(this, 'verge', function() {
+
+  var xports = {}
+    , win = typeof window != 'undefined' && window
+    , doc = typeof document != 'undefined' && document
+    , docElem = doc && doc.documentElement
+    , matchMedia = win['matchMedia'] || win['msMatchMedia']
+    , mq = matchMedia ? function(q) {
+        return !!matchMedia.call(win, q).matches;
+      } : function() {
+        return false;
+      }
+    , viewportW = xports['viewportW'] = function() {
+        var a = docElem['clientWidth'], b = win['innerWidth'];
+        return a < b ? b : a;
+      }
+    , viewportH = xports['viewportH'] = function() {
+        var a = docElem['clientHeight'], b = win['innerHeight'];
+        return a < b ? b : a;
+      };
+  
+  /** 
+   * Test if a media query is active. Like Modernizr.mq
+   * @since 1.6.0
+   * @return {boolean}
+   */  
+  xports['mq'] = mq;
+
+  /** 
+   * Normalized matchMedia
+   * @since 1.6.0
+   * @return {MediaQueryList|Object}
+   */ 
+  xports['matchMedia'] = matchMedia ? function() {
+    // matchMedia must be binded to window
+    return matchMedia.apply(win, arguments);
+  } : function() {
+    // Gracefully degrade to plain object
+    return {};
+  };
+
+  /**
+   * @since 1.8.0
+   * @return {{width:number, height:number}}
+   */
+  function viewport() {
+    return {'width':viewportW(), 'height':viewportH()};
+  }
+  xports['viewport'] = viewport;
+  
+  /** 
+   * Cross-browser window.scrollX
+   * @since 1.0.0
+   * @return {number}
+   */
+  xports['scrollX'] = function() {
+    return win.pageXOffset || docElem.scrollLeft; 
+  };
+
+  /** 
+   * Cross-browser window.scrollY
+   * @since 1.0.0
+   * @return {number}
+   */
+  xports['scrollY'] = function() {
+    return win.pageYOffset || docElem.scrollTop; 
+  };
+
+  /**
+   * @param {{top:number, right:number, bottom:number, left:number}} coords
+   * @param {number=} cushion adjustment
+   * @return {Object}
+   */
+  function calibrate(coords, cushion) {
+    var o = {};
+    cushion = +cushion || 0;
+    o['width'] = (o['right'] = coords['right'] + cushion) - (o['left'] = coords['left'] - cushion);
+    o['height'] = (o['bottom'] = coords['bottom'] + cushion) - (o['top'] = coords['top'] - cushion);
+    return o;
+  }
+
+  /**
+   * Cross-browser element.getBoundingClientRect plus optional cushion.
+   * Coords are relative to the top-left corner of the viewport.
+   * @since 1.0.0
+   * @param {Element|Object} el element or stack (uses first item)
+   * @param {number=} cushion +/- pixel adjustment amount
+   * @return {Object|boolean}
+   */
+  function rectangle(el, cushion) {
+    el = el && !el.nodeType ? el[0] : el;
+    if (!el || 1 !== el.nodeType) return false;
+    return calibrate(el.getBoundingClientRect(), cushion);
+  }
+  xports['rectangle'] = rectangle;
+
+  /**
+   * Get the viewport aspect ratio (or the aspect ratio of an object or element)
+   * @since 1.7.0
+   * @param {(Element|Object)=} o optional object with width/height props or methods
+   * @return {number}
+   * @link http://w3.org/TR/css3-mediaqueries/#orientation
+   */
+  function aspect(o) {
+    o = null == o ? viewport() : 1 === o.nodeType ? rectangle(o) : o;
+    var h = o['height'], w = o['width'];
+    h = typeof h == 'function' ? h.call(o) : h;
+    w = typeof w == 'function' ? w.call(o) : w;
+    return w/h;
+  }
+  xports['aspect'] = aspect;
+
+  /**
+   * Test if an element is in the same x-axis section as the viewport.
+   * @since 1.0.0
+   * @param {Element|Object} el
+   * @param {number=} cushion
+   * @return {boolean}
+   */
+  xports['inX'] = function(el, cushion) {
+    var r = rectangle(el, cushion);
+    return !!r && r.right >= 0 && r.left <= viewportW();
+  };
+
+  /**
+   * Test if an element is in the same y-axis section as the viewport.
+   * @since 1.0.0
+   * @param {Element|Object} el
+   * @param {number=} cushion
+   * @return {boolean}
+   */
+  xports['inY'] = function(el, cushion) {
+    var r = rectangle(el, cushion);
+    return !!r && r.bottom >= 0 && r.top <= viewportH();
+  };
+
+  /**
+   * Test if an element is in the viewport.
+   * @since 1.0.0
+   * @param {Element|Object} el
+   * @param {number=} cushion
+   * @return {boolean}
+   */
+  xports['inViewport'] = function(el, cushion) {
+    // Equiv to `inX(el, cushion) && inY(el, cushion)` but just manually do both 
+    // to avoid calling rectangle() twice. It gzips just as small like this.
+    var r = rectangle(el, cushion);
+    return !!r && r.bottom >= 0 && r.right >= 0 && r.top <= viewportH() && r.left <= viewportW();
+  };
+
+  return xports;
+}));
+},{}],5:[function(require,module,exports){
 var Component, Core;
 
 Component = require('../../src/extension/components.coffee');
@@ -566,7 +732,7 @@ describe('Components Extension', function() {
 
 
 
-},{"../../src/core.coffee":9,"../../src/extension/components.coffee":12}],5:[function(require,module,exports){
+},{"../../src/core.coffee":10,"../../src/extension/components.coffee":13}],6:[function(require,module,exports){
 var Base, Core, ExtManager;
 
 Base = require('../../src/base.coffee');
@@ -701,7 +867,7 @@ describe('Core', function() {
         return Base.device.isWindowsDevice.should.be.a('function');
       });
     });
-    return describe('Cookies', function() {
+    describe('Cookies', function() {
       it('should have Cookies handler available', function() {
         return Base.should.have.property('cookies');
       });
@@ -720,12 +886,55 @@ describe('Core', function() {
         return Base.cookies.expire.should.be.a('function');
       });
     });
+    return describe('Viewport detection', function() {
+      it('should have Viewport detector available', function() {
+        return Base.should.have.property('vp');
+      });
+      it('should be available within sandboxes', function() {
+        var sb;
+        sb = core.createSandbox('test');
+        return sb.should.have.property('vp');
+      });
+      it('should provide a viewportW method', function() {
+        return Base.vp.viewportW.should.be.a('function');
+      });
+      it('should provide a viewportH method', function() {
+        return Base.vp.viewportH.should.be.a('function');
+      });
+      it('should provide a viewport method', function() {
+        return Base.vp.viewport.should.be.a('function');
+      });
+      it('should provide a inViewport method', function() {
+        return Base.vp.inViewport.should.be.a('function');
+      });
+      it('should provide a inX method', function() {
+        return Base.vp.inX.should.be.a('function');
+      });
+      it('should provide a inY method', function() {
+        return Base.vp.inY.should.be.a('function');
+      });
+      it('should provide a scrollX method', function() {
+        return Base.vp.scrollX.should.be.a('function');
+      });
+      it('should provide a scrollY method', function() {
+        return Base.vp.scrollY.should.be.a('function');
+      });
+      it('should provide a mq method', function() {
+        return Base.vp.mq.should.be.a('function');
+      });
+      it('should provide a rectangle method', function() {
+        return Base.vp.rectangle.should.be.a('function');
+      });
+      return it('should provide a aspect method', function() {
+        return Base.vp.aspect.should.be.a('function');
+      });
+    });
   });
 });
 
 
 
-},{"../../src/base.coffee":7,"../../src/core.coffee":9,"../../src/extmanager.coffee":13}],6:[function(require,module,exports){
+},{"../../src/base.coffee":8,"../../src/core.coffee":10,"../../src/extmanager.coffee":14}],7:[function(require,module,exports){
 var ExtManager;
 
 ExtManager = require('../../src/extmanager.coffee');
@@ -795,13 +1004,14 @@ describe('ExtManager', function() {
 
 
 
-},{"../../src/extmanager.coffee":13}],7:[function(require,module,exports){
+},{"../../src/extmanager.coffee":14}],8:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Base) {
   Base.log = require('./logger.coffee');
   Base.device = require('./devicedetection.coffee');
   Base.cookies = require('./cookies.coffee');
+  Base.vp = require('./viewportdetection.coffee');
   Base.util = {
     each: $.each,
     extend: $.extend,
@@ -813,7 +1023,7 @@ describe('ExtManager', function() {
 
 
 
-},{"./cookies.coffee":8,"./devicedetection.coffee":10,"./logger.coffee":14}],8:[function(require,module,exports){
+},{"./cookies.coffee":9,"./devicedetection.coffee":11,"./logger.coffee":15,"./viewportdetection.coffee":16}],9:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Cookies) {
@@ -835,7 +1045,7 @@ describe('ExtManager', function() {
 
 
 
-},{"cookies-js":1}],9:[function(require,module,exports){
+},{"cookies-js":1}],10:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = root.NGL = factory(root, {});
 })(window, function(root, NGL) {
@@ -907,7 +1117,7 @@ describe('ExtManager', function() {
 
 
 
-},{"./base.coffee":7,"./extension/backbone.ext.coffee":11,"./extension/components.coffee":12,"./extmanager.coffee":13}],10:[function(require,module,exports){
+},{"./base.coffee":8,"./extension/backbone.ext.coffee":12,"./extension/components.coffee":13,"./extmanager.coffee":14}],11:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, DeviceDetection) {
@@ -956,7 +1166,7 @@ describe('ExtManager', function() {
 
 
 
-},{"ismobilejs":2}],11:[function(require,module,exports){
+},{"ismobilejs":2}],12:[function(require,module,exports){
 
 /**
  * This extension should probably be defined at a project level, not here
@@ -1080,7 +1290,7 @@ describe('ExtManager', function() {
 
 
 
-},{"./../base.coffee":7}],12:[function(require,module,exports){
+},{"./../base.coffee":8}],13:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Ext) {
@@ -1201,7 +1411,7 @@ describe('ExtManager', function() {
 
 
 
-},{"./../base.coffee":7}],13:[function(require,module,exports){
+},{"./../base.coffee":8}],14:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, NGL) {
@@ -1253,7 +1463,7 @@ describe('ExtManager', function() {
 
 
 
-},{"./base.coffee":7}],14:[function(require,module,exports){
+},{"./base.coffee":8}],15:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Logger) {
@@ -1284,4 +1494,50 @@ describe('ExtManager', function() {
 
 
 
-},{"loglevel":3}]},{},[4,5,6]);
+},{"loglevel":3}],16:[function(require,module,exports){
+(function(root, factory) {
+  return module.exports = factory(root, {});
+})(window, function(root, Viewport) {
+  var viewport;
+  viewport = require('verge');
+  Viewport = {
+    viewportW: function() {
+      return viewport.viewportW();
+    },
+    viewportH: function(key) {
+      return viewport.viewportH();
+    },
+    viewport: function(key) {
+      return viewport.viewport();
+    },
+    inViewport: function(el, cushion) {
+      return viewport.inViewport(el, cushion);
+    },
+    inX: function(el, cushion) {
+      return viewport.inX(el, cushion);
+    },
+    inY: function(el, cushion) {
+      return viewport.inY(el, cushion);
+    },
+    scrollX: function() {
+      return viewport.scrollX();
+    },
+    scrollY: function() {
+      return viewport.scrollY();
+    },
+    mq: function(mediaQueryString) {
+      return viewport.mq(mediaQueryString);
+    },
+    rectangle: function(el, cushion) {
+      return viewport.rectangle(el, cushion);
+    },
+    aspect: function(o) {
+      return viewport.aspect(o);
+    }
+  };
+  return Viewport;
+});
+
+
+
+},{"verge":4}]},{},[5,6,7]);
