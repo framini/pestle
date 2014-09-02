@@ -2,8 +2,8 @@
   (function(root, factory) {
     return module.exports = factory(root, {});
   })(window, function(root, Base) {
-    Base.log = require('loglevel');
-    Base.device = require('ismobilejs');
+    Base.log = require('./logger.coffee');
+    Base.device = require('./devicedetection.coffee');
     Base.util = {
       each: $.each,
       extend: $.extend,

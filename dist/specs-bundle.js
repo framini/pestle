@@ -422,7 +422,7 @@ describe('Components Extension', function() {
 
 
 
-},{"../../src/core.coffee":7,"../../src/extension/components.coffee":9}],4:[function(require,module,exports){
+},{"../../src/core.coffee":7,"../../src/extension/components.coffee":10}],4:[function(require,module,exports){
 var Base, Core, ExtManager;
 
 Base = require('../../src/base.coffee');
@@ -483,17 +483,17 @@ describe('Core', function() {
     });
   });
   return describe('Base libraries', function() {
-    return describe('Logger', function() {
+    describe('Logger', function() {
       it('should have a Logger available', function() {
         return Base.should.have.property('log');
       });
       it('should provide a way to set logging levels', function() {
         return Base.log.setLevel.should.be.a('function');
       });
-      it('should available within sandboxes', function() {
+      it('should be available within sandboxes', function() {
         var sb;
         sb = core.createSandbox('test');
-        return sb.log.should.be.defined;
+        return sb.should.have.property('log');
       });
       it('should provide a function to log trace messages', function() {
         return Base.log.trace.should.be.a('function');
@@ -511,12 +511,58 @@ describe('Core', function() {
         return Base.log.error.should.be.a('function');
       });
     });
+    return describe('Device Detection', function() {
+      it('should have Device Detector available', function() {
+        return Base.should.have.property('device');
+      });
+      it('should be available within sandboxes', function() {
+        var sb;
+        sb = core.createSandbox('test');
+        return sb.should.have.property('device');
+      });
+      it('should provide an isMobile method', function() {
+        return Base.device.isMobile.should.be.a('function');
+      });
+      it('should provide an isTablet method', function() {
+        return Base.device.isTablet.should.be.a('function');
+      });
+      it('should provide an isIphone method', function() {
+        return Base.device.isIphone.should.be.a('function');
+      });
+      it('should provide an isIpod method', function() {
+        return Base.device.isIpod.should.be.a('function');
+      });
+      it('should provide an isIpad method', function() {
+        return Base.device.isIpad.should.be.a('function');
+      });
+      it('should provide an isApple method', function() {
+        return Base.device.isApple.should.be.a('function');
+      });
+      it('should provide an isAndroidPhone method', function() {
+        return Base.device.isAndroidPhone.should.be.a('function');
+      });
+      it('should provide an isAndroidTablet method', function() {
+        return Base.device.isAndroidTablet.should.be.a('function');
+      });
+      it('should provide an isAndroidDevice method', function() {
+        return Base.device.isAndroidDevice.should.be.a('function');
+      });
+      it('should provide an isWindowsPhone method', function() {
+        return Base.device.isWindowsPhone.should.be.a('function');
+      });
+      it('should provide an isWindowsTablet method', function() {
+        return Base.device.isWindowsTablet.should.be.a('function');
+      });
+      return it('should provide an isWindowsDevice method', function() {
+        return Base.device.isWindowsDevice.should.be.a('function');
+      });
+    });
   });
 });
 
 
 
-},{"../../src/base.coffee":6,"../../src/core.coffee":7,"../../src/extmanager.coffee":10}],5:[function(require,module,exports){
+},{"../../src/base.coffee":6,"../../src/core.coffee":7,"../../src/extmanager.coffee":11}],5:[function(require,module,exports){
 var ExtManager;
 
 ExtManager = require('../../src/extmanager.coffee');
@@ -586,12 +632,12 @@ describe('ExtManager', function() {
 
 
 
-},{"../../src/extmanager.coffee":10}],6:[function(require,module,exports){
+},{"../../src/extmanager.coffee":11}],6:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Base) {
-  Base.log = require('loglevel');
-  Base.device = require('ismobilejs');
+  Base.log = require('./logger.coffee');
+  Base.device = require('./devicedetection.coffee');
   Base.util = {
     each: $.each,
     extend: $.extend,
@@ -603,7 +649,7 @@ describe('ExtManager', function() {
 
 
 
-},{"ismobilejs":1,"loglevel":2}],7:[function(require,module,exports){
+},{"./devicedetection.coffee":8,"./logger.coffee":12}],7:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = root.NGL = factory(root, {});
 })(window, function(root, NGL) {
@@ -630,7 +676,7 @@ describe('ExtManager', function() {
       this.started = false;
       Base.log.setLevel(this.config.debug.logLevel);
       this.extManager = new ExtManager();
-      this.sandbox = Object.create(Base);
+      this.sandbox = _.clone(Base);
       this.sandboxes = {};
     }
 
@@ -662,7 +708,7 @@ describe('ExtManager', function() {
     };
 
     Core.prototype.createSandbox = function(name, opts) {
-      return this.sandboxes[name] = _.extend(Object.create(this.sandbox), {
+      return this.sandboxes[name] = _.extend({}, this.sandbox, {
         name: name
       });
     };
@@ -675,7 +721,56 @@ describe('ExtManager', function() {
 
 
 
-},{"./base.coffee":6,"./extension/backbone.ext.coffee":8,"./extension/components.coffee":9,"./extmanager.coffee":10}],8:[function(require,module,exports){
+},{"./base.coffee":6,"./extension/backbone.ext.coffee":9,"./extension/components.coffee":10,"./extmanager.coffee":11}],8:[function(require,module,exports){
+(function(root, factory) {
+  return module.exports = factory(root, {});
+})(window, function(root, DeviceDetection) {
+  var isMobile;
+  isMobile = require('ismobilejs');
+  DeviceDetection = {
+    isMobile: function() {
+      return isMobile.phone;
+    },
+    isTablet: function() {
+      return isMobile.tablet;
+    },
+    isIphone: function() {
+      return isMobile.apple.phone;
+    },
+    isIpod: function() {
+      return isMobile.apple.ipod;
+    },
+    isIpad: function() {
+      return isMobile.apple.tablet;
+    },
+    isApple: function() {
+      return isMobile.apple.device;
+    },
+    isAndroidPhone: function() {
+      return isMobile.android.phone;
+    },
+    isAndroidTablet: function() {
+      return isMobile.android.tablet;
+    },
+    isAndroidDevice: function() {
+      return isMobile.android.device;
+    },
+    isWindowsPhone: function() {
+      return isMobile.windows.phone;
+    },
+    isWindowsTablet: function() {
+      return isMobile.windows.tablet;
+    },
+    isWindowsDevice: function() {
+      return isMobile.windows.device;
+    }
+  };
+  return DeviceDetection;
+});
+
+
+
+},{"ismobilejs":1}],9:[function(require,module,exports){
 
 /**
  * This extension should probably be defined at a project level, not here
@@ -799,7 +894,7 @@ describe('ExtManager', function() {
 
 
 
-},{"./../base.coffee":6}],9:[function(require,module,exports){
+},{"./../base.coffee":6}],10:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Ext) {
@@ -920,7 +1015,7 @@ describe('ExtManager', function() {
 
 
 
-},{"./../base.coffee":6}],10:[function(require,module,exports){
+},{"./../base.coffee":6}],11:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, NGL) {
@@ -972,4 +1067,35 @@ describe('ExtManager', function() {
 
 
 
-},{"./base.coffee":6}]},{},[3,4,5]);
+},{"./base.coffee":6}],12:[function(require,module,exports){
+(function(root, factory) {
+  return module.exports = factory(root, {});
+})(window, function(root, Logger) {
+  var loglevel;
+  loglevel = require('loglevel');
+  Logger = {
+    setLevel: function(level) {
+      return loglevel.setLevel(level);
+    },
+    trace: function(msg) {
+      return loglevel.trace(msg);
+    },
+    debug: function(msg) {
+      return loglevel.debug(msg);
+    },
+    info: function(msg) {
+      return loglevel.info(msg);
+    },
+    warn: function(msg) {
+      return loglevel.warn(msg);
+    },
+    error: function(msg) {
+      return loglevel.error(msg);
+    }
+  };
+  return Logger;
+});
+
+
+
+},{"loglevel":2}]},{},[3,4,5]);

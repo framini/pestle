@@ -9,10 +9,10 @@
     # DOM manipulation
 
     # Logger
-    Base.log = require('loglevel')
+    Base.log = require './logger.coffee'
 
     # Device detection
-    Base.device = require('ismobilejs')
+    Base.device = require './devicedetection.coffee'
 
     # Utils
     # Libraris like underscore, backbone, will be loaded by the project

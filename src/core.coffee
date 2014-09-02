@@ -38,13 +38,12 @@
             # and make its functionality available to the stack
             @extManager = new ExtManager()
 
-            # through this object the modules will be accesing the method defined by the
+            # through this object the modules will be accesing the methods defined by the
             # extensions
-            @sandbox = Object.create(Base)
+            @sandbox = _.clone Base
 
             # namespace to hold all the sandboxes
             @sandboxes = {}
-
 
 
         addExtension: (ext) ->
@@ -83,7 +82,7 @@
                     ext.afterAppStarted(@)
 
         createSandbox: (name, opts) ->
-            @sandboxes[name] = _.extend Object.create(@.sandbox), name : name
+            @sandboxes[name] = _.extend {}, @sandbox, name : name
 
 
     return NGL

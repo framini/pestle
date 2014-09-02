@@ -25,7 +25,7 @@
         this.started = false;
         Base.log.setLevel(this.config.debug.logLevel);
         this.extManager = new ExtManager();
-        this.sandbox = Object.create(Base);
+        this.sandbox = _.clone(Base);
         this.sandboxes = {};
       }
 
@@ -56,7 +56,7 @@
       };
 
       Core.prototype.createSandbox = function(name, opts) {
-        return this.sandboxes[name] = _.extend(Object.create(this.sandbox), {
+        return this.sandboxes[name] = _.extend({}, this.sandbox, {
           name: name
         });
       };

@@ -55,6 +55,8 @@ describe 'Core', ->
 
     describe 'Base libraries', ->
 
+        # For these we are just going to check their APIs
+
         describe 'Logger', ->
 
             it 'should have a Logger available', ->
@@ -63,9 +65,9 @@ describe 'Core', ->
             it 'should provide a way to set logging levels', ->
                 Base.log.setLevel.should.be.a('function')
 
-            it 'should available within sandboxes', ->
-                sb = core.createSandbox('test')
-                sb.log.should.be.defined
+            it 'should be available within sandboxes', ->
+                sb = core.createSandbox 'test'
+                sb.should.have.property 'log'
 
             it 'should provide a function to log trace messages', ->
                 Base.log.trace.should.be.a('function')
@@ -81,6 +83,52 @@ describe 'Core', ->
 
             it 'should provide a function to log error messages', ->
                 Base.log.error.should.be.a('function')
+
+        describe 'Device Detection', ->
+
+            it 'should have Device Detector available', ->
+                Base.should.have.property('device')
+
+            it 'should be available within sandboxes', ->
+                sb = core.createSandbox 'test'
+                sb.should.have.property 'device'
+
+            it 'should provide an isMobile method', ->
+                Base.device.isMobile.should.be.a('function')
+
+            it 'should provide an isTablet method', ->
+                Base.device.isTablet.should.be.a('function')
+
+            it 'should provide an isIphone method', ->
+                Base.device.isIphone.should.be.a('function')
+
+            it 'should provide an isIpod method', ->
+                Base.device.isIpod.should.be.a('function')
+
+            it 'should provide an isIpad method', ->
+                Base.device.isIpad.should.be.a('function')
+
+            it 'should provide an isApple method', ->
+                Base.device.isApple.should.be.a('function')
+
+            it 'should provide an isAndroidPhone method', ->
+                Base.device.isAndroidPhone.should.be.a('function')
+
+            it 'should provide an isAndroidTablet method', ->
+                Base.device.isAndroidTablet.should.be.a('function')
+
+            it 'should provide an isAndroidDevice method', ->
+                Base.device.isAndroidDevice.should.be.a('function')
+
+            it 'should provide an isWindowsPhone method', ->
+                Base.device.isWindowsPhone.should.be.a('function')
+
+            it 'should provide an isWindowsTablet method', ->
+                Base.device.isWindowsTablet.should.be.a('function')
+
+            it 'should provide an isWindowsDevice method', ->
+                Base.device.isWindowsDevice.should.be.a('function')
+
 
 
 
