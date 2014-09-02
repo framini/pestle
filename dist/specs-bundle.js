@@ -1,4 +1,148 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*!
+ * Cookies.js - 0.4.0
+ *
+ * Copyright (c) 2014, Scott Hamper
+ * Licensed under the MIT license,
+ * http://www.opensource.org/licenses/MIT
+ */
+(function (undefined) {
+    'use strict';
+
+    var Cookies = function (key, value, options) {
+        return arguments.length === 1 ?
+            Cookies.get(key) : Cookies.set(key, value, options);
+    };
+
+    // Allows for setter injection in unit tests
+    Cookies._document = document;
+    Cookies._navigator = navigator;
+
+    Cookies.defaults = {
+        path: '/'
+    };
+
+    Cookies.get = function (key) {
+        if (Cookies._cachedDocumentCookie !== Cookies._document.cookie) {
+            Cookies._renewCache();
+        }
+
+        return Cookies._cache[key];
+    };
+
+    Cookies.set = function (key, value, options) {
+        options = Cookies._getExtendedOptions(options);
+        options.expires = Cookies._getExpiresDate(value === undefined ? -1 : options.expires);
+
+        Cookies._document.cookie = Cookies._generateCookieString(key, value, options);
+
+        return Cookies;
+    };
+
+    Cookies.expire = function (key, options) {
+        return Cookies.set(key, undefined, options);
+    };
+
+    Cookies._getExtendedOptions = function (options) {
+        return {
+            path: options && options.path || Cookies.defaults.path,
+            domain: options && options.domain || Cookies.defaults.domain,
+            expires: options && options.expires || Cookies.defaults.expires,
+            secure: options && options.secure !== undefined ?  options.secure : Cookies.defaults.secure
+        };
+    };
+
+    Cookies._isValidDate = function (date) {
+        return Object.prototype.toString.call(date) === '[object Date]' && !isNaN(date.getTime());
+    };
+
+    Cookies._getExpiresDate = function (expires, now) {
+        now = now || new Date();
+        switch (typeof expires) {
+            case 'number': expires = new Date(now.getTime() + expires * 1000); break;
+            case 'string': expires = new Date(expires); break;
+        }
+
+        if (expires && !Cookies._isValidDate(expires)) {
+            throw new Error('`expires` parameter cannot be converted to a valid Date instance');
+        }
+
+        return expires;
+    };
+
+    Cookies._generateCookieString = function (key, value, options) {
+        key = key.replace(/[^#$&+\^`|]/g, encodeURIComponent);
+        key = key.replace(/\(/g, '%28').replace(/\)/g, '%29');
+        value = (value + '').replace(/[^!#$&-+\--:<-\[\]-~]/g, encodeURIComponent);
+        options = options || {};
+
+        var cookieString = key + '=' + value;
+        cookieString += options.path ? ';path=' + options.path : '';
+        cookieString += options.domain ? ';domain=' + options.domain : '';
+        cookieString += options.expires ? ';expires=' + options.expires.toUTCString() : '';
+        cookieString += options.secure ? ';secure' : '';
+
+        return cookieString;
+    };
+
+    Cookies._getCookieObjectFromString = function (documentCookie) {
+        var cookieObject = {};
+        var cookiesArray = documentCookie ? documentCookie.split('; ') : [];
+
+        for (var i = 0; i < cookiesArray.length; i++) {
+            var cookieKvp = Cookies._getKeyValuePairFromCookieString(cookiesArray[i]);
+
+            if (cookieObject[cookieKvp.key] === undefined) {
+                cookieObject[cookieKvp.key] = cookieKvp.value;
+            }
+        }
+
+        return cookieObject;
+    };
+
+    Cookies._getKeyValuePairFromCookieString = function (cookieString) {
+        // "=" is a valid character in a cookie value according to RFC6265, so cannot `split('=')`
+        var separatorIndex = cookieString.indexOf('=');
+
+        // IE omits the "=" when the cookie value is an empty string
+        separatorIndex = separatorIndex < 0 ? cookieString.length : separatorIndex;
+
+        return {
+            key: decodeURIComponent(cookieString.substr(0, separatorIndex)),
+            value: decodeURIComponent(cookieString.substr(separatorIndex + 1))
+        };
+    };
+
+    Cookies._renewCache = function () {
+        Cookies._cache = Cookies._getCookieObjectFromString(Cookies._document.cookie);
+        Cookies._cachedDocumentCookie = Cookies._document.cookie;
+    };
+
+    Cookies._areEnabled = function () {
+        var testKey = 'cookies.js';
+        var areEnabled = Cookies.set(testKey, 1).get(testKey) === '1';
+        Cookies.expire(testKey);
+        return areEnabled;
+    };
+
+    Cookies.enabled = Cookies._areEnabled();
+
+    // AMD support
+    if (typeof define === 'function' && define.amd) {
+        define(function () { return Cookies; });
+    // CommonJS and Node.js module support.
+    } else if (typeof exports !== 'undefined') {
+        // Support Node.js specific `module.exports` (which can be a function)
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = Cookies;
+        }
+        // But always support CommonJS module 1.1.1 spec (`exports` cannot be a function)
+        exports.Cookies = Cookies;
+    } else {
+        window.Cookies = Cookies;
+    }
+})();
+},{}],2:[function(require,module,exports){
 /**
  * isMobile.js v0.3.2
  *
@@ -109,7 +253,7 @@
 
 })(this);
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 /*
 * loglevel - https://github.com/pimterry/loglevel
 *
@@ -316,7 +460,7 @@
     return self;
 }));
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var Component, Core;
 
 Component = require('../../src/extension/components.coffee');
@@ -422,7 +566,7 @@ describe('Components Extension', function() {
 
 
 
-},{"../../src/core.coffee":7,"../../src/extension/components.coffee":10}],4:[function(require,module,exports){
+},{"../../src/core.coffee":9,"../../src/extension/components.coffee":12}],5:[function(require,module,exports){
 var Base, Core, ExtManager;
 
 Base = require('../../src/base.coffee');
@@ -511,7 +655,7 @@ describe('Core', function() {
         return Base.log.error.should.be.a('function');
       });
     });
-    return describe('Device Detection', function() {
+    describe('Device Detection', function() {
       it('should have Device Detector available', function() {
         return Base.should.have.property('device');
       });
@@ -557,12 +701,31 @@ describe('Core', function() {
         return Base.device.isWindowsDevice.should.be.a('function');
       });
     });
+    return describe('Cookies', function() {
+      it('should have Cookies handler available', function() {
+        return Base.should.have.property('cookies');
+      });
+      it('should be available within sandboxes', function() {
+        var sb;
+        sb = core.createSandbox('test');
+        return sb.should.have.property('cookies');
+      });
+      it('should provide a set method', function() {
+        return Base.cookies.set.should.be.a('function');
+      });
+      it('should provide a get method', function() {
+        return Base.cookies.get.should.be.a('function');
+      });
+      return it('should provide a expire method', function() {
+        return Base.cookies.expire.should.be.a('function');
+      });
+    });
   });
 });
 
 
 
-},{"../../src/base.coffee":6,"../../src/core.coffee":7,"../../src/extmanager.coffee":11}],5:[function(require,module,exports){
+},{"../../src/base.coffee":7,"../../src/core.coffee":9,"../../src/extmanager.coffee":13}],6:[function(require,module,exports){
 var ExtManager;
 
 ExtManager = require('../../src/extmanager.coffee');
@@ -632,12 +795,13 @@ describe('ExtManager', function() {
 
 
 
-},{"../../src/extmanager.coffee":11}],6:[function(require,module,exports){
+},{"../../src/extmanager.coffee":13}],7:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Base) {
   Base.log = require('./logger.coffee');
   Base.device = require('./devicedetection.coffee');
+  Base.cookies = require('./cookies.coffee');
   Base.util = {
     each: $.each,
     extend: $.extend,
@@ -649,7 +813,29 @@ describe('ExtManager', function() {
 
 
 
-},{"./devicedetection.coffee":8,"./logger.coffee":12}],7:[function(require,module,exports){
+},{"./cookies.coffee":8,"./devicedetection.coffee":10,"./logger.coffee":14}],8:[function(require,module,exports){
+(function(root, factory) {
+  return module.exports = factory(root, {});
+})(window, function(root, Cookies) {
+  var cookies;
+  cookies = require('cookies-js');
+  Cookies = {
+    set: function(key, value, options) {
+      return cookies.set(key, value, options);
+    },
+    get: function(key) {
+      return cookies.get(key);
+    },
+    expire: function(key, options) {
+      return cookies.expire(key, options);
+    }
+  };
+  return Cookies;
+});
+
+
+
+},{"cookies-js":1}],9:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = root.NGL = factory(root, {});
 })(window, function(root, NGL) {
@@ -721,7 +907,7 @@ describe('ExtManager', function() {
 
 
 
-},{"./base.coffee":6,"./extension/backbone.ext.coffee":9,"./extension/components.coffee":10,"./extmanager.coffee":11}],8:[function(require,module,exports){
+},{"./base.coffee":7,"./extension/backbone.ext.coffee":11,"./extension/components.coffee":12,"./extmanager.coffee":13}],10:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, DeviceDetection) {
@@ -770,7 +956,7 @@ describe('ExtManager', function() {
 
 
 
-},{"ismobilejs":1}],9:[function(require,module,exports){
+},{"ismobilejs":2}],11:[function(require,module,exports){
 
 /**
  * This extension should probably be defined at a project level, not here
@@ -894,7 +1080,7 @@ describe('ExtManager', function() {
 
 
 
-},{"./../base.coffee":6}],10:[function(require,module,exports){
+},{"./../base.coffee":7}],12:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Ext) {
@@ -1015,7 +1201,7 @@ describe('ExtManager', function() {
 
 
 
-},{"./../base.coffee":6}],11:[function(require,module,exports){
+},{"./../base.coffee":7}],13:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, NGL) {
@@ -1067,7 +1253,7 @@ describe('ExtManager', function() {
 
 
 
-},{"./base.coffee":6}],12:[function(require,module,exports){
+},{"./base.coffee":7}],14:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Logger) {
@@ -1098,4 +1284,4 @@ describe('ExtManager', function() {
 
 
 
-},{"loglevel":2}]},{},[3,4,5]);
+},{"loglevel":3}]},{},[4,5,6]);

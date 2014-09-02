@@ -14,9 +14,13 @@
     # Device detection
     Base.device = require './devicedetection.coffee'
 
+    # Cookies API
+    Base.cookies = require './cookies.coffee'
+
     # Utils
-    # Libraris like underscore, backbone, will be loaded by the project
+    # Libraries like underscore, backbone, will be loaded by the project
     # as hard dependencies for this layer
+    # TODO: Make something with this. As it is, is useless
     Base.util =
         each: $.each,
         extend: $.extend,

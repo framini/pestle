@@ -129,6 +129,24 @@ describe 'Core', ->
             it 'should provide an isWindowsDevice method', ->
                 Base.device.isWindowsDevice.should.be.a('function')
 
+        describe 'Cookies', ->
+
+            it 'should have Cookies handler available', ->
+                Base.should.have.property('cookies')
+
+            it 'should be available within sandboxes', ->
+                sb = core.createSandbox 'test'
+                sb.should.have.property 'cookies'
+
+            it 'should provide a set method', ->
+                Base.cookies.set.should.be.a('function')
+
+            it 'should provide a get method', ->
+                Base.cookies.get.should.be.a('function')
+
+            it 'should provide a expire method', ->
+                Base.cookies.expire.should.be.a('function') 
+
 
 
 
