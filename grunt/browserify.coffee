@@ -1,7 +1,7 @@
 module.exports =
     dist:
         files:
-            'dist/sdk.js': ['src/base.coffee', 'src/extmanager.coffee', 'src/core.coffee', 'extension/*.coffee']
+            '<%= ng.distFolder %>/sdk.js': ['src/base.coffee', 'src/extmanager.coffee', 'src/core.coffee', 'extension/*.coffee']
 
         options:
             transform: ['coffeeify']
@@ -11,7 +11,7 @@ module.exports =
 
     dev:
         files:
-            'dist/sdk.js': ['src/base.coffee', 'src/extmanager.coffee', 'src/core.coffee', 'extension/*.coffee']
+            '<%= ng.buildFolder %>/sdk.js': ['src/base.coffee', 'src/extmanager.coffee', 'src/core.coffee', 'extension/*.coffee']
 
         options:
             transform: ['coffeeify']
@@ -20,7 +20,7 @@ module.exports =
                 debug : true
 
     karma:
-        dest: 'dist/specs-bundle.js'
+        dest: '<%= ng.buildFolder %>/specs-bundle.js'
         src: 'spec/**/*.coffee'
         options:
             transform: ['coffeeify']

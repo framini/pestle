@@ -9,6 +9,6 @@ module.exports =
             flatten: false,
             cwd: 'src',
             src: ['**/*.handlebars'],
-            dest: 'dist',
+            dest: '<%= ng.buildFolder %>',
             ext: '.js'
         ]

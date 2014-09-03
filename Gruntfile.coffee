@@ -6,18 +6,17 @@ module.exports = (grunt) ->
             pkg : grunt.file.readJSON 'package.json'
             ng : 
                 rootFolder: 'src'
-                buildFolder: 'dist'
+                buildFolder: '.tmp'
+                distFolder: 'dist'
                 pkg: grunt.file.readJSON 'package.json'
                 projectName : 'platform-sdk'
 
-    grunt.registerTask 'compile', [
-        'compass:compile'
-        'coffee:compile'
-        'handlebars:compile'
-    ]
 
-    grunt.registerTask 'test', [
+    grunt.registerTask 'dist', [
+        'browserify:dist',
+        'browserify:karma'
         'coffeelint'
+        'karma:continuous'
     ]
 
     grunt.registerTask 'server', (target) ->

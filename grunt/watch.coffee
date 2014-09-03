@@ -6,7 +6,7 @@ module.exports =
         ]
         tasks: [
             'coffee:compile',
-            'browserify',
+            'browserify:dev',
             'coffeelint'
         ]
         options:
@@ -22,7 +22,7 @@ module.exports =
         tasks: ['compass:server']
 
     css:
-        files: ['dist/style.css']
+        files: ['<%= ng.buildFolder %>/style.css']
         options:
             livereload: true
 
@@ -35,5 +35,5 @@ module.exports =
             livereload: true
 
     karma:
-        files: ['dist/specs-bundle.js', 'karma.conf.js']
+        files: ['<%= ng.buildFolder %>/specs-bundle.js', 'karma.conf.js']
         tasks: ['karma:dev:run']

@@ -73,7 +73,7 @@ describe 'Core', ->
                 Base.log.trace.should.be.a('function')
 
             it 'should provide a function to log debug messages', ->
-                Base.log.debug.should.be.a('function')
+                Base.log.debug.should.not.be.a('function')
 
             it 'should provide a function to log info messages', ->
                 Base.log.info.should.be.a('function')
