@@ -24,7 +24,6 @@ module.exports = function(config) {
       'bower_components/backbone/backbone.js',
       'bower_components/handlebars/handlebars.js',
       'dist/sdk.js',
-      'spec/unit/**.js',
       'dist/specs-bundle.js'
     ],
 

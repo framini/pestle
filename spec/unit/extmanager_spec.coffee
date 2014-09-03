@@ -16,7 +16,7 @@ describe 'ExtManager', ->
     it 'should have a getInitializedExtensions method', ->
         extManager.getInitializedExtensions.should.be.a 'function'
 
-    describe 'adding extensions', ->
+    describe 'Extensions', ->
 
         it 'should be possible to add new extensions', ->
 

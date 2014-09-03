@@ -23,7 +23,7 @@ describe 'Components Extension', ->
     it 'should have the class that gives the behavior to the extension exposed', ->
         Component.classes.should.be.defined
 
-    describe 'is accessing the Component class', ->
+    describe 'Component class', ->
 
         # access the exposed Component class
         cmp = Component.classes
@@ -34,7 +34,7 @@ describe 'Components Extension', ->
         it.skip 'should have a start method to initialize one component', ->
             cmp.start.should.be.a 'function'
 
-        describe 'and starting multiple components', ->
+        describe 'Starting multiple components', ->
 
             before ->
 

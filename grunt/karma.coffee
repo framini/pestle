@@ -7,5 +7,5 @@ module.exports =
         singleRun: true
         browsers: ['PhantomJS']
     dev:
-        reporters: 'dots'
+        reporters: 'mocha'
         background: true
