@@ -138,4 +138,10 @@
                     oldInitialize.apply this
 
     name: 'Backbone Extension'
+
+    # The exposed key name that could be used to pass options
+    # to the extension.
+    # This is gonna be used when instantiating the Core object.
+    # Note: By convention we'll use the filename
+    optionKey: 'backboneext'
 )

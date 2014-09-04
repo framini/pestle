@@ -12,6 +12,10 @@
 
         _initializedExtensions: []
 
+        _extensionConfigDefaults:
+            activated : true # unless said otherwise, every added extension
+                             # will be activated on start
+
         constructor: () ->
 
         add: (ext) ->
@@ -40,12 +44,31 @@
                 xt = extensions.shift()
 
                 # Call extensions constructor
-                xt.initialize(context)
+                xt.initialize(context) if @_isExtensionAllowedToBeActivated(xt, context.config)
 
                 # Keep track of the initialized extensions for future reference
                 @_initializedExtensions.push xt
 
                 @_initExtension(extensions, context)
+
+        _isExtensionAllowedToBeActivated: (xt, config) ->
+
+            # first we have to make sure that the "options" key is defined
+            # by the extension
+            unless xt.optionKey
+                msg = "The options is required is required and was not defined by: " + xt.name 
+                Base.log.error msg
+                throw new Error(msg)
+
+            # if options were provided to the extension, lets check just for "activated"
+            # which is the only option that should matter within this method 
+            if config.extension and config.extension[xt.optionKey] and config.extension[xt.optionKey].hasOwnProperty 'activated'
+                activated = config.extension[xt.optionKey].activated
+            else
+                activated = @_extensionConfigDefaults.activated
+
+            return activated
+
 
         getInitializedExtensions : () ->
             return @_initializedExtensions

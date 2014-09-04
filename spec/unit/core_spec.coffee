@@ -4,7 +4,11 @@ Core = require '../../src/core.coffee'
 
 describe 'Core', ->
    
-    core = new NGL.Core()
+    core = new NGL.Core(
+        extension:
+            "ext_deact" :
+                activated : false
+    )
 
     ext =
         initialize: sinon.spy (app) ->
@@ -13,7 +17,23 @@ describe 'Core', ->
 
         afterAppStarted: sinon.spy()
 
+        optionKey: 'ext'
+
+        name: "Testing Extension"
+
+    ext_deact =
+        initialize: sinon.spy (app) ->
+            
+            app.sandbox.bar = 'foo'
+
+        afterAppStarted: sinon.spy()
+
+        optionKey: 'ext_deact'
+
+        name: "Second Testing Extension"
+
     core.addExtension(ext)
+    core.addExtension(ext_deact)
 
     core.start()
 
@@ -42,8 +62,11 @@ describe 'Core', ->
         it 'should have an instance of the extension manager', ->
             core.extManager.should.be.an.instanceOf(ExtManager)
 
-        it 'should call the initialize method for each extension', ->
+        it 'should call the initialize method on activated extension', ->
             ext.initialize.should.have.been.called
+
+        it 'should NOT call the initialize method on deactivated extension', ->
+            ext_deact.initialize.should.not.have.been.called
 
         it 'should pass the core as an argument to the initialize method for extensions', ->
             ext.initialize.should.have.been.calledWith(core)

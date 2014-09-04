@@ -19,9 +19,11 @@
 
         cfg:
             debug:
-                logLevel: 5 # by default the logging is disabled
+                logLevel: 5 # by default the logging will be disabled
                             # values can go from 0 to 5 (5 means disabled)
             namespace: 'lodges' # TODO: change this to 'platform'
+
+            extension: {} # define the namespace to define extension specific settings
 
         constructor: (config = {}) ->
 
@@ -45,7 +47,6 @@
             # namespace to hold all the sandboxes
             @sandboxes = {}
 
-
         addExtension: (ext) ->
             # we'll only allow to add new extensions before
             # the Core get started
@@ -64,10 +65,12 @@
             # Require core extensions
             Components = require('./extension/components.coffee')
             BackboneExt = require('./extension/backbone.ext.coffee')
+            DeviceDetectionEmitter = require('./extension/devicedetectionemitter.coffee')
 
             # Add core extensions to the app
             @extManager.add(Components)
             @extManager.add(BackboneExt)
+            @extManager.add(DeviceDetectionEmitter)
 
             # Init all the extensions
             @extManager.init(@)

@@ -27,6 +27,8 @@ describe 'ExtManager', ->
 
                 afterAppStarted: sinon.spy()
 
+                optionKey: 'ext1'
+
             ext2 =
                 initialize: sinon.spy (app) ->
                     
@@ -34,9 +36,11 @@ describe 'ExtManager', ->
 
                 afterAppStarted: sinon.spy()
 
+                optionKey: 'ext2'
+
             # for this particular example we only need the sandbox property
             # on the context
-            context = { sandbox: {} }
+            context = { sandbox: {}, config: { extension: {} } }
 
             # use the method add from the extensionManager to add the
             # new extensions and prepare them to be initialized
@@ -56,6 +60,8 @@ describe 'ExtManager', ->
                     app.sandbox.foo = 'bar'
 
                 afterAppStarted: sinon.spy()
+
+                optionKey: 'bar'
 
             extManager.add(ext1)
             state = () => extManager.add(ext1)

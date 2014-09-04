@@ -145,4 +145,10 @@
     # this property will be used for testing purposes
     # to validate the Component class in isolation
     classes : Component
+
+    # The exposed key name that could be used to pass options
+    # to the extension.
+    # This is gonna be used when instantiating the Core object.
+    # Note: By convention we'll use the filename
+    optionKey: 'components'
 )
