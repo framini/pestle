@@ -2,7 +2,7 @@ module.exports =
     compile:
         expand: true,
         flatten: false,
-        cwd: '<%= ng.rootFolder %>',
-        src: ['**/*.coffee'],
+        cwd: './',
+        src: ['src/**/*.coffee', 'example/**/*.coffee'],
         dest: '<%= ng.buildFolder %>',
         ext: '.js'

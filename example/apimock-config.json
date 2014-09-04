@@ -1,5 +1,5 @@
 {
-  "mockDirectory": "/home/likewise-open/GLOBANT/francisco.ramini/dev/projects/platform-sdk/mocks",
+  "mockDirectory": "/Users/framini/Work/Globant/platform-sdk/example/mocks",
   "quiet": false,
   "port": "7878",
   "latency": 50,

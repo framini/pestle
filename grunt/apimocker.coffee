@@ -1,3 +1,3 @@
 module.exports = 
     options:
-        configFile: 'apimock-config.json'
+        configFile: 'example/apimock-config.json'

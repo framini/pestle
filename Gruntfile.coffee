@@ -22,6 +22,7 @@ module.exports = (grunt) ->
     grunt.registerTask 'server', (target) ->
 
         grunt.task.run [
+            'coffee:compile',
             'browserify:dev'
             'browserify:karma'
             'apimocker'

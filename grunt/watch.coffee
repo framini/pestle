@@ -2,11 +2,13 @@ module.exports =
     coffee:
         files: [
             'src/**/*.coffee',
+            'example/**/*.coffee',
             'spec/**/*.coffee'
         ]
         tasks: [
             'coffee:compile',
             'browserify:dev',
+            'browserify:karma',
             'coffeelint'
         ]
         options:
