@@ -1,7 +1,9 @@
 {
   "name": "platform-sdk",
   "version": "0.1.0",
-  "dependencies": {},
+  "dependencies": {
+    "imager.js": "^0.2.0"
+  },
   "devDependencies": {
     "browserify": "^5.9.1",
     "chai": "^1.9.1",
@@ -10,7 +12,6 @@
     "cookies-js": "^0.4.0",
     "grunt": "~0.4.2",
     "grunt-apimocker": "0.0.1",
-    "grunt-bower-task": "git://github.com/framini/grunt-bower-task.git#fr/cldependencies",
     "grunt-browserify": "^3.0.0",
     "grunt-coffeelint": "0.0.7",
     "grunt-concurrent": "~0.4.2",
@@ -42,7 +43,8 @@
     "minimatch": "~0.2.14",
     "mocha": "^1.21.4",
     "verge": "^1.9.1",
-    "karma-mocha-reporter": "^0.3.1"
+    "karma-mocha-reporter": "^0.3.1",
+    "imager.js": "git://github.com/framini/Imager.js.git#feature/kidsreq"
   },
   "engines": {
     "node": ">=0.8.0"

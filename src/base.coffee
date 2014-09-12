@@ -20,6 +20,9 @@
     # Viewport detection
     Base.vp = require './viewportdetection.coffee'
 
+    # Function that is gonna handle responsive images
+    Base.Imager = require 'imager.js'
+
     # Utils
     # Libraries like underscore, backbone, will be loaded by the project
     # as hard dependencies for this layer

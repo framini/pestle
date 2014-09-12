@@ -56,7 +56,7 @@
             # first we have to make sure that the "options" key is defined
             # by the extension
             unless xt.optionKey
-                msg = "The options is required is required and was not defined by: " + xt.name 
+                msg = "The optionKey is required and was not defined by: " + xt.name 
                 Base.log.error msg
                 throw new Error(msg)
 
