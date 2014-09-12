@@ -126,7 +126,7 @@
     # constructor
     initialize : (app) ->
 
-        Base.log.info "Inicializada la componente de Componentes"
+        Base.log.info "[ext] Component extension initialized"
 
         app.sandbox.startComponents = (list, app) ->
 

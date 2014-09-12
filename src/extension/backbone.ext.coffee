@@ -109,7 +109,7 @@
     # init the extension
     initialize : (app) ->
 
-        Base.log.info "Inicializada la componente de Backbone"
+        Base.log.info "[ext] Backbone extension initialized"
 
         app.sandbox.mvc = () ->
             Base.log.info "Inicializada la componente de MVC"
