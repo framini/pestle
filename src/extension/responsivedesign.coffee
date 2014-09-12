@@ -1,5 +1,7 @@
 ###*
- * This extension should probably be defined at a project level, not here
+ * This extension will be triggering events once the Device in which the
+ * user is navigating the site is detected. Its fucionality mostly depends
+ * on the configurations settings (provided by default, but they can be overriden)
 ###
 ((root, factory) ->
 
