@@ -65,12 +65,13 @@
             # Require core extensions
             Components = require('./extension/components.coffee')
             BackboneExt = require('./extension/backbone.ext.coffee')
-            DeviceDetectionEmitter = require('./extension/devicedetectionemitter.coffee')
+            ResponsiveDesign = require('./extension/responsivedesign.coffee')
+
 
             # Add core extensions to the app
             @extManager.add(Components)
             @extManager.add(BackboneExt)
-            @extManager.add(DeviceDetectionEmitter)
+            @extManager.add(ResponsiveDesign)
 
             # Init all the extensions
             @extManager.init(@)

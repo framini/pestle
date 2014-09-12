@@ -29,6 +29,10 @@
         extend: $.extend,
         uniq: root._.uniq,
         _: root._
+        string:
+            capitalize: (str) ->
+                str = (if not str? then "" else String(str))
+                str.charAt(0).toUpperCase() + str.slice(1)
 
     return Base
 )
