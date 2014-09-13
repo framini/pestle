@@ -143,6 +143,450 @@
     }
 })();
 },{}],2:[function(require,module,exports){
+;
+(function(window, document) {
+
+    'use strict';
+
+    var defaultWidths, getKeys, nextTick, addEvent, getNaturalWidth;
+
+    nextTick = window.requestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        function(callback) {
+            window.setTimeout(callback, 1000 / 60);
+    };
+
+    function applyEach(collection, callbackEach) {
+        var i = 0,
+            length = collection.length,
+            new_collection = [];
+
+        for (; i < length; i++) {
+            new_collection[i] = callbackEach(collection[i], i);
+        }
+
+        return new_collection;
+    }
+
+    function returnDirectValue(value) {
+        return value;
+    }
+
+    getNaturalWidth = (function() {
+        if (Object.prototype.hasOwnProperty.call(document.createElement('img'), 'naturalWidth')) {
+            return function(image) {
+                return image.naturalWidth;
+            };
+        }
+        // IE8 and below lacks the naturalWidth property
+        return function(source) {
+            var img = document.createElement('img');
+            img.src = source.src;
+            return img.width;
+        };
+    })();
+
+    addEvent = (function() {
+        if (document.addEventListener) {
+            return function addStandardEventListener(el, eventName, fn) {
+                return el.addEventListener(eventName, fn, false);
+            };
+        } else {
+            return function addIEEventListener(el, eventName, fn) {
+                return el.attachEvent('on' + eventName, fn);
+            };
+        }
+    })();
+
+    defaultWidths = [96, 130, 165, 200, 235, 270, 304, 340, 375, 410, 445, 485, 520, 555, 590, 625, 660, 695, 736];
+
+    getKeys = typeof Object.keys === 'function' ? Object.keys : function(object) {
+        var keys = [],
+            key;
+
+        for (key in object) {
+            keys.push(key);
+        }
+
+        return keys;
+    };
+
+
+    /*
+        Construct a new Imager instance, passing an optional configuration object.
+
+        Example usage:
+
+            {
+                // Available widths for your images
+                availableWidths: [Number],
+
+                // Selector to be used to locate your div placeholders
+                selector: '',
+
+                // Class name to give your resizable images
+                className: '',
+
+                // If set to true, Imager will update the src attribute of the relevant images
+                onResize: Boolean,
+
+                // Toggle the lazy load functionality on or off
+                lazyload: Boolean,
+
+                // Used alongside the lazyload feature (helps performance by setting a higher delay)
+                scrollDelay: Number
+            }
+
+        @param {object} configuration settings
+        @return {object} instance of Imager
+     */
+    function Imager(elements, opts) {
+        var self = this,
+            doc = document;
+
+        opts = opts || {};
+
+        if (elements !== undefined) {
+            // first argument is selector string
+            if (typeof elements === 'string') {
+                opts.selector = elements;
+                elements = undefined;
+            }
+
+            // first argument is the `opts` object, `elements` is implicitly the `opts.selector` string
+            else if (typeof elements.length === 'undefined') {
+                opts = elements;
+                elements = undefined;
+            }
+        }
+
+        this.imagesOffScreen = [];
+        this.viewportHeight = doc.documentElement.clientHeight;
+        this.selector = opts.selector || '.delayed-image-load';
+        this.className = opts.className || 'image-replace';
+        this.gif = doc.createElement('img');
+        this.gif.src = 'data:image/gif;base64,R0lGODlhEAAJAIAAAP///wAAACH5BAEAAAAALAAAAAAQAAkAAAIKhI+py+0Po5yUFQA7';
+        this.gif.className = this.className;
+        this.gif.alt = '';
+        this.scrollDelay = opts.scrollDelay || 250;
+        this.onResize = opts.hasOwnProperty('onResize') ? opts.onResize : true;
+        this.lazyload = opts.hasOwnProperty('lazyload') ? opts.lazyload : false;
+        this.scrolled = false;
+        this.availablePixelRatios = opts.availablePixelRatios || [1, 2];
+        this.availableWidths = opts.availableWidths || defaultWidths;
+        this.onImagesReplaced = opts.onImagesReplaced || function() {};
+        this.widthsMap = {};
+        this.refreshPixelRatio();
+        this.widthInterpolator = opts.widthInterpolator || returnDirectValue;
+        this.deltaSquare = opts.deltaSquare || 1.5;
+        this.squareSelector = opts.squareSelector || 'sqrcrop';
+        this.adaptSelector = this.adaptSelector || 'adapt';
+
+        // Needed as IE8 adds a default `width`/`height` attribute…
+        this.gif.removeAttribute('height');
+        this.gif.removeAttribute('width');
+
+        if (typeof this.availableWidths !== 'function') {
+            if (typeof this.availableWidths.length === 'number') {
+                this.widthsMap = Imager.createWidthsMap(this.availableWidths, this.widthInterpolator);
+            } else {
+                this.widthsMap = this.availableWidths;
+                this.availableWidths = getKeys(this.availableWidths);
+            }
+
+            this.availableWidths = this.availableWidths.sort(function(a, b) {
+                return a - b;
+            });
+        }
+
+
+
+        if (elements) {
+            this.divs = applyEach(elements, returnDirectValue);
+            this.selector = null;
+        } else {
+            this.divs = applyEach(doc.querySelectorAll(this.selector), returnDirectValue);
+        }
+
+        this.changeDivsToEmptyImages();
+
+        nextTick(function() {
+            self.init();
+        });
+    }
+
+    Imager.prototype.scrollCheck = function() {
+        if (this.scrolled) {
+            if (!this.imagesOffScreen.length) {
+                window.clearInterval(this.interval);
+            }
+
+            this.divs = this.imagesOffScreen.slice(0); // copy by value, don't copy by reference
+            this.imagesOffScreen.length = 0;
+            this.changeDivsToEmptyImages();
+            this.scrolled = false;
+        }
+    };
+
+    Imager.prototype.init = function() {
+        this.initialized = true;
+        this.checkImagesNeedReplacing(this.divs);
+
+        if (this.onResize) {
+            this.registerResizeEvent();
+        }
+
+        if (this.lazyload) {
+            this.registerScrollEvent();
+        }
+    };
+
+    Imager.prototype.createGif = function(element) {
+        // if the element is already a responsive image then we don't replace it again
+        if (element.className.match(new RegExp('(^| )' + this.className + '( |$)'))) {
+            return element;
+        }
+
+        var elementClassName = element.getAttribute('data-class');
+        var elementWidth = element.getAttribute('data-width');
+        var gif = this.gif.cloneNode(false);
+
+        if (elementWidth) {
+            gif.width = elementWidth;
+            gif.setAttribute('data-width', elementWidth);
+        }
+
+        gif.className = (elementClassName ? elementClassName + ' ' : '') + this.className;
+        gif.setAttribute('data-src', element.getAttribute('data-src'));
+        gif.setAttribute('alt', element.getAttribute('data-alt') || this.gif.alt);
+
+        element.parentNode.replaceChild(gif, element);
+
+        return gif;
+    };
+
+    Imager.prototype.changeDivsToEmptyImages = function() {
+        var self = this;
+
+        applyEach(this.divs, function(element, i) {
+            if (self.lazyload) {
+                if (self.isThisElementOnScreen(element)) {
+                    self.divs[i] = self.createGif(element);
+                } else {
+                    self.imagesOffScreen.push(element);
+                }
+            } else {
+                self.divs[i] = self.createGif(element);
+            }
+        });
+
+        if (this.initialized) {
+            this.checkImagesNeedReplacing(this.divs);
+        }
+    };
+
+    Imager.prototype.isThisElementOnScreen = function(element) {
+        // document.body.scrollTop was working in Chrome but didn't work on Firefox, so had to resort to window.pageYOffset
+        // but can't fallback to document.body.scrollTop as that doesn't work in IE with a doctype (?) so have to use document.documentElement.scrollTop
+        var offset = Imager.getPageOffset();
+        var elementOffsetTop = 0;
+
+        if (element.offsetParent) {
+            do {
+                elementOffsetTop += element.offsetTop;
+            }
+            while (element = element.offsetParent);
+        }
+
+        return (elementOffsetTop < (this.viewportHeight + offset)) ? true : false;
+    };
+
+    Imager.prototype.checkImagesNeedReplacing = function(images) {
+        var self = this;
+
+        if (!this.isResizing) {
+            this.isResizing = true;
+            this.refreshPixelRatio();
+
+            applyEach(images, function(image) {
+                self.replaceImagesBasedOnScreenDimensions(image);
+            });
+
+            this.isResizing = false;
+            this.onImagesReplaced(images);
+        }
+    };
+
+    Imager.prototype.replaceImagesBasedOnScreenDimensions = function(image) {
+        var computedWidth, src, naturalWidth;
+
+        naturalWidth = getNaturalWidth(image);
+        computedWidth = typeof this.availableWidths === 'function' ? this.availableWidths(image) : this.determineAppropriateResolution(image);
+
+        image.width = computedWidth;
+
+        if (image.src !== this.gif.src && computedWidth <= naturalWidth) {
+            return;
+        }
+
+        src = this.changeImageSrcToUseNewImageDimensions(this.buildUrlStructure(image.getAttribute('data-src'), image), computedWidth);
+
+        image.src = src;
+
+        if (Backbone) {
+            Backbone.trigger('imager:ready')
+        }
+    };
+
+    Imager.prototype.determineAppropriateResolution = function(image) {
+        return Imager.getClosestValue(image.getAttribute('data-width') || image.parentNode.clientWidth, this.availableWidths);
+    };
+
+    /**
+     * Updates the device pixel ratio value used by Imager
+     *
+     * It is performed before each replacement loop, in case a user zoomed in/out
+     * and thus updated the `window.devicePixelRatio` value.
+     *
+     * @api
+     * @since 1.0.1
+     */
+    Imager.prototype.refreshPixelRatio = function refreshPixelRatio() {
+        this.devicePixelRatio = Imager.getClosestValue(Imager.getPixelRatio(), this.availablePixelRatios);
+    };
+
+    Imager.prototype.changeImageSrcToUseNewImageDimensions = function(src, selectedWidth) {
+        return src
+            .replace(/{width}/g, Imager.transforms.width(selectedWidth, this.widthsMap))
+            .replace(/{pixel_ratio}/g, Imager.transforms.pixelRatio(this.devicePixelRatio));
+    };
+
+    Imager.prototype.buildUrlStructure = function(src, image) {
+        var squareSelector = this.isImageContainerSquare(image) ? '.' + this.squareSelector : '';
+
+        return src
+            .replace(/\.(jpg|gif|bmp|png)[^s]?({width})?[^s]({pixel_ratio})?/g, '.' + this.adaptSelector + '.$2.$3' + squareSelector + '.$1');
+    };
+
+    Imager.prototype.isImageContainerSquare = function(image) {
+        return (image.parentNode.clientWidth / image.parentNode.clientHeight) <= this.deltaSquare
+    };
+
+    Imager.getPixelRatio = function getPixelRatio(context) {
+        return (context || window)['devicePixelRatio'] || 1;
+    };
+
+    Imager.createWidthsMap = function createWidthsMap(widths, interpolator) {
+        var map = {},
+            i = widths.length;
+
+        while (i--) {
+            map[widths[i]] = interpolator(widths[i]);
+        }
+
+        return map;
+    };
+
+    Imager.transforms = {
+        pixelRatio: function(value) {
+            return value;
+        },
+        width: function(width, map) {
+            return map[width] || width;
+        }
+    };
+
+    /**
+     * Returns the closest upper value.
+     *
+     * ```js
+     * var candidates = [1, 1.5, 2];
+     *
+     * Imager.getClosestValue(0.8, candidates); // -> 1
+     * Imager.getClosestValue(1, candidates); // -> 1
+     * Imager.getClosestValue(1.3, candidates); // -> 1.5
+     * Imager.getClosestValue(3, candidates); // -> 2
+     * ```
+     *
+     * @api
+     * @since 1.0.1
+     * @param {Number} baseValue
+     * @param {Array.<Number>} candidates
+     * @returns {Number}
+     */
+    Imager.getClosestValue = function getClosestValue(baseValue, candidates) {
+        var i = candidates.length,
+            selectedWidth = candidates[i - 1];
+
+        baseValue = parseFloat(baseValue, 10);
+
+        while (i--) {
+            if (baseValue <= candidates[i]) {
+                selectedWidth = candidates[i];
+            }
+        }
+
+        return selectedWidth;
+    };
+
+    Imager.prototype.registerResizeEvent = function() {
+        var self = this;
+
+        addEvent(window, 'resize', function() {
+            self.checkImagesNeedReplacing(self.divs);
+        });
+    };
+
+    Imager.prototype.registerScrollEvent = function() {
+        var self = this;
+
+        this.scrolled = false;
+
+        this.interval = window.setInterval(function() {
+            self.scrollCheck();
+        }, self.scrollDelay);
+
+        addEvent(window, 'scroll', function() {
+            self.scrolled = true;
+        });
+    };
+
+    Imager.getPageOffsetGenerator = function getPageVerticalOffset(testCase) {
+        if (testCase) {
+            return function() {
+                return window.pageYOffset;
+            };
+        } else {
+            return function() {
+                return document.documentElement.scrollTop;
+            };
+        }
+    };
+
+    // This form is used because it seems impossible to stub `window.pageYOffset`
+    Imager.getPageOffset = Imager.getPageOffsetGenerator(Object.prototype.hasOwnProperty.call(window, 'pageYOffset'));
+
+    // Exporting for testing purpose
+    Imager.applyEach = applyEach;
+
+    /* global module, exports: true, define */
+    if (typeof module === 'object' && typeof module.exports === 'object') {
+        // CommonJS, just export
+        module.exports = exports = Imager;
+    } else if (typeof define === 'function' && define.amd) {
+        // AMD support
+        define(function() {
+            return Imager;
+        });
+    } else if (typeof window === 'object') {
+        // If no AMD and we are in the browser, attach to window
+        window.Imager = Imager;
+    }
+    /* global -module, -exports, -define */
+
+}(window, document));
+},{}],3:[function(require,module,exports){
 /**
  * isMobile.js v0.3.2
  *
@@ -253,7 +697,7 @@
 
 })(this);
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /*
 * loglevel - https://github.com/pimterry/loglevel
 *
@@ -460,7 +904,7 @@
     return self;
 }));
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /*!
  * verge 1.9.1+201402130803
  * https://github.com/ryanve/verge
@@ -622,7 +1066,7 @@
 
   return xports;
 }));
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Base) {
@@ -630,18 +1074,25 @@
   Base.device = require('./devicedetection.coffee');
   Base.cookies = require('./cookies.coffee');
   Base.vp = require('./viewportdetection.coffee');
+  Base.Imager = require('imager.js');
   Base.util = {
     each: $.each,
     extend: $.extend,
     uniq: root._.uniq,
-    _: root._
+    _: root._,
+    string: {
+      capitalize: function(str) {
+        str = (str == null ? "" : String(str));
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      }
+    }
   };
   return Base;
 });
 
 
 
-},{"./cookies.coffee":6,"./devicedetection.coffee":8,"./logger.coffee":12,"./viewportdetection.coffee":13}],6:[function(require,module,exports){
+},{"./cookies.coffee":7,"./devicedetection.coffee":9,"./logger.coffee":15,"./viewportdetection.coffee":16,"imager.js":2}],7:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Cookies) {
@@ -663,7 +1114,7 @@
 
 
 
-},{"cookies-js":1}],7:[function(require,module,exports){
+},{"cookies-js":1}],8:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = root.NGL = factory(root, {});
 })(window, function(root, NGL) {
@@ -679,7 +1130,8 @@
       debug: {
         logLevel: 5
       },
-      namespace: 'lodges'
+      namespace: 'lodges',
+      extension: {}
     };
 
     function Core(config) {
@@ -704,13 +1156,17 @@
     };
 
     Core.prototype.start = function(options) {
-      var BackboneExt, Components;
+      var BackboneExt, Components, ResponsiveDesign, ResponsiveImages;
       Base.log.info("Start de Core");
       this.started = true;
       Components = require('./extension/components.coffee');
       BackboneExt = require('./extension/backbone.ext.coffee');
+      ResponsiveDesign = require('./extension/responsivedesign.coffee');
+      ResponsiveImages = require('./extension/responsiveimages.coffee');
       this.extManager.add(Components);
       this.extManager.add(BackboneExt);
+      this.extManager.add(ResponsiveDesign);
+      this.extManager.add(ResponsiveImages);
       this.extManager.init(this);
       return Base.util.each(this.extManager.getInitializedExtensions(), (function(_this) {
         return function(i, ext) {
@@ -735,7 +1191,7 @@
 
 
 
-},{"./base.coffee":5,"./extension/backbone.ext.coffee":9,"./extension/components.coffee":10,"./extmanager.coffee":11}],8:[function(require,module,exports){
+},{"./base.coffee":6,"./extension/backbone.ext.coffee":10,"./extension/components.coffee":11,"./extension/responsivedesign.coffee":12,"./extension/responsiveimages.coffee":13,"./extmanager.coffee":14}],9:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, DeviceDetection) {
@@ -784,7 +1240,7 @@
 
 
 
-},{"ismobilejs":2}],9:[function(require,module,exports){
+},{"ismobilejs":3}],10:[function(require,module,exports){
 
 /**
  * This extension should probably be defined at a project level, not here
@@ -871,7 +1327,7 @@
   };
   return {
     initialize: function(app) {
-      Base.log.info("Inicializada la componente de Backbone");
+      Base.log.info("[ext] Backbone extension initialized");
       app.sandbox.mvc = function() {
         return Base.log.info("Inicializada la componente de MVC");
       };
@@ -902,13 +1358,14 @@
         }
       };
     },
-    name: 'Backbone Extension'
+    name: 'Backbone Extension',
+    optionKey: 'backboneext'
   };
 });
 
 
 
-},{"./../base.coffee":5}],10:[function(require,module,exports){
+},{"./../base.coffee":6}],11:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Ext) {
@@ -1013,7 +1470,7 @@
   })();
   return {
     initialize: function(app) {
-      Base.log.info("Inicializada la componente de Componentes");
+      Base.log.info("[ext] Component extension initialized");
       return app.sandbox.startComponents = function(list, app) {
         return Component.startAll(list, app);
       };
@@ -1023,13 +1480,217 @@
       return app.sandbox.startComponents(null, app);
     },
     name: 'Component Extension',
-    classes: Component
+    classes: Component,
+    optionKey: 'components'
   };
 });
 
 
 
-},{"./../base.coffee":5}],11:[function(require,module,exports){
+},{"./../base.coffee":6}],12:[function(require,module,exports){
+
+/**
+ * This extension will be triggering events once the Device in which the
+ * user is navigating the site is detected. Its fucionality mostly depends
+ * on the configurations settings (provided by default, but they can be overriden)
+ */
+(function(root, factory) {
+  return module.exports = factory(root, {});
+})(window, function(root, Ext) {
+  var Base, ResponsiveDesign;
+  Base = require('./../base.coffee');
+  ResponsiveDesign = (function() {
+    ResponsiveDesign.prototype.cfg = {
+      waitLimit: 300,
+      windowResizeEvent: true,
+      breakpoints: [
+        {
+          name: "mobile",
+          bpmin: 0,
+          bpmax: 767
+        }, {
+          name: "tablet",
+          bpmin: 768,
+          bpmax: 959
+        }, {
+          name: "desktop",
+          bpmin: 960
+        }
+      ]
+    };
+
+    function ResponsiveDesign(config) {
+      if (config == null) {
+        config = {};
+      }
+      _.bindAll(this, "_init", "detectDevice", "_checkViewport", "_attachWindowHandlers");
+      this.config = Base.util._.defaults(config, this.cfg);
+      this._init();
+    }
+
+    ResponsiveDesign.prototype._init = function() {
+      if (this.config.windowResizeEvent) {
+        this._attachWindowHandlers();
+      }
+      return this.detectDevice();
+    };
+
+    ResponsiveDesign.prototype._attachWindowHandlers = function() {
+      var lazyResize;
+      lazyResize = _.debounce(this.detectDevice, this.config.waitLimit);
+      return $(window).resize(lazyResize);
+    };
+
+    ResponsiveDesign.prototype.detectDevice = function() {
+      var UADetector, bp, capitalizedBPName, evt, msg, stateUA, vp, vpd;
+      bp = this.config.breakpoints;
+      vp = Base.vp.viewportW();
+      vpd = this._checkViewport(vp, bp);
+      if (!_.isEmpty(vpd)) {
+        capitalizedBPName = Base.util.string.capitalize(vpd.name);
+        if (_.isFunction(Base.device['is' + capitalizedBPName])) {
+          UADetector = Base.device['is' + capitalizedBPName];
+        }
+        stateUA = false;
+        if (_.isFunction(UADetector)) {
+          stateUA = UADetector();
+        }
+        if (stateUA || vpd.name) {
+          evt = 'rwd:' + vpd.name.toLowerCase();
+          Base.log.info("[ext] Responsive Design extension is triggering the following");
+          Base.log.info(evt);
+          return Backbone.trigger(evt);
+        }
+      } else {
+        msg = "[ext] The passed settings to the Responsive Design Extension " + "might not be correct since we haven't been able to detect an " + "asociated breakpoint to the current viewport";
+        return Base.log.warn(msg);
+      }
+    };
+
+
+    /**
+     * detect if the current viewport
+     * correspond to any of the defined bp in the config setting
+     * @param  {[type]} vp [number. Current viewport]
+     * @param  {[type]} breakpoints [clone of the breakpoint key object]
+     * @return {[type]} the breakpoint that corresponds to the currently
+     *                  detected viewport
+     */
+
+    ResponsiveDesign.prototype._checkViewport = function(vp, breakpoints) {
+      var breakpoint;
+      breakpoint = _.filter(breakpoints, function(bp) {
+        if (vp >= bp.bpmin) {
+          if (bp.bpmax && bp.bpmax !== 0) {
+            if (vp <= bp.bpmax) {
+              return true;
+            } else {
+              return false;
+            }
+          } else {
+            return true;
+          }
+        } else {
+          return false;
+        }
+      });
+      if (breakpoint.length > 0) {
+        return breakpoint.shift();
+      } else {
+        return {};
+      }
+    };
+
+    return ResponsiveDesign;
+
+  })();
+  return {
+    initialize: function(app) {
+      var config;
+      Base.log.info("[ext] Responsive Design Extension initialized");
+      config = {};
+      if (app.config.extension && app.config.extension[this.optionKey]) {
+        config = Base.util._.defaults({}, app.config.extension[this.optionKey]);
+      }
+      return new ResponsiveDesign(config);
+    },
+    name: 'Responsive Design Extension',
+    optionKey: 'responsivedesign'
+  };
+});
+
+
+
+},{"./../base.coffee":6}],13:[function(require,module,exports){
+
+/**
+ * This extension will be handling the creation of the responsive images
+ */
+(function(root, factory) {
+  return module.exports = factory(root, {});
+})(window, function(root, Ext) {
+  var Base, ResponsiveImages;
+  Base = require('./../base.coffee');
+  ResponsiveImages = (function() {
+    ResponsiveImages.prototype.cfg = {
+      availableWidths: [133, 152, 162, 225, 210, 224, 280, 352, 470, 536, 590, 676, 710, 768, 885, 945, 1190],
+      availablePixelRatios: [1, 2, 3],
+      defaultSelector: '.delayed-image-load',
+      lazymode: true
+    };
+
+    function ResponsiveImages(config) {
+      if (config == null) {
+        config = {};
+      }
+      _.bindAll(this, "_init", "_createListeners", "_createInstance");
+      this.config = Base.util._.defaults(config, this.cfg);
+      this._init();
+    }
+
+    ResponsiveImages.prototype._init = function() {
+      if (this.config.lazymode) {
+        this._createListeners();
+      }
+      return this._createInstance();
+    };
+
+    ResponsiveImages.prototype._createListeners = function() {
+      return Backbone.on('responsiveimages:create', this._createInstance);
+    };
+
+    ResponsiveImages.prototype._createInstance = function(options) {
+      if (options == null) {
+        options = {};
+      }
+      Base.log.info("[ext] Responsive Images Extension creating a new Imager instance");
+      return new Base.Imager(options.selector || this.config.defaultSelector, {
+        availableWidths: options.availableWidths || this.config.availableWidths,
+        availablePixelRatios: options.availablePixelRatios || this.config.availablePixelRatios
+      });
+    };
+
+    return ResponsiveImages;
+
+  })();
+  return {
+    initialize: function(app) {
+      var config;
+      Base.log.info("[ext] Responsive Images Extension initialized");
+      config = {};
+      if (app.config.extension && app.config.extension[this.optionKey]) {
+        config = Base.util._.defaults({}, app.config.extension[this.optionKey]);
+      }
+      return new ResponsiveImages(config);
+    },
+    name: 'Responsive Images Extension',
+    optionKey: 'responsiveimages'
+  };
+});
+
+
+
+},{"./../base.coffee":6}],14:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, NGL) {
@@ -1039,6 +1700,10 @@
     ExtManager.prototype._extensions = [];
 
     ExtManager.prototype._initializedExtensions = [];
+
+    ExtManager.prototype._extensionConfigDefaults = {
+      activated: true
+    };
 
     function ExtManager() {}
 
@@ -1063,10 +1728,27 @@
       var xt;
       if (extensions.length > 0) {
         xt = extensions.shift();
-        xt.initialize(context);
+        if (this._isExtensionAllowedToBeActivated(xt, context.config)) {
+          xt.initialize(context);
+        }
         this._initializedExtensions.push(xt);
         return this._initExtension(extensions, context);
       }
+    };
+
+    ExtManager.prototype._isExtensionAllowedToBeActivated = function(xt, config) {
+      var activated, msg;
+      if (!xt.optionKey) {
+        msg = "The optionKey is required and was not defined by: " + xt.name;
+        Base.log.error(msg);
+        throw new Error(msg);
+      }
+      if (config.extension && config.extension[xt.optionKey] && config.extension[xt.optionKey].hasOwnProperty('activated')) {
+        activated = config.extension[xt.optionKey].activated;
+      } else {
+        activated = this._extensionConfigDefaults.activated;
+      }
+      return activated;
     };
 
     ExtManager.prototype.getInitializedExtensions = function() {
@@ -1081,7 +1763,7 @@
 
 
 
-},{"./base.coffee":5}],12:[function(require,module,exports){
+},{"./base.coffee":6}],15:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Logger) {
@@ -1112,7 +1794,7 @@
 
 
 
-},{"loglevel":3}],13:[function(require,module,exports){
+},{"loglevel":4}],16:[function(require,module,exports){
 (function(root, factory) {
   return module.exports = factory(root, {});
 })(window, function(root, Viewport) {
@@ -1158,4 +1840,4 @@
 
 
 
-},{"verge":4}]},{},[5,11,7]);
+},{"verge":5}]},{},[6,14,8]);
