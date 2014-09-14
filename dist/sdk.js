@@ -1524,7 +1524,7 @@
         config = {};
       }
       _.bindAll(this, "_init", "detectDevice", "_checkViewport", "_attachWindowHandlers");
-      this.config = Base.util._.defaults(config, this.cfg);
+      this.config = Base.util._.extend({}, this.cfg, config);
       this._init();
     }
 
@@ -1644,7 +1644,7 @@
         config = {};
       }
       _.bindAll(this, "_init", "_createListeners", "_createInstance");
-      this.config = Base.util._.defaults(config, this.cfg);
+      this.config = Base.util._.extend({}, this.cfg, config);
       this._init();
     }
 
