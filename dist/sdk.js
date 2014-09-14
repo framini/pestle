@@ -1543,6 +1543,7 @@
 
     ResponsiveDesign.prototype.detectDevice = function() {
       var UADetector, bp, capitalizedBPName, evt, msg, stateUA, vp, vpd;
+      Backbone.trigger("rwd:windowresize");
       bp = this.config.breakpoints;
       vp = Base.vp.viewportW();
       vpd = this._checkViewport(vp, bp);
