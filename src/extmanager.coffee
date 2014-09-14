@@ -56,13 +56,14 @@
             # first we have to make sure that the "options" key is defined
             # by the extension
             unless xt.optionKey
-                msg = "The optionKey is required and was not defined by: " + xt.name 
+                msg = "The optionKey is required and was not defined by: " + xt.name
                 Base.log.error msg
                 throw new Error(msg)
 
             # if options were provided to the extension, lets check just for "activated"
-            # which is the only option that should matter within this method 
-            if config.extension and config.extension[xt.optionKey] and config.extension[xt.optionKey].hasOwnProperty 'activated'
+            # which is the only option that should matter within this method
+            if config.extension and config.extension[xt.optionKey] and
+                                    config.extension[xt.optionKey].hasOwnProperty 'activated'
                 activated = config.extension[xt.optionKey].activated
             else
                 activated = @_extensionConfigDefaults.activated
