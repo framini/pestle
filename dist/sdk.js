@@ -1523,7 +1523,7 @@
       if (config == null) {
         config = {};
       }
-      _.bindAll(this, "_init", "detectDevice", "_checkViewport", "_attachWindowHandlers");
+      _.bindAll(this, "_init", "detectDevice", "_checkViewport", "_attachWindowHandlers", "getDevice");
       this.config = Base.util._.extend({}, this.cfg, config);
       this._init();
     }
@@ -1560,12 +1560,17 @@
           evt = 'rwd:' + vpd.name.toLowerCase();
           Base.log.info("[ext] Responsive Design extension is triggering the following");
           Base.log.info(evt);
-          return Backbone.trigger(evt);
+          Backbone.trigger(evt);
+          return this.device = vpd.name.toLowerCase();
         }
       } else {
         msg = "[ext] The passed settings to the Responsive Design Extension " + "might not be correct since we haven't been able to detect an " + "asociated breakpoint to the current viewport";
         return Base.log.warn(msg);
       }
+    };
+
+    ResponsiveDesign.prototype.getDevice = function() {
+      return this.device;
     };
 
 
@@ -1607,13 +1612,17 @@
   })();
   return {
     initialize: function(app) {
-      var config;
+      var config, rwd;
       Base.log.info("[ext] Responsive Design Extension initialized");
       config = {};
       if (app.config.extension && app.config.extension[this.optionKey]) {
         config = Base.util._.defaults({}, app.config.extension[this.optionKey]);
       }
-      return new ResponsiveDesign(config);
+      rwd = new ResponsiveDesign(config);
+      app.sandbox.rwd = {};
+      return app.sandbox.rwd.getDevice = function() {
+        return rwd.getDevice();
+      };
     },
     name: 'Responsive Design Extension',
     optionKey: 'responsivedesign'

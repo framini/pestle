@@ -43,6 +43,7 @@
                          "detectDevice",
                          "_checkViewport",
                          "_attachWindowHandlers"
+                         "getDevice"
 
             @config = Base.util._.extend {}, @cfg, config
 
@@ -107,11 +108,18 @@
 
                     Backbone.trigger evt
 
+                    # Store the current device
+                    @device = vpd.name.toLowerCase()
+
             else
                 msg = "[ext] The passed settings to the Responsive Design Extension " +
                           "might not be correct since we haven't been able to detect an " +
                           "asociated breakpoint to the current viewport"
                 Base.log.warn msg
+
+        getDevice: () ->
+
+            return @device
 
         ###*
          * detect if the current viewport
@@ -171,7 +179,13 @@
         if app.config.extension and app.config.extension[@optionKey]
             config = Base.util._.defaults {}, app.config.extension[@optionKey]
 
-        new ResponsiveDesign(config)
+        rwd = new ResponsiveDesign(config)
+
+        app.sandbox.rwd = {}
+
+        app.sandbox.rwd.getDevice = () ->
+
+            rwd.getDevice()
 
     name: 'Responsive Design Extension'
 
