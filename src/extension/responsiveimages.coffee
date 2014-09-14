@@ -30,7 +30,7 @@
                          "_createListeners",
                          "_createInstance"
 
-            @config = Base.util._.defaults config, @cfg
+            @config = Base.util._.extend {}, @cfg, config
 
             @_init()
 

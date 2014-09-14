@@ -44,7 +44,7 @@
                          "_checkViewport",
                          "_attachWindowHandlers"
 
-            @config = Base.util._.defaults config, @cfg
+            @config = Base.util._.extend {}, @cfg, config
 
             @_init()
 
