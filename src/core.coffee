@@ -78,14 +78,27 @@
             # Init all the extensions
             @extManager.init(@)
 
+            # Callback object that is gonna hold functions to be executed
+            # after all extensions has been initialized and the each afterAppStarted
+            # method executed
+            cb = $.Callbacks "unique memory"
+
             # Once the extensions have been initialized, lets call the afterAppStarted
             # from each extension
             # Note: This method will let each extension to automatically execute some code
             #       once the app has started.
             Base.util.each @extManager.getInitializedExtensions(), (i, ext) =>
-                # Since this method is not required lets check if it's defined
-                if ext && typeof ext.afterAppStarted == 'function'
-                    ext.afterAppStarted(@)
+
+                if ext
+
+                    if Base.util._.isFunction ext.afterAppStarted
+                        ext.afterAppStarted(@)
+
+                    if Base.util._.isFunction ext.afterAppInitialized
+                        cb.add ext.afterAppInitialized
+
+            # Call the .afterAppInitialized callbacks with @ as parameter
+            cb.fire @
 
         createSandbox: (name, opts) ->
             @sandboxes[name] = _.extend {}, @sandbox, name : name

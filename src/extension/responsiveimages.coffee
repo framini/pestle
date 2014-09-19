@@ -65,13 +65,24 @@
 
         Base.log.info "[ext] Responsive Images Extension initialized"
 
-        config = {}
+        app.sandbox.responsiveimages = () ->
 
-        # Check if the extension has a custom config to use
-        if app.config.extension and app.config.extension[@optionKey]
-            config = Base.util._.defaults {}, app.config.extension[@optionKey]
+            config = {}
 
-        new ResponsiveImages(config)
+            # Check if the extension has a custom config to use
+            if app.config.extension and app.config.extension[@optionKey]
+                config = Base.util._.defaults {}, app.config.extension[@optionKey]
+
+            rp = new ResponsiveImages(config)
+
+    # this method is meant to be executed after components have been
+    # initialized
+    afterAppInitialized: (app) ->
+
+        Base.log.info "afterAll method from ResponsiveImages"
+
+        app.sandbox.responsiveimages()
+
 
     name: 'Responsive Images Extension'
 

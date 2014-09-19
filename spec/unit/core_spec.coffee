@@ -17,9 +17,24 @@ describe 'Core', ->
 
         afterAppStarted: sinon.spy()
 
+        afterAppInitialized: sinon.spy()
+
         optionKey: 'ext'
 
         name: "Testing Extension"
+
+    ext2 =
+        initialize: sinon.spy (app) ->
+            
+            app.sandbox.foo = 'bar'
+
+        afterAppStarted: sinon.spy()
+
+        afterAppInitialized: sinon.spy()
+
+        optionKey: 'ext2'
+
+        name: "Testing Extension 2"
 
     ext_deact =
         initialize: sinon.spy (app) ->
@@ -33,6 +48,7 @@ describe 'Core', ->
         name: "Second Testing Extension"
 
     core.addExtension(ext)
+    core.addExtension(ext2)
     core.addExtension(ext_deact)
 
     core.start()
@@ -74,6 +90,13 @@ describe 'Core', ->
 
         it 'should call the after afterAppStarted on each extension', ->
             ext.afterAppStarted.should.have.been.called
+
+        it 'should call the afterAppInitialized method (if any) after the afterAppStarted method', ->
+            ext.afterAppInitialized.should.have.been.calledAfter ext.afterAppStarted
+            ext.afterAppInitialized.should.have.been.calledAfter ext2.afterAppStarted
+
+            ext2.afterAppInitialized.should.have.been.calledAfter ext.afterAppStarted
+            ext2.afterAppInitialized.should.have.been.calledAfter ext2.afterAppStarted
 
 
     describe 'Base libraries', ->
