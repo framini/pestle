@@ -44,6 +44,7 @@
                          "_checkViewport",
                          "_attachWindowHandlers"
                          "getDevice"
+                         "_resizeHandler"
 
             @config = Base.util._.extend {}, @cfg, config
 
@@ -57,16 +58,19 @@
 
         _attachWindowHandlers: () ->
 
-            lazyResize = _.debounce @detectDevice, @config.waitLimit
+            lazyResize = _.debounce @_resizeHandler, @config.waitLimit
 
             $(window).resize(lazyResize)
 
-        detectDevice: () ->
-
+        _resizeHandler: () ->
             # triggers a windowsresize event so this way we have a centralized
             # way to listen for the resize event on the windows and the componens
             # can listen directly to this event instead of defining a new listener
             Backbone.trigger "rwd:windowresize"
+
+            @detectDevice()
+
+        detectDevice: () ->
 
             bp = @config.breakpoints
 
@@ -181,11 +185,22 @@
 
         rwd = new ResponsiveDesign(config)
 
-        app.sandbox.rwd = {}
+        app.sandbox.rwd = () ->
+            # call detect Device in order to trigger the corresponding
+            # device event
+            rwd.detectDevice()
 
         app.sandbox.rwd.getDevice = () ->
 
             rwd.getDevice()
+
+    # this method is meant to be executed after components have been
+    # initialized
+    afterAppInitialized: (app) ->
+
+        Base.log.info "afterAll method from ResponsiveDesign"
+
+        app.sandbox.rwd()
 
     name: 'Responsive Design Extension'
 
