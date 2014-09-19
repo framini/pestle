@@ -198,7 +198,7 @@
     # initialized
     afterAppInitialized: (app) ->
 
-        Base.log.info "afterAll method from ResponsiveDesign"
+        Base.log.info "afterAppInitialized method from ResponsiveDesign"
 
         app.sandbox.rwd()
 

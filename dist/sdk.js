@@ -1156,7 +1156,7 @@
     };
 
     Core.prototype.start = function(options) {
-      var BackboneExt, Components, ResponsiveDesign, ResponsiveImages;
+      var BackboneExt, Components, ResponsiveDesign, ResponsiveImages, cb;
       Base.log.info("Start de Core");
       this.started = true;
       Components = require('./extension/components.coffee');
@@ -1168,13 +1168,20 @@
       this.extManager.add(ResponsiveDesign);
       this.extManager.add(ResponsiveImages);
       this.extManager.init(this);
-      return Base.util.each(this.extManager.getInitializedExtensions(), (function(_this) {
+      cb = $.Callbacks("unique memory");
+      Base.util.each(this.extManager.getInitializedExtensions(), (function(_this) {
         return function(i, ext) {
-          if (ext && typeof ext.afterAppStarted === 'function') {
-            return ext.afterAppStarted(_this);
+          if (ext) {
+            if (Base.util._.isFunction(ext.afterAppStarted)) {
+              ext.afterAppStarted(_this);
+            }
+            if (Base.util._.isFunction(ext.afterAppInitialized)) {
+              return cb.add(ext.afterAppInitialized);
+            }
           }
         };
       })(this));
+      return cb.fire(this);
     };
 
     Core.prototype.createSandbox = function(name, opts) {
@@ -1523,7 +1530,7 @@
       if (config == null) {
         config = {};
       }
-      _.bindAll(this, "_init", "detectDevice", "_checkViewport", "_attachWindowHandlers", "getDevice");
+      _.bindAll(this, "_init", "detectDevice", "_checkViewport", "_attachWindowHandlers", "getDevice", "_resizeHandler");
       this.config = Base.util._.extend({}, this.cfg, config);
       this._init();
     }
@@ -1537,13 +1544,17 @@
 
     ResponsiveDesign.prototype._attachWindowHandlers = function() {
       var lazyResize;
-      lazyResize = _.debounce(this.detectDevice, this.config.waitLimit);
+      lazyResize = _.debounce(this._resizeHandler, this.config.waitLimit);
       return $(window).resize(lazyResize);
+    };
+
+    ResponsiveDesign.prototype._resizeHandler = function() {
+      Backbone.trigger("rwd:windowresize");
+      return this.detectDevice();
     };
 
     ResponsiveDesign.prototype.detectDevice = function() {
       var UADetector, bp, capitalizedBPName, evt, msg, stateUA, vp, vpd;
-      Backbone.trigger("rwd:windowresize");
       bp = this.config.breakpoints;
       vp = Base.vp.viewportW();
       vpd = this._checkViewport(vp, bp);
@@ -1619,10 +1630,16 @@
         config = Base.util._.defaults({}, app.config.extension[this.optionKey]);
       }
       rwd = new ResponsiveDesign(config);
-      app.sandbox.rwd = {};
+      app.sandbox.rwd = function() {
+        return rwd.detectDevice();
+      };
       return app.sandbox.rwd.getDevice = function() {
         return rwd.getDevice();
       };
+    },
+    afterAppInitialized: function(app) {
+      Base.log.info("afterAppInitialized method from ResponsiveDesign");
+      return app.sandbox.rwd();
     },
     name: 'Responsive Design Extension',
     optionKey: 'responsivedesign'
@@ -1685,13 +1702,19 @@
   })();
   return {
     initialize: function(app) {
-      var config;
       Base.log.info("[ext] Responsive Images Extension initialized");
-      config = {};
-      if (app.config.extension && app.config.extension[this.optionKey]) {
-        config = Base.util._.defaults({}, app.config.extension[this.optionKey]);
-      }
-      return new ResponsiveImages(config);
+      return app.sandbox.responsiveimages = function() {
+        var config, rp;
+        config = {};
+        if (app.config.extension && app.config.extension[this.optionKey]) {
+          config = Base.util._.defaults({}, app.config.extension[this.optionKey]);
+        }
+        return rp = new ResponsiveImages(config);
+      };
+    },
+    afterAppInitialized: function(app) {
+      Base.log.info("afterAppInitialized method from ResponsiveImages");
+      return app.sandbox.responsiveimages();
     },
     name: 'Responsive Images Extension',
     optionKey: 'responsiveimages'

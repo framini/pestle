@@ -79,7 +79,7 @@
     # initialized
     afterAppInitialized: (app) ->
 
-        Base.log.info "afterAll method from ResponsiveImages"
+        Base.log.info "afterAppInitialized method from ResponsiveImages"
 
         app.sandbox.responsiveimages()
 
