@@ -13,10 +13,11 @@ module.exports = (grunt) ->
 
 
     grunt.registerTask 'dist', [
-        'browserify:dist',
+        'browserify:dist'
         'browserify:karma'
         'coffeelint'
         'karma:continuous'
+        'changelog'
     ]
 
     grunt.registerTask 'server', (target) ->
