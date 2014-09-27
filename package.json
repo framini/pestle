@@ -6,6 +6,7 @@
     "type": "git",
     "url": "git://github.com/framini/platform-sdk.git"
   },
+  "main": "dist/sdk.js",
   "author": {
     "name": "Francisco Ramini",
     "email": "framini@gmail.com"
@@ -51,7 +52,8 @@
     "matchdep": "~0.3.0",
     "minimatch": "~0.2.14",
     "mocha": "^1.21.4",
-    "verge": "^1.9.1"
+    "verge": "^1.9.1",
+    "wolfy87-eventemitter": "^4.2.6"
   },
   "engines": {
     "node": ">=0.8.0"
