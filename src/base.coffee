@@ -10,6 +10,22 @@
 
 )(window, (root, Base) ->
 
+    # Array that holds hard dependencies for the SDK
+    dependencies = [
+            "name": "jQuery"
+            "required": "1.10" # required version
+            "obj": root.$ # global object
+            "version": if root.$ then root.$.fn.jquery else 0 # gives the version number
+                                                              # of the loaded lib
+    ]
+
+    # Version checker util
+    VersionChecker = require './util/versionchecker.coffee'
+
+    # In case any of our dependencies were not loaded, or its version doest not correspond to ours
+    # needs, the versionChecker will thorw an error explaining why
+    VersionChecker.check(dependencies)
+
     # Logger
     Base.log = require './util/logger.coffee'
 
@@ -28,10 +44,10 @@
     # Event Bus
     Base.Events = require './util/eventbus.coffee'
 
+    # General Utils
+    Utils = require './util/general.coffee'
+
     # Utils
-    # Libraries like underscore, backbone, will be loaded by the project
-    # as hard dependencies for this layer
-    # TODO: Make something with this. As it is, is useless
     Base.util =
         each: $.each,
         extend: $.extend,
