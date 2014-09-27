@@ -13,7 +13,7 @@
     ExtManager = require('./extmanager.coffee')
 
     # we'll use the NGS object as the global Event bus
-    _.extend NGS, Backbone.Events
+    NGS = new Base.Events()
 
     # Namespace for module definition
     NGS.modules = {}

@@ -62,8 +62,7 @@ Lodge = Backbone.View.extend
     removeItem: (e) ->
         e.preventDefault()
 
-        # TODO: Replace this with PostalJS
-        Backbone.trigger('searchahead:remove', @model)
+        NGS.emit('searchahead:remove', @model)
 
         @remove()
 
@@ -167,9 +166,8 @@ SearchResults = Backbone.View.extend
         # array to hold references to child views
         @views = []
 
-        # TODO: Replace this with Postaljs
-        Backbone.on('searchahead:selected', @processSelection)
-        Backbone.on('searchahead:remove', @updateCollection)
+        NGS.on('searchahead:selected', @processSelection)
+        NGS.on('searchahead:remove', @updateCollection)
 
         # collection to keep track of selected lodges
         @selectedLodges = new Dataset()

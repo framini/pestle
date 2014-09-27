@@ -25,6 +25,9 @@
     # Function that is gonna handle responsive images
     Base.Imager = require 'imager.js'
 
+    # Event Bus
+    Base.Events = require './util/eventbus.coffee'
+
     # Utils
     # Libraries like underscore, backbone, will be loaded by the project
     # as hard dependencies for this layer

@@ -48,7 +48,7 @@
         _createListeners: () ->
             # this gives the ability to create responsive images
             # by trigger this event with optional attributes
-            Backbone.on 'responsiveimages:create', @_createInstance
+            NGS.on 'responsiveimages:create', @_createInstance
 
         _createInstance : (options = {}) ->
 
