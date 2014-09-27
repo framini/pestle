@@ -1,8 +1,14 @@
 {
   "name": "platform-sdk",
   "version": "0.1.0",
-  "dependencies": {
-    "imager.js": "^0.2.0"
+  "homepage": "https://github.com/framini/platform-sdk",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/framini/platform-sdk.git"
+  },
+  "author": {
+    "name": "Francisco Ramini",
+    "email": "framini@gmail.com"
   },
   "devDependencies": {
     "browserify": "^5.9.1",
@@ -25,8 +31,10 @@
     "grunt-contrib-jshint": "~0.8.0",
     "grunt-contrib-jst": "~0.5.0",
     "grunt-contrib-watch": "^0.6.1",
+    "grunt-conventional-changelog": "^1.1.0",
     "grunt-karma": "^0.8.3",
     "grunt-open": "~0.2.2",
+    "imager.js": "git://github.com/framini/Imager.js.git#feature/kidsreq",
     "ismobilejs": "^0.3.3",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.1.4",
@@ -34,6 +42,7 @@
     "karma-fixture": "^0.2.1-1",
     "karma-html2js-preprocessor": "^0.1.0",
     "karma-mocha": "^0.1.9",
+    "karma-mocha-reporter": "^0.3.1",
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-safari-launcher": "^0.1.1",
     "karma-sinon-chai": "^0.2.0",
@@ -42,9 +51,7 @@
     "matchdep": "~0.3.0",
     "minimatch": "~0.2.14",
     "mocha": "^1.21.4",
-    "verge": "^1.9.1",
-    "karma-mocha-reporter": "^0.3.1",
-    "imager.js": "git://github.com/framini/Imager.js.git#feature/kidsreq"
+    "verge": "^1.9.1"
   },
   "engines": {
     "node": ">=0.8.0"
