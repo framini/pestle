@@ -4,7 +4,7 @@ Core = require '../../src/core.coffee'
 
 describe 'Core', ->
    
-    core = new NGL.Core(
+    core = new NGS.Core(
         extension:
             "ext_deact" :
                 activated : false

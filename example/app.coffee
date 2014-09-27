@@ -1,4 +1,4 @@
-c = new NGL.Core(
+c = new NGS.Core(
     debug:
         logLevel: 0
     extension:

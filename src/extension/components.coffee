@@ -105,8 +105,8 @@
                 # Check if the modules are defined using the modules namespace
                 # TODO: Provide an alternate way to define which is gonna be
                 # this global object that is gonna hold the module definition
-                if not _.isEmpty(NGL.modules) and NGL.modules[m.name] and m.options
-                    mod = NGL.modules[m.name]
+                if not _.isEmpty(NGS.modules) and NGS.modules[m.name] and m.options
+                    mod = NGS.modules[m.name]
 
                     # create a new sandbox for this module
                     sb = app.createSandbox(m.name)

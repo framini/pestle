@@ -1,19 +1,24 @@
+###*
+ * The core layer will depend on the base layer and will provide
+ * the core set of functionality to application framework
+ * @author Francisco Ramini <framini at gmail.com>
+###
 ((root, factory) ->
 
-    module.exports = root.NGL = factory(root, {})
+    module.exports = root.NGS = factory(root, {})
 
-)(window, (root, NGL) ->
+)(window, (root, NGS) ->
 
     Base = require('./base.coffee')
     ExtManager = require('./extmanager.coffee')
 
-    # we'll use the NGL object as the global Event bus
-    _.extend NGL, Backbone.Events
+    # we'll use the NGS object as the global Event bus
+    _.extend NGS, Backbone.Events
 
     # Namespace for module definition
-    NGL.modules = {}
+    NGS.modules = {}
 
-    class NGL.Core
+    class NGS.Core
         # current version of the library
         version: "0.0.1"
 
@@ -104,5 +109,5 @@
             @sandboxes[name] = _.extend {}, @sandbox, name : name
 
 
-    return NGL
+    return NGS
 )

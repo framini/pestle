@@ -1,17 +1,34 @@
+###*
+ * The Extension Mananger will provide the base set of functionalities
+ * to make the Core library extensible.
+ * @author Francisco Ramini <framini at gmail.com>
+###
 ((root, factory) ->
 
     module.exports = factory(root, {})
 
-)(window, (root, NGL) ->
+)(window, (root, NGS) ->
 
     Base = require('./base.coffee')
 
     class ExtManager
 
+        ###*
+         * Keep track of all extensions
+         * @type {Array}
+        ###
         _extensions: []
 
+        ###*
+         * Keep track of all initialized extensions
+         * @type {Array}
+        ###
         _initializedExtensions: []
 
+        ###*
+         * Defaults configs for the module
+         * @type {[type]}
+        ###
         _extensionConfigDefaults:
             activated : true # unless said otherwise, every added extension
                              # will be activated on start

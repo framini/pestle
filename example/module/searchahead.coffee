@@ -248,7 +248,7 @@ SearchResults = Backbone.View.extend
 # returns an object with the initialize method that will init the module
 ##
 
-NGL.modules.Searchahead =
+NGS.modules.Searchahead =
 
     # constructor
     initialize : () ->
