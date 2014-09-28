@@ -26,11 +26,7 @@
                     throw new Error(msg)
 
                 # compare the version
-                if Utils.versionCompare(dp.version, dp.required) >= 0
-                    msg = "[OK] " + dp.name + ": version checked"
-                    log.info msg
-
-                else
+                unless Utils.versionCompare(dp.version, dp.required) >= 0
                     # if we enter here it means the loaded library doest not fulfill our needs
                     msg = "[FAIL] " + dp.name + ": version required: " + dp.required +
                           " <--> Loaded version: " + dp.version

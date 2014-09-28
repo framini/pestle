@@ -45,7 +45,8 @@
                 Base.log.warn msg
 
             # Lets throw an error if we try to initialize the same extension twices
-            if _.include(this._extensions, ext) then throw new Error("Extension: " + ext.name + " already exists.")
+            if Base.util.include(this._extensions, ext)
+                throw new Error("Extension: " + ext.name + " already exists.")
 
             @_extensions.push(ext)
 

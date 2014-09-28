@@ -32,7 +32,7 @@
 
         constructor: (config = {}) ->
 
-            @config = Base.util._.defaults config, @cfg
+            @config = Base.util.defaults config, @cfg
 
             # this will track the state of the Core. When it is
             # true, it means the "start()" has been called
@@ -47,7 +47,7 @@
 
             # through this object the modules will be accesing the methods defined by the
             # extensions
-            @sandbox = _.clone Base
+            @sandbox = Base.util.clone Base
 
             # namespace to hold all the sandboxes
             @sandboxes = {}
@@ -92,21 +92,21 @@
             # from each extension
             # Note: This method will let each extension to automatically execute some code
             #       once the app has started.
-            Base.util.each @extManager.getInitializedExtensions(), (i, ext) =>
+            Base.util.each @extManager.getInitializedExtensions(), (ext, i) =>
 
                 if ext
 
-                    if Base.util._.isFunction ext.afterAppStarted
+                    if Base.util.isFunction ext.afterAppStarted
                         ext.afterAppStarted(@)
 
-                    if Base.util._.isFunction ext.afterAppInitialized
+                    if Base.util.isFunction ext.afterAppInitialized
                         cb.add ext.afterAppInitialized
 
             # Call the .afterAppInitialized callbacks with @ as parameter
             cb.fire @
 
         createSandbox: (name, opts) ->
-            @sandboxes[name] = _.extend {}, @sandbox, name : name
+            @sandboxes[name] = Base.util.extend {}, @sandbox, name : name
 
 
     return NGS

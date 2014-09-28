@@ -17,7 +17,7 @@
                 Base.log.error "The template passed to the Renderer is not defined"
                 return
 
-            if _.isFunction template
+            if Base.util.isFunction template
                 return template data
 
 
@@ -29,16 +29,16 @@
         initialize: () ->
             Base.log.info "initialize del BaseView"
 
-            _.bindAll @, 'render',
+            Base.util.bindAll @, 'render',
                          'renderWrapper'
 
-            if Base.util._.isFunction @beforeRender
-                _.bindAll @, 'beforeRender'
+            if Base.util.isFunction @beforeRender
+                Base.util.bindAll @, 'beforeRender'
 
-            if Base.util._.isFunction @afterRender
-                _.bindAll @, 'afterRender'
+            if Base.util.isFunction @afterRender
+                Base.util.bindAll @, 'afterRender'
 
-            @render = Base.util._.wrap @render, @renderWrapper
+            @render = Base.util.wrap @render, @renderWrapper
 
         # Method to ensure that the data is always passed to the template in the same way
         serializeData : () ->
@@ -56,7 +56,7 @@
             # and needs to display a customizable title on top
             if @title
                 data.title = @title
-            
+
             return data
 
         # Ensures that events are removed before the View is removed from the DOM
@@ -72,11 +72,11 @@
 
         # Wrapper to add "beforeRender" and "afterRender" methods.
         renderWrapper: (originalRender) ->
-            @beforeRender() if Base.util._.isFunction @beforeRender
+            @beforeRender() if Base.util.isFunction @beforeRender
 
-            originalRender() if Base.util._.isFunction originalRender
+            originalRender() if Base.util.isFunction originalRender
 
-            @afterRender() if Base.util._.isFunction @afterRender
+            @afterRender() if Base.util.isFunction @afterRender
 
             @
 
@@ -129,8 +129,8 @@
             if mixin.initialize isnt 'undefined'
                 oldInitialize = view::initialize
 
-            _.extend view::, mixin
-            _.defaults view::events, mixin.events
+            Base.util.extend view::, mixin
+            Base.util.defaults view::events, mixin.events
 
             if oldInitialize
                 view::initialize = ->

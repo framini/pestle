@@ -35,8 +35,7 @@
 
             cssSelectors = []
 
-            # TODO: access this utils function through Base
-            _.each namespaces, (ns, i) ->
+            Base.util.each namespaces, (ns, i) ->
                 # if a new namespace has been provided lets add it to the list
                 cssSelectors.push "[data-" + ns + "-component]"
 
@@ -45,7 +44,7 @@
 
                 ns = do () ->
                     namespace = ""
-                    _.each namespaces, (ns, i) ->
+                    Base.util.each namespaces, (ns, i) ->
                         # This way we obtain the namespace of the current component
                         if $(comp).data(ns + "-component")
                             namespace = ns
@@ -61,7 +60,7 @@
 
         @parseComponentOptions: (el, namespace, opts) ->
             # TODO: access this utils function through Base
-            options = _.clone(opts || {})
+            options = Base.util.clone(opts || {})
             options.el = el
 
             # TODO: access this DOM function through Base
@@ -92,7 +91,7 @@
             # build ad return the option object
             Component.buildOptionsObject(name, options)
 
-        
+
         @buildOptionsObject: (name, options) ->
 
             options.name = name
@@ -100,19 +99,18 @@
             return options
 
         @instantiate: (components, app) ->
-            # TODO: access this utils function through Base
-            _.each(components, (m, i) ->
+            Base.util.each(components, (m, i) ->
                 # Check if the modules are defined using the modules namespace
                 # TODO: Provide an alternate way to define which is gonna be
                 # this global object that is gonna hold the module definition
-                if not _.isEmpty(NGS.modules) and NGS.modules[m.name] and m.options
+                if not Base.util.isEmpty(NGS.modules) and NGS.modules[m.name] and m.options
                     mod = NGS.modules[m.name]
 
                     # create a new sandbox for this module
                     sb = app.createSandbox(m.name)
 
                     # inject the sandbox and the options in the module proto
-                    _.extend mod, sandbox : sb, options: m.options
+                    Base.util.extend mod, sandbox : sb, options: m.options
 
                     # init the module
                     mod.initialize()

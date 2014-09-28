@@ -17,6 +17,11 @@
             "obj": root.$ # global object
             "version": if root.$ then root.$.fn.jquery else 0 # gives the version number
                                                               # of the loaded lib
+        ,
+            "name": "Underscore"
+            "required": "1.7.0" # required version
+            "obj": root._ # global object
+            "version": if root._ then root._.VERSION else 0
     ]
 
     # Version checker util
@@ -48,15 +53,7 @@
     Utils = require './util/general.coffee'
 
     # Utils
-    Base.util =
-        each: $.each,
-        extend: $.extend,
-        uniq: root._.uniq,
-        _: root._
-        string:
-            capitalize: (str) ->
-                str = (if not str? then "" else String(str))
-                str.charAt(0).toUpperCase() + str.slice(1)
+    Base.util = root._.extend Utils, root._
 
     return Base
 )

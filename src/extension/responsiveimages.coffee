@@ -26,11 +26,11 @@
 
         constructor: (config = {}) ->
 
-            _.bindAll @, "_init",
+            Base.util.bindAll @, "_init",
                          "_createListeners",
                          "_createInstance"
 
-            @config = Base.util._.extend {}, @cfg, config
+            @config = Base.util.extend {}, @cfg, config
 
             @_init()
 
@@ -71,7 +71,7 @@
 
             # Check if the extension has a custom config to use
             if app.config.extension and app.config.extension[@optionKey]
-                config = Base.util._.defaults {}, app.config.extension[@optionKey]
+                config = Base.util.defaults {}, app.config.extension[@optionKey]
 
             rp = new ResponsiveImages(config)
 

@@ -39,14 +39,14 @@
 
         constructor: (config = {}) ->
 
-            _.bindAll @, "_init",
+            Base.util.bindAll @, "_init",
                          "detectDevice",
                          "_checkViewport",
                          "_attachWindowHandlers"
                          "getDevice"
                          "_resizeHandler"
 
-            @config = Base.util._.extend {}, @cfg, config
+            @config = Base.util.extend {}, @cfg, config
 
             @_init()
 
@@ -58,7 +58,7 @@
 
         _attachWindowHandlers: () ->
 
-            lazyResize = _.debounce @_resizeHandler, @config.waitLimit
+            lazyResize = Base.util.debounce @_resizeHandler, @config.waitLimit
 
             $(window).resize(lazyResize)
 
@@ -80,12 +80,12 @@
             # defined in the config.
             vpd = @_checkViewport(vp, bp)
 
-            if not _.isEmpty vpd
+            if not Base.util.isEmpty vpd
 
                 capitalizedBPName = Base.util.string.capitalize(vpd.name)
                 
                 # let's fist check if we have a method to detect the device through UA
-                if _.isFunction Base.device['is' + capitalizedBPName]
+                if Base.util.isFunction Base.device['is' + capitalizedBPName]
                     UADetector = Base.device['is' + capitalizedBPName]
 
                 # variable that holds the result of a UA check.
@@ -93,7 +93,7 @@
                 # leave it as false and use only the viewport to
                 # make the device detection
                 stateUA = false
-                if _.isFunction UADetector
+                if Base.util.isFunction UADetector
 
                     stateUA = UADetector()
 
@@ -135,7 +135,7 @@
         ###
         _checkViewport: (vp, breakpoints) ->
 
-            breakpoint = _.filter(breakpoints, (bp) ->
+            breakpoint = Base.util.filter(breakpoints, (bp) ->
 
                 # starts checking if the detected viewport is
                 # bigger than the bpmin defined in the current
@@ -181,7 +181,7 @@
 
         # Check if the extension has a custom config to use
         if app.config.extension and app.config.extension[@optionKey]
-            config = Base.util._.defaults {}, app.config.extension[@optionKey]
+            config = Base.util.defaults {}, app.config.extension[@optionKey]
 
         rwd = new ResponsiveDesign(config)
 
