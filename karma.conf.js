@@ -23,7 +23,7 @@ module.exports = function(config) {
       'bower_components/underscore/underscore.js',
       'bower_components/backbone/backbone.js',
       'bower_components/handlebars/handlebars.js',
-      '.tmp/sdk.js',
+      '.tmp/pestle.js',
       '.tmp/specs-bundle.js'
     ],
 

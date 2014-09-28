@@ -9,7 +9,7 @@ module.exports = (grunt) ->
                 buildFolder: '.tmp'
                 distFolder: 'dist'
                 pkg: grunt.file.readJSON 'package.json'
-                projectName : 'platform-sdk'
+                projectName : 'pestle'
 
 
     grunt.registerTask 'dist', [

@@ -1,7 +1,7 @@
 module.exports =
     dist:
         files:
-            '<%= ng.distFolder %>/sdk.js': ['src/base.coffee', 'src/extmanager.coffee', 'src/core.coffee', 'extension/*.coffee']
+            '<%= ng.distFolder %>/pestle.js': ['src/base.coffee', 'src/extmanager.coffee', 'src/core.coffee', 'extension/*.coffee']
 
         options:
             transform: ['coffeeify']
@@ -11,7 +11,7 @@ module.exports =
 
     dev:
         files:
-            '<%= ng.buildFolder %>/sdk.js': ['src/base.coffee', 'src/extmanager.coffee', 'src/core.coffee', 'extension/*.coffee']
+            '<%= ng.buildFolder %>/pestle.js': ['src/base.coffee', 'src/extmanager.coffee', 'src/core.coffee', 'extension/*.coffee']
 
         options:
             transform: ['coffeeify']

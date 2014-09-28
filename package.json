@@ -1,12 +1,12 @@
 {
-  "name": "platform-sdk",
+  "name": "pestle",
   "version": "0.1.0",
   "homepage": "https://github.com/framini/platform-sdk",
   "repository": {
     "type": "git",
     "url": "git://github.com/framini/platform-sdk.git"
   },
-  "main": "dist/sdk.js",
+  "main": "dist/pestle.js",
   "author": {
     "name": "Francisco Ramini",
     "email": "framini@gmail.com"
