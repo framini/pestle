@@ -33,7 +33,8 @@
             i = -1
             while i < v1parts.length
                 i++
-                return 1 if v2parts.length < i
+
+                return 1 if v2parts.length < i + 1
                 if v1parts[i] == v2parts[i]
                     continue
                 else if v1parts[i] > v2parts[i]
