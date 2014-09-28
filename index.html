@@ -19,20 +19,45 @@
         <div class="lazy-image-load" data-src="http://kids.nationalgeographic.com/content/dam/kids/photos/articles/Explorers/Ice Cream Expedition/ice-estes-park-blog.jpg/{width}/{pixel_ratio}"></div>
     </div>
 
-    <script type="text/javascript" src="bower_components/jquery/dist/jquery.js"></script>
-    <script type="text/javascript" src="bower_components/underscore/underscore.js"></script>
-    <script type="text/javascript" src="bower_components/backbone/backbone.js"></script>
-    <script type="text/javascript" src="bower_components/handlebars/handlebars.js"></script>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/backbone/backbone.js"></script>
+    <script src="bower_components/handlebars/handlebars.js"></script>
 
-    <script type="text/javascript" src=".tmp/sdk.js"></script>
+    <script src=".tmp/sdk.js"></script>
 
-    <script type="text/javascript" src=".tmp/example/module/lodge.js"></script>
-    <script type="text/javascript" src=".tmp/example/module/roomtype.js"></script>
-    <script type="text/javascript" src=".tmp/example/module/roomtypes.js"></script>
-    <script type="text/javascript" src=".tmp/example/module/searchahead.js"></script>
+    <script src=".tmp/example/module/lodge.js"></script>
+    <script src=".tmp/example/module/roomtype.js"></script>
+    <script src=".tmp/example/module/roomtypes.js"></script>
+    <script src=".tmp/example/module/searchahead.js"></script>
 
+    <script>
+        (function() {
+          NGS.instance = new NGS.Core({
+            debug: {
+              logLevel: 0
+            },
+            extension: {
+              "responsiveimages": {
+                "availableWidths": [133, 152, 162, 225, 210, 224, 280, 352, 470, 536, 590, 676, 710, 768, 885, 945, 1190]
+              }
+            }
+          });
 
-    <script type="text/javascript" src=".tmp/example/app.js"></script>
+        }).call(this);
+    </script>
+
+    <script src=".tmp/example/extension/backbone.js"></script>
+
+    <script>
+        (function() {
+
+          NGS.instance.addExtension(backboneext)
+
+          NGS.instance.start();
+
+        }).call(this);
+    </script>
 
 </body>
 </html>

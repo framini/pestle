@@ -1,13 +1,10 @@
-###*
- * This extension should probably be defined at a project level, not here
-###
 ((root, factory) ->
 
-    module.exports = factory(root, {})
+    root.backboneext = factory(root, {})
 
 )(window, (root, Ext) ->
 
-    Base = require('./../base.coffee')
+    Base = NGS.instance.sandbox
 
     Renderer =
 

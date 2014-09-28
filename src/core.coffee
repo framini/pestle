@@ -69,14 +69,12 @@
 
             # Require core extensions
             Components = require('./extension/components.coffee')
-            BackboneExt = require('./extension/backbone.ext.coffee')
             ResponsiveDesign = require('./extension/responsivedesign.coffee')
             ResponsiveImages = require('./extension/responsiveimages.coffee')
 
 
             # Add core extensions to the app
             @extManager.add(Components)
-            @extManager.add(BackboneExt)
             @extManager.add(ResponsiveDesign)
             @extManager.add(ResponsiveImages)
 
