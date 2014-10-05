@@ -34,12 +34,13 @@
             while i < v1parts.length
                 i++
 
-                return 1 if v2parts.length < i + 1
+                if v2parts.length < i
+                    return 1
                 if v1parts[i] == v2parts[i]
                     continue
                 else if v1parts[i] > v2parts[i]
                     return 1
-                else
+                else if v2parts[i] > v1parts[i]
                     return -1
 
             return -1 if v1parts.length != v2parts.length
