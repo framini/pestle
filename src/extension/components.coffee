@@ -8,6 +8,9 @@
 
     class Component
 
+        # object to store initialized components
+        @initializedComponents : {}
+
         ###*
          * [startAll description]
          * @author Francisco Ramini <francisco.ramini at globant.com>
@@ -21,8 +24,9 @@
             Base.log.info "Parsed components"
             Base.log.debug components
 
-            # TODO: Proximo paso inicializar las componentes
             Component.instantiate(components, app)
+
+            return Component.initializedComponents
 
         @parseList: (selector, namespace) ->
             # array to hold parsed components
@@ -59,7 +63,6 @@
             return list
 
         @parseComponentOptions: (el, namespace, opts) ->
-            # TODO: access this utils function through Base
             options = Base.util.clone(opts || {})
             options.el = el
 
@@ -68,8 +71,7 @@
             name = ''
             length = 0
 
-            # TODO: access this utils function through Base
-            $.each data, (k, v) ->
+            Base.util.each data, (v, k) ->
 
                 # removes the namespace
                 k = k.replace(new RegExp("^" + namespace), "")
@@ -99,22 +101,36 @@
             return options
 
         @instantiate: (components, app) ->
-            Base.util.each(components, (m, i) ->
+
+            if components.length > 0
+
+                m = components.shift()
+
                 # Check if the modules are defined using the modules namespace
-                # TODO: Provide an alternate way to define which is gonna be
-                # this global object that is gonna hold the module definition
+                # TODO: Provide an alternate way to define the
+                # global object that is gonna hold the module definition
                 if not Base.util.isEmpty(NGS.modules) and NGS.modules[m.name] and m.options
-                    mod = NGS.modules[m.name]
+                    mod = Base.util.clone NGS.modules[m.name]
 
                     # create a new sandbox for this module
                     sb = app.createSandbox(m.name)
+
+                    # generates an unique guid for the module
+                    m.options.guid = Base.util.uniqueId(m.name + "_")
 
                     # inject the sandbox and the options in the module proto
                     Base.util.extend mod, sandbox : sb, options: m.options
 
                     # init the module
                     mod.initialize()
-            )
+
+                    # store a reference of the generated guid on the el
+                    $(mod.options.el).data '__guid__', m.options.guid
+
+                    # saves a reference of the initialized module
+                    Component.initializedComponents[ m.options.guid ] = mod
+
+                Component.instantiate(components, app)
 
 
     ##
@@ -126,15 +142,21 @@
 
         Base.log.info "[ext] Component extension initialized"
 
+        initializedComponents = {}
+
         app.sandbox.startComponents = (list, app) ->
 
             Component.startAll(list, app)
+
+        app.sandbox.getInitializedComponents = () ->
+
+            return initializedComponents
 
 
     # this method will be called once all the extensions have been loaded
     afterAppStarted: (app) ->
 
-        Base.log.info "Llamando al afterAppStarted"
+        Base.log.info "Calling startComponents from afterAppStarted"
 
         app.sandbox.startComponents(null, app)
 
