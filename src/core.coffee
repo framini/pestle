@@ -26,7 +26,7 @@
             debug:
                 logLevel: 5 # by default the logging will be disabled
                             # values can go from 0 to 5 (5 means disabled)
-            namespace: 'lodges' # TODO: change this to 'platform'
+            namespace: 'platform'
 
             extension: {} # define the namespace to define extension specific settings
 
