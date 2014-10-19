@@ -14,18 +14,6 @@
     class ExtManager
 
         ###*
-         * Keep track of all extensions
-         * @type {Array}
-        ###
-        _extensions: []
-
-        ###*
-         * Keep track of all initialized extensions
-         * @type {Array}
-        ###
-        _initializedExtensions: []
-
-        ###*
          * Defaults configs for the module
          * @type {[type]}
         ###
@@ -34,6 +22,11 @@
                              # will be activated on start
 
         constructor: () ->
+            # to keep track of all extensions
+            @_extensions = []
+
+            # to keep track of all initialized extension
+            @_initializedExtensions = []
 
         add: (ext) ->
 
@@ -45,8 +38,9 @@
                 Base.log.warn msg
 
             # Lets throw an error if we try to initialize the same extension twices
-            if Base.util.include(this._extensions, ext)
-                throw new Error("Extension: " + ext.name + " already exists.")
+            Base.util.each @_extensions, (xt, i) ->
+                if _.isEqual xt, ext
+                    throw new Error("Extension: " + ext.name + " already exists.")
 
             @_extensions.push(ext)
 
@@ -54,7 +48,7 @@
             Base.log.info @_extensions
 
             @_initExtension(@_extensions, context)
-    
+
         _initExtension : (extensions, context) ->
 
             if extensions.length > 0
@@ -91,6 +85,15 @@
 
         getInitializedExtensions : () ->
             return @_initializedExtensions
+
+        getInitializedExtensionByName : (name) ->
+            Base.util.where @_initializedExtensions, optionKey: name
+
+        getExtensions : () ->
+            return @_extensions
+
+        getExtensionByName : (name) ->
+            Base.util.where @_extensions, optionKey: name
 
     return ExtManager
 
