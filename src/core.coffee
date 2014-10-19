@@ -52,6 +52,16 @@
             # namespace to hold all the sandboxes
             @sandboxes = {}
 
+            # Require core extensions
+            Components = require('./extension/components.coffee')
+            ResponsiveDesign = require('./extension/responsivedesign.coffee')
+            ResponsiveImages = require('./extension/responsiveimages.coffee')
+
+            # Add core extensions to the app
+            @extManager.add(Components)
+            @extManager.add(ResponsiveDesign)
+            @extManager.add(ResponsiveImages)
+
         addExtension: (ext) ->
             # we'll only allow to add new extensions before
             # the Core get started
@@ -66,17 +76,6 @@
             Base.log.info("Start de Core")
 
             @started = true
-
-            # Require core extensions
-            Components = require('./extension/components.coffee')
-            ResponsiveDesign = require('./extension/responsivedesign.coffee')
-            ResponsiveImages = require('./extension/responsiveimages.coffee')
-
-
-            # Add core extensions to the app
-            @extManager.add(Components)
-            @extManager.add(ResponsiveDesign)
-            @extManager.add(ResponsiveImages)
 
             # Init all the extensions
             @extManager.init(@)
@@ -105,6 +104,9 @@
 
         createSandbox: (name, opts) ->
             @sandboxes[name] = Base.util.extend {}, @sandbox, name : name
+
+        getInitializedComponents: () ->
+            @sandbox.getInitializedComponents()
 
 
     return NGS

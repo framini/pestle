@@ -3,7 +3,7 @@ ExtManager = require '../../src/extmanager.coffee'
 Core = require '../../src/core.coffee'
 
 describe 'Core', ->
-   
+
     core = new NGS.Core(
         extension:
             "ext_deact" :
@@ -12,7 +12,7 @@ describe 'Core', ->
 
     ext =
         initialize: sinon.spy (app) ->
-            
+
             app.sandbox.bar = 'foo'
 
         afterAppStarted: sinon.spy()
@@ -25,7 +25,7 @@ describe 'Core', ->
 
     ext2 =
         initialize: sinon.spy (app) ->
-            
+
             app.sandbox.foo = 'bar'
 
         afterAppStarted: sinon.spy()
@@ -38,7 +38,7 @@ describe 'Core', ->
 
     ext_deact =
         initialize: sinon.spy (app) ->
-            
+
             app.sandbox.bar = 'foo'
 
         afterAppStarted: sinon.spy()
@@ -50,8 +50,6 @@ describe 'Core', ->
     core.addExtension(ext)
     core.addExtension(ext2)
     core.addExtension(ext_deact)
-
-    core.start()
 
     it 'should use NGS as the global object', ->
         NGS.should.be.an 'object'
@@ -72,6 +70,9 @@ describe 'Core', ->
     it 'should have a start Method', ->
         core.start.should.be.a 'function'
 
+    it 'should have a getInitializedComponents Method', ->
+        core.getInitializedComponents.should.be.a 'function'
+
     it.skip 'should have a stop Method', ->
         core.stop.should.be.a 'function'
 
@@ -81,6 +82,44 @@ describe 'Core', ->
     it 'should throw an error if an extensions is added after the Core has been started', ->
         state = () => core.addExtension( initialize: () -> )
         state.should.throw(Error)
+
+    describe 'starting the app', ->
+
+        compsExt = core.extManager.getExtensionByName('components')
+        rwdExt = core.extManager.getExtensionByName('responsivedesign')
+        respimgExt = core.extManager.getExtensionByName('responsiveimages')
+
+        # attach some spies before starting the app
+        sinon.spy(compsExt[0], "initialize")
+        sinon.spy(rwdExt[0], "initialize")
+        sinon.spy(respimgExt[0], "initialize")
+
+        # starts the app
+        core.start()
+
+        it 'should change its state of started to true', ->
+            core.started.should.be.equal true
+
+        it 'should load the Components extension by default', ->
+            compsExt.length.should.be.equal 1
+
+        it 'should initialize the Components extension by default', ->
+            compsExt[0].initialize.should.have.been.called
+            compsExt[0].initialize.restore()
+
+        it 'should load the ResponsiveDesign extension by default', ->
+            rwdExt.length.should.be.equal 1
+
+        it 'should initialize the ResponsiveDesign extension by default', ->
+            rwdExt[0].initialize.should.have.been.called
+            rwdExt[0].initialize.restore()
+
+        it 'should load the ResponsiveImages extension by default', ->
+            respimgExt.length.should.be.equal 1
+
+        it 'should initialize the ResponsiveImages extension by default', ->
+            respimgExt[0].initialize.should.have.been.called
+            respimgExt[0].initialize.restore()
 
     describe 'Extension Manager', ->
 
@@ -95,7 +134,6 @@ describe 'Core', ->
 
         it 'should pass the core as an argument to the initialize method for extensions', ->
             ext.initialize.should.have.been.calledWith(core)
-
 
         it 'should call the after afterAppStarted on each extension', ->
             ext.afterAppStarted.should.have.been.called
@@ -174,7 +212,7 @@ describe 'Core', ->
 
             it 'should have a Logger available', ->
                 Base.should.have.property('log')
-            
+
             it 'should provide a way to set logging levels', ->
                 Base.log.setLevel.should.be.a('function')
 
