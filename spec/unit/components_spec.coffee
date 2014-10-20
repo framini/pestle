@@ -37,7 +37,7 @@ describe 'Components Extension', ->
         it.skip 'should have a start method to initialize one component', ->
             cmp.start.should.be.a 'function'
 
-        describe 'Starting multiple components', ->
+        describe.only 'Starting multiple components', ->
 
             before ->
 
@@ -57,9 +57,7 @@ describe 'Components Extension', ->
                     afterAppStarted: sinon.spy()
 
                 # Starts all the components present in the 'body'
-                cmp.startAll('body', new NGS.Core())
-
-                initializedComponents = cmp.initializedComponents
+                initializedComponents = cmp.startAll('body', new NGS.Core())
 
             after ->
                 delete NGS.modules.dummy
@@ -86,26 +84,26 @@ describe 'Components Extension', ->
             it 'should give access to each attr listed as data-NAMESPACE-* (different from data-NAMESPACE-component)', ->
                 _.each initializedComponents, (m, i) ->
 
-                    if $(m.options.el).data('lodges-component') == "dummy"
-                        $(m.options.el).should.have.data('lodgesDataset')
-                        $(m.options.el).should.have.data('lodgesObject')
-                        $(m.options.el).should.have.data('lodgesString')
+                    if $(m.options.el).data('platform-component') == "dummy"
+                        $(m.options.el).should.have.data('platformDataset')
+                        $(m.options.el).should.have.data('platformObject')
+                        $(m.options.el).should.have.data('platformString')
                         m.options.dataset.should.be.an 'array'
                         m.options.object.should.be.an 'object'
                         m.options.string.should.be.an 'string'
                         # the 3 passed + the one automatically added (el)
                         m.options.length.should.be.equal 4
 
-                    else if $(m.options.el).data('lodges-component') == "dummy2"
-                        $(m.options.el).should.have.data('lodgesObject2')
-                        $(m.options.el).should.have.data('lodgesString2')
+                    else if $(m.options.el).data('platform-component') == "dummy2"
+                        $(m.options.el).should.have.data('platformObject2')
+                        $(m.options.el).should.have.data('platformString2')
                         m.options.object2.should.be.an 'object'
                         m.options.string2.should.be.an 'string'
                         # the 2 passed + the one automatically added (el)
                         m.options.length.should.be.equal 3
 
-                    else if $(m.options.el).data('lodges-component') == "dummy3"
-                        $(m.options.el).should.have.data('lodgesDataset')
+                    else if $(m.options.el).data('platform-component') == "dummy3"
+                        $(m.options.el).should.have.data('platformDataset')
                         m.options.dataset.should.be.an 'array'
                         # the 1 passed + the one automatically added (el)
                         m.options.length.should.be.equal 2

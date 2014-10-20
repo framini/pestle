@@ -146,7 +146,7 @@
 
         app.sandbox.startComponents = (list, app) ->
 
-            Component.startAll(list, app)
+            initializedComponents = Component.startAll(list, app)
 
         app.sandbox.getInitializedComponents = () ->
 
