@@ -37,7 +37,7 @@ describe 'Components Extension', ->
         it.skip 'should have a start method to initialize one component', ->
             cmp.start.should.be.a 'function'
 
-        describe.only 'Starting multiple components', ->
+        describe 'Starting multiple components', ->
 
             before ->
 
