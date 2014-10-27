@@ -77,7 +77,7 @@
 
             # trigger the event to let everybody knows that this extension finished
             # its initialization
-            Backbone.trigger 'responsiveimages:initialized'
+            NGS.emit 'responsiveimages:initialized'
 
     # this method is meant to be executed after components have been
     # initialized
