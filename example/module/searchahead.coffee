@@ -1,3 +1,10 @@
+JST = {}
+
+JST['lodge'] = require './lodge'
+JST['roomtype'] = require './roomtype'
+JST['roomtypes'] = require './roomtypes'
+backboneExt = require '../extension/backbone.ext.coffee'
+
 ###
 # Models and Collections
 ###
@@ -6,7 +13,7 @@
  * Model for a Lodge
  * @type {[type]}
 ###
-LodgeDatum = Backbone.Model.extend
+LodgeDatum = Backbone.Model.extend 
 
     idAttribute: "itemId"
 

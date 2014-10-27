@@ -21,7 +21,7 @@ describe 'Components Extension', ->
         Component.name.should.be.a 'string'
 
     it 'should have the class that gives the behavior to the extension exposed', ->
-        Component.classes.should.be.defined
+        Component.classes.should.be.a 'function'
 
     describe 'Component class', ->
 
