@@ -1,3 +1,3 @@
 var gulp = require('gulp');
 
-gulp.task('ci', ['testing']);
+gulp.task('ci', ['dist']);
