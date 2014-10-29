@@ -9,7 +9,7 @@ var generalConfig  = require('../config/general');
 var config         = require('../config/browserify');
 var coffeelint     = require('gulp-coffeelint');
 
-gulp.task('browserify', ['lint'], function(callback) {
+gulp.task('browserify', ['testing'], function(callback) {
 
   var bundleQueue = config.bundleConfigs.length;
 
