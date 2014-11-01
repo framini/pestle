@@ -4,12 +4,5 @@
   "main": "dist/pestle.js",
   "authors": [
     "Francisco Ramini"
-  ],
-  "devDependencies": {
-    "jquery": "~2.1.1",
-    "backbone": "~1.1.2",
-    "underscore": "~1.7.0",
-    "handlebars": "~2.0.0",
-    "chai-jquery": "~2.0.0"
-  }
+  ]
 }
