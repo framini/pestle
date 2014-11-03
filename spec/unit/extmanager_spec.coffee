@@ -1,4 +1,4 @@
-ExtManager = require '../../src/extmanager.coffee'
+ExtManager = require '../../src/util/extmanager.coffee'
 
 describe 'ExtManager', ->
 

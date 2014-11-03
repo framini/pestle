@@ -9,11 +9,13 @@
 
 )(window, (root, NGS) ->
 
-    Base = require('./base.coffee')
-    ExtManager = require('./extmanager.coffee')
+    Base       = require('./base.coffee')
+    ExtManager = require('./util/extmanager.coffee')
 
     # we'll use the NGS object as the global Event bus
     NGS = new Base.Events()
+
+    NGS.Module = require('./util/module.coffee')
 
     # Namespace for module definition
     NGS.modules = {}
@@ -68,8 +70,8 @@
             unless @started
                 @extManager.add(ext)
             else
-                Base.log.error("The Core has already been started. You could not add new extensions at this point.")
-                throw new Error('You could not add extensions when the Core has already been started.')
+                Base.log.error("The Core has already been started. You can not add new extensions at this point.")
+                throw new Error('You can not add extensions when the Core has already been started.')
 
         start: (options) ->
 

@@ -9,7 +9,7 @@
 
 )(window, (root, NGS) ->
 
-    Base = require('./base.coffee')
+    Base = require('../base.coffee')
 
     class ExtManager
 

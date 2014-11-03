@@ -1,5 +1,6 @@
 Component = require '../../src/extension/components.coffee'
 Core = require '../../src/core.coffee'
+Module = require('../../src/util/module.coffee')
 
 describe 'Components Extension', ->
 
@@ -41,17 +42,17 @@ describe 'Components Extension', ->
 
             before ->
 
-                NGS.modules.dummy =
+                Module.add 'dummy',
                     initialize : sinon.spy (app) ->
 
                     afterAppStarted: sinon.spy()
 
-                NGS.modules.dummy2 =
+                Module.add 'dummy2',
                     initialize : sinon.spy (app) ->
 
                     afterAppStarted: sinon.spy()
 
-                NGS.modules.dummy3 =
+                Module.add 'dummy3',
                     initialize : sinon.spy (app) ->
 
                     afterAppStarted: sinon.spy()
@@ -63,6 +64,12 @@ describe 'Components Extension', ->
                 delete NGS.modules.dummy
                 delete NGS.modules.dummy2
                 delete NGS.modules.dummy3
+
+            it 'should ensure that all modules definition within NGS.modules extends from class Module', ->
+                _.each NGS.modules, (m, i) ->
+                    # TODO: right we are checking that it is a function, not that extends from Module
+                    # we'll have to find a better way to check this
+                    m.should.be.a 'function'
 
             it 'should call the initialize method defined in the component', ->
                 _.each initializedComponents, (m, i) ->

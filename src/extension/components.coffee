@@ -4,7 +4,8 @@
 
 )(window, (root, Ext) ->
 
-    Base = require('./../base.coffee')
+    Base   = require('./../base.coffee')
+    Module = require('./../util/module.coffee')
 
     class Component
 
@@ -17,12 +18,23 @@
          * @param  {[type]} selector = 'body'. CSS selector to tell the app where to look for components
          * @return {[type]}
         ###
-        @startAll: (selector = 'body', app) ->
+        @startAll: (selector = 'body', app, namespace = NGS.modules) ->
 
             components = Component.parseList(selector, app.config.namespace)
 
             Base.log.info "Parsed components"
-            Base.log.debug components
+            Base.log.debug Base.util.clone components
+
+            # added to keep namespace.NAME = DEFINITION sintax. This will extend
+            # the object definition with the Module class
+            # this might need to be removed
+            Base.util.each namespace, (definition, name) ->
+                if Base.util.isObject definition
+                    Module.extend name, definition
+
+            # grab a reference of all the module defined using the Module.add
+            # method.
+            Base.util.extend namespace, NGS.Module.list
 
             Component.instantiate(components, app)
 
@@ -110,7 +122,7 @@
                 # TODO: Provide an alternate way to define the
                 # global object that is gonna hold the module definition
                 if not Base.util.isEmpty(NGS.modules) and NGS.modules[m.name] and m.options
-                    mod = Base.util.clone NGS.modules[m.name]
+                    mod = NGS.modules[m.name]
 
                     # create a new sandbox for this module
                     sb = app.createSandbox(m.name)
@@ -119,16 +131,17 @@
                     m.options.guid = Base.util.uniqueId(m.name + "_")
 
                     # inject the sandbox and the options in the module proto
-                    Base.util.extend mod, sandbox : sb, options: m.options
+                    # Base.util.extend mod, sandbox : sb, options: m.options
+                    modx = new mod(sandbox : sb, options: m.options)
 
                     # init the module
-                    mod.initialize()
+                    modx.initialize()
 
                     # store a reference of the generated guid on the el
-                    $(mod.options.el).data '__guid__', m.options.guid
+                    # $(mod.options.el).data '__guid__', m.options.guid
 
                     # saves a reference of the initialized module
-                    Component.initializedComponents[ m.options.guid ] = mod
+                    Component.initializedComponents[ m.options.guid ] = modx
 
                 Component.instantiate(components, app)
 

@@ -1,5 +1,5 @@
 Base = require '../../src/base.coffee'
-ExtManager = require '../../src/extmanager.coffee'
+ExtManager = require '../../src/util/extmanager.coffee'
 Core = require '../../src/core.coffee'
 
 describe 'Core', ->

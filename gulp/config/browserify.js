@@ -15,9 +15,9 @@ module.exports = {
         outputName: 'pestle.js',
         dist: true
     }, {
-        entries: './example/module/searchahead.coffee',
+        entries: './example/main.coffee',
         dest: config.paths.build,
-        outputName: 'searchahead.js',
+        outputName: 'main.js',
         dist: ''
     }]
 }

@@ -5,18 +5,20 @@
 </head>
 <body>
 
-    <div data-platform-component="Searchahead" 
-    data-platform-dataset='[{"itemId": "1","title": "Lizard Island","nearby": "Australia","leadImage": "http://lorempixel.com/g/200/200/","path": "http://lizard.com"},{"itemId": "2","title": "Homewood Suites","nearby": "United States","leadImage": "http://lorempixel.com/g/200/200/","path": ""}]' data-platform-single="no"></div>
+    <div data-platform-component="Example1" 
+    data-platform-dataset='[{"itemId": "1","title": "Lizard Island","nearby": "Australia","leadImage": "http://lorempixel.com/g/200/200/","path": "http://lizard.com"},{"itemId": "2","title": "Homewood Suites","nearby": "United States","leadImage": "http://lorempixel.com/g/200/200/","path": ""}]' data-platform-single="no"><span class="boton">X</span></div>
 
-    <div data-lodges-component="Searchahead" 
-    data-lodges-dataset='[{"itemId": "1","title": "Lizard Island","nearby": "Australia","leadImage": "http://lorempixel.com/g/200/200/","path": "http://lizard.com"},{"itemId": "2","title": "Homewood Suites","nearby": "United States","leadImage": "http://lorempixel.com/g/200/200/","path": ""}]' data-lodges-single="no"></div>
+    <div data-platform-component="Example2" 
+    data-platform-dataset='[{"itemId": "1","title": "Lizard Island","nearby": "Australia","leadImage": "http://lorempixel.com/g/200/200/","path": "http://lizard.com"},{"itemId": "2","title": "Homewood Suites","nearby": "United States","leadImage": "http://lorempixel.com/g/200/200/","path": ""}]' data-platform-single="no"><span class="boton">X</span></div>
+
+    <div data-platform-component="Example4" 
+    data-platform-dataset='[{"itemId": "1","title": "Lizard Island","nearby": "Australia","leadImage": "http://lorempixel.com/g/200/200/","path": "http://lizard.com"},{"itemId": "2","title": "Homewood Suites","nearby": "United States","leadImage": "http://lorempixel.com/g/200/200/","path": ""}]' data-platform-single="no"><span class="boton">X</span></div>
+
+    <!-- <div data-platform-component="Example2" 
+    data-platform-dataset='[{"itemId": "3","title": "Lizard Island 2","nearby": "Australia 2","leadImage": "http://lorempixel.com/g/200/200?as=asd","path": "http://lizard.com"},{"itemId": "4","title": "Homewood Suites 2","nearby": "United States 2","leadImage": "http://lorempixel.com/g/200/200?asds=dsds","path": ""}]' data-platform-single="no"><span class="boton">X</span></div> -->
     
     <div style="width:200px">
         <div class="delayed-image-load" data-src="http://kids.nationalgeographic.com/content/dam/kids/photos/articles/Other Explore Photos/H-P/International Photography Contest/IPC-amazing-AlexV2003.jpg/{width}/{pixel_ratio}"></div>
-    </div>
-
-    <div style="width:200px">
-        <div class="lazy-image-load" data-src="http://kids.nationalgeographic.com/content/dam/kids/photos/articles/Explorers/Ice Cream Expedition/ice-estes-park-blog.jpg/{width}/{pixel_ratio}"></div>
     </div>
 
     <script src="node_modules/jquery/dist/jquery.js"></script>
@@ -42,12 +44,10 @@
         }).call(this);
     </script>
 
-    <script src="build/searchahead.js"></script>
+    <script src="build/main.js"></script>
 
     <script>
         (function() {
-
-          NGS.instance.addExtension(backboneext)
 
           NGS.instance.start();
 
