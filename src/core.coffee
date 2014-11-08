@@ -73,36 +73,56 @@
                 Base.log.error("The Core has already been started. You can not add new extensions at this point.")
                 throw new Error('You can not add extensions when the Core has already been started.')
 
-        start: (options) ->
+        start: (selector = '') ->
 
-            Base.log.info("Start de Core")
+            # this will let us initialize components at a later stage
+            if @started and selector isnt ''
 
-            @started = true
+                Base.log.info("Pestle is initializing a component")
 
-            # Init all the extensions
-            @extManager.init(@)
+                @sandbox.startComponents selector, @
 
-            # Callback object that is gonna hold functions to be executed
-            # after all extensions has been initialized and the each afterAppStarted
-            # method executed
-            cb = $.Callbacks "unique memory"
 
-            # Once the extensions have been initialized, lets call the afterAppStarted
-            # from each extension
-            # Note: This method will let each extension to automatically execute some code
-            #       once the app has started.
-            Base.util.each @extManager.getInitializedExtensions(), (ext, i) =>
+            # if we enter here, it means it is the fist time the start
+            # method is called and we'll have to initialize all the extensions
+            else
 
-                if ext
+                Base.log.info("Pestle started the initializing process")
 
-                    if Base.util.isFunction ext.afterAppStarted
-                        ext.afterAppStarted(@)
+                @started = true
 
-                    if Base.util.isFunction ext.afterAppInitialized
-                        cb.add ext.afterAppInitialized
+                # Init all the extensions
+                @extManager.init(@)
 
-            # Call the .afterAppInitialized callbacks with @ as parameter
-            cb.fire @
+                # Callback object that is gonna hold functions to be executed
+                # after all extensions has been initialized and the each afterAppStarted
+                # method executed
+                cb = $.Callbacks "unique memory"
+
+                # Once the extensions have been initialized, lets call the afterAppStarted
+                # from each extension
+                # Note: This method will let each extension to automatically execute some code
+                #       once the app has started.
+                Base.util.each @extManager.getInitializedExtensions(), (ext, i) =>
+
+                    if ext
+
+                        if Base.util.isFunction ext.afterAppStarted
+                            # since the component extension is the entry point
+                            # for initializing the app, we'll give it special
+                            # treatment and give it the ability to receive an
+                            # extra parameter (to start components that only belong
+                            # to a particular DOM element)
+                            if ext.optionKey is "components"
+                                ext.afterAppStarted selector, @
+                            else
+                                ext.afterAppStarted(@)
+
+                        if Base.util.isFunction ext.afterAppInitialized
+                            cb.add ext.afterAppInitialized
+
+                # Call the .afterAppInitialized callbacks with @ as parameter
+                cb.fire @
 
         createSandbox: (name, opts) ->
             @sandboxes[name] = Base.util.extend {}, @sandbox, name : name

@@ -13,24 +13,29 @@
         @initializedComponents : {}
 
         ###*
-         * [startAll description]
+         * startAll method
+         * This method will look for components to start within the passed selector
+         * and call their .initialize() method
          * @author Francisco Ramini <francisco.ramini at globant.com>
          * @param  {[type]} selector = 'body'. CSS selector to tell the app where to look for components
          * @return {[type]}
         ###
         @startAll: (selector = 'body', app, namespace = NGS.modules) ->
 
-            components = Component.parseList(selector, app.config.namespace)
+            components = Component.parse(selector, app.config.namespace)
+
+            cmpclone = Base.util.clone components
 
             Base.log.info "Parsed components"
-            Base.log.debug Base.util.clone components
+            Base.log.debug cmpclone
 
             # added to keep namespace.NAME = DEFINITION sintax. This will extend
             # the object definition with the Module class
             # this might need to be removed
-            Base.util.each namespace, (definition, name) ->
-                if Base.util.isObject definition
-                    Module.extend name, definition
+            unless Base.util.isEmpty components
+                Base.util.each namespace, (definition, name) ->
+                    unless Base.util.isFunction definition
+                        Module.extend name, definition
 
             # grab a reference of all the module defined using the Module.add
             # method.
@@ -38,19 +43,32 @@
 
             Component.instantiate(components, app)
 
-            return Component.initializedComponents
+            return {
+                all: Component.initializedComponents
+                new: cmpclone
+            }
 
-        @parseList: (selector, namespace) ->
-            # array to hold parsed components
+        ###*
+         * the parse method will look for components defined using
+         * the configured namespace and living within the passed
+         * CSS selector
+         * @author Francisco Ramini <framini at gmail.com>
+         * @param  {[type]} selector  [description]
+         * @param  {[type]} namespace [description]
+         * @return {[type]}           [description]
+        ###
+        @parse: (selector, namespace) ->
+            # array to store parsed components
             list = []
 
-            namespaces = ['platform']
+            # if a string is passed as parameter, convert it to an array
+            namespaces = namespace.split ','    unless Base.util.isArray namespace
 
-            # TODO: Add the ability to pass an array/object of namespaces instead of just one
-            namespaces.push namespace if namespace isnt 'platform'
-
+            # array to store the composed css selector that will look up for
+            # component definitions
             cssSelectors = []
 
+            # iterates over the namespace array and create the needed css selectors
             Base.util.each namespaces, (ns, i) ->
                 # if a new namespace has been provided lets add it to the list
                 cssSelectors.push "[data-" + ns + "-component]"
@@ -58,22 +76,29 @@
             # TODO: Access these DOM functionality through Base
             $(selector).find(cssSelectors.join(',')).each (i, comp) ->
 
-                ns = do () ->
-                    namespace = ""
-                    Base.util.each namespaces, (ns, i) ->
-                        # This way we obtain the namespace of the current component
-                        if $(comp).data(ns + "-component")
-                            namespace = ns
+                # if the comp already has the pestle-guid attached, it means
+                # it was already started, so we'll only look for unnitialized
+                # components here
+                unless $(comp).data('pestle-guid')
 
-                    return namespace
+                    ns = do () ->
+                        namespace = ""
+                        Base.util.each namespaces, (ns, i) ->
+                            # This way we obtain the namespace of the current component
+                            if $(comp).data(ns + "-component")
+                                namespace = ns
 
-                # options will hold all the data-* related to the component
-                options = Component.parseComponentOptions(@, ns)
+                        return namespace
 
-                list.push({ name: options.name, options: options })
+                    # options will hold all the data-* attributes related to the component
+                    options = Component.parseComponentOptions(@, ns)
+
+                    list.push({ name: options.name, options: options })
 
             return list
 
+        # this method will be in charge of parsing all the data-* attributes
+        # defined in the its $el markup and placing them in a object
         @parseComponentOptions: (el, namespace, opts) ->
             options = Base.util.clone(opts || {})
             options.el = el
@@ -138,7 +163,7 @@
                     modx.initialize()
 
                     # store a reference of the generated guid on the el
-                    # $(mod.options.el).data '__guid__', m.options.guid
+                    $(m.options.el).data 'pestle-guid', m.options.guid
 
                     # saves a reference of the initialized module
                     Component.initializedComponents[ m.options.guid ] = modx
@@ -157,21 +182,25 @@
 
         initializedComponents = {}
 
-        app.sandbox.startComponents = (list, app) ->
+        app.sandbox.startComponents = (selector, app) ->
 
-            initializedComponents = Component.startAll(list, app)
+            initializedComponents = Component.startAll(selector, app)
 
         app.sandbox.getInitializedComponents = () ->
 
-            return initializedComponents
+            return initializedComponents.all
+
+        app.sandbox.getLastestInitializedComponents = () ->
+
+            return initializedComponents.new
 
 
     # this method will be called once all the extensions have been loaded
-    afterAppStarted: (app) ->
+    afterAppStarted: (selector, app) ->
 
         Base.log.info "Calling startComponents from afterAppStarted"
-
-        app.sandbox.startComponents(null, app)
+        s = if selector then selector else null
+        app.sandbox.startComponents(s, app)
 
     name: 'Component Extension'
 

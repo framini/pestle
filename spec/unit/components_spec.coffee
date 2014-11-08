@@ -31,6 +31,7 @@ describe 'Components Extension', ->
 
         # object that will store initialized components
         initializedComponents = {}
+        initializedComponents2 = {}
 
         it 'should have a startAll method', ->
             cmp.startAll.should.be.a 'function'
@@ -57,13 +58,45 @@ describe 'Components Extension', ->
 
                     afterAppStarted: sinon.spy()
 
-                # Starts all the components present in the 'body'
-                initializedComponents = cmp.startAll('body', new NGS.Core())
+                Module.add 'dummy4',
+                    initialize : sinon.spy (app) ->
+
+                    afterAppStarted: sinon.spy()
+
+                Module.add 'dummy5',
+                    initialize : sinon.spy (app) ->
+
+                    afterAppStarted: sinon.spy()
 
             after ->
                 delete NGS.modules.dummy
                 delete NGS.modules.dummy2
                 delete NGS.modules.dummy3
+
+            it 'should only start components that belongs to the passed selector', ->
+
+                # Starts all the components present in the 'dummycontainer-1'
+                initializedComponents = cmp.startAll('.dummycontainer-1', new NGS.Core())
+
+                # in the fixture there are 3 components defined within dummycontainer-1
+                # and 2 in dummycontainer-2
+                _.size(initializedComponents.all).should.be.equal 3
+
+                _.each initializedComponents.all, (m, i) ->
+                    $(m.options.el).data('platform-component').should.be.not.equal 'dummy4'
+                    $(m.options.el).data('platform-component').should.be.not.equal 'dummy5'
+
+
+                initializedComponents2 = cmp.startAll('.dummycontainer-2', new NGS.Core())
+
+                _.size(initializedComponents.all).should.be.equal 5
+                _.size(initializedComponents2.all).should.be.equal 5
+                _.size(initializedComponents2.new).should.be.equal 2
+
+                _.each initializedComponents2.new, (m, i) ->
+                    $(m.options.el).data('platform-component').should.be.not.equal 'dummy'
+                    $(m.options.el).data('platform-component').should.be.not.equal 'dummy2'
+                    $(m.options.el).data('platform-component').should.be.not.equal 'dummy3'
 
             it 'should ensure that all modules definition within NGS.modules extends from class Module', ->
                 _.each NGS.modules, (m, i) ->
@@ -72,24 +105,24 @@ describe 'Components Extension', ->
                     m.should.be.a 'function'
 
             it 'should call the initialize method defined in the component', ->
-                _.each initializedComponents, (m, i) ->
+                _.each initializedComponents.all, (m, i) ->
                     m.initialize.should.have.been.called
 
             it 'should give each component access to a sandbox', () ->
-                _.each initializedComponents, (m, i) ->
+                _.each initializedComponents.all, (m, i) ->
                     m.sandbox.should.be.an 'object'
 
             it 'should give each component access to a options object containing the options passed data-* attributes', ->
-                _.each initializedComponents, (m, i) ->
+                _.each initializedComponents.all, (m, i) ->
                     m.options.should.be.an 'object'
 
             it 'should give access to the "el" element used to define the component', ->
-                _.each initializedComponents, (m, i) ->
+                _.each initializedComponents.all, (m, i) ->
                     m.options.el.should.be.defined
                     $(m.options.el).should.exist
 
             it 'should give access to each attr listed as data-NAMESPACE-* (different from data-NAMESPACE-component)', ->
-                _.each initializedComponents, (m, i) ->
+                _.each initializedComponents.all, (m, i) ->
 
                     if $(m.options.el).data('platform-component') == "dummy"
                         $(m.options.el).should.have.data('platformDataset')
@@ -117,9 +150,9 @@ describe 'Components Extension', ->
 
             it 'should give each component an unique sandbox', ->
 
-                _.each initializedComponents, (m, i) ->
+                _.each initializedComponents.all, (m, i) ->
 
                     # compare the sandbox against all other sandboxes
-                    _.each initializedComponents, (mc, j) ->
+                    _.each initializedComponents.all, (mc, j) ->
                         if i != j
                             m.sandbox.should.not.deep.equal mc.sandbox
