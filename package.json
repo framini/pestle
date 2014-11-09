@@ -1,10 +1,10 @@
 {
   "name": "pestle",
   "version": "0.1.0",
-  "homepage": "https://github.com/framini/platform-sdk",
+  "homepage": "https://github.com/framini/pestle",
   "repository": {
     "type": "git",
-    "url": "git://github.com/framini/platform-sdk.git"
+    "url": "git://github.com/framini/pestle.git"
   },
   "main": "dist/pestle.js",
   "author": {
@@ -13,14 +13,11 @@
   },
   "browserify": {
     "transform": [
-      "coffeeify",
-      "hbsfy"
+      "coffeeify"
     ]
   },
   "dependencies": {
-    "coffeeify": "~0.7.0",
-    "hbsfy": "~2.0.0",
-    "handlebars": "^1.3.0"
+    "coffeeify": "~0.7.0"
   },
   "devDependencies": {
     "browser-sync": "~1.3.6",
