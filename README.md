@@ -1,1 +1,1 @@
-[![Build Status](http://img.shields.io/travis/framini/pestle/master.svg?style=flat)](https://travis-ci.org/framini/pestle)
+# Pestle [![Build Status](http://img.shields.io/travis/framini/pestle/master.svg?style=flat)](https://travis-ci.org/framini/pestle) [![Dependency Status](https://david-dm.org/framini/pestle.svg)](https://david-dm.org/framini/pestle) [![devDependency Status](https://david-dm.org/framini/pestle/dev-status.svg)](https://david-dm.org/framini/pestle#info=devDependencies)
