@@ -38,6 +38,9 @@ describe 'Module', ->
     it 'should expose an add method', ->
         Module.add.should.be.a 'function'
 
+    it 'should expose get method to retreive module\'s definitions', ->
+        Module.get.should.be.a 'function'
+
     it 'should expose an extend method', ->
         Module.extend.should.be.a 'function'
 

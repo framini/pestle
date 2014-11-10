@@ -26,9 +26,26 @@
         # this will hold the list of added modules
         @list : {}
 
-        # just an alias for extend
+        ###*
+         * just an alias for the extend method
+         * @author Francisco Ramini <framini at gmail.com>
+         * @param  {[String]} name
+         * @param  {[Object]} definition
+        ###
         @add : (name, definition) ->
             @extend(name, definition, Module)
+
+        ###*
+         * getter for retrieving modules definitions
+         * @author Francisco Ramini <framini at gmail.com>
+         * @param  {[type]} name
+         * @return {[Function/undefined]}
+        ###
+        @get : (name) ->
+            if Base.util.isString(name) and @list[name]
+                return @list[name]
+            else
+                return undefined
 
         ###*
          * this will allows us to simplify and have more control

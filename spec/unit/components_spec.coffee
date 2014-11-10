@@ -44,7 +44,7 @@ describe 'Components Extension', ->
             before ->
 
                 Module.add 'dummy',
-                    initialize : sinon.spy (app) ->
+                    initialize : (app) ->
 
                     afterAppStarted: sinon.spy()
 
@@ -67,6 +67,10 @@ describe 'Components Extension', ->
                     initialize : sinon.spy (app) ->
 
                     afterAppStarted: sinon.spy()
+
+                # example for spying in existing methods
+                def = Module.get('dummy')
+                sinon.spy def.prototype, 'initialize'
 
             after ->
                 delete NGS.modules.dummy
