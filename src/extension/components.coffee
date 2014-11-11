@@ -61,8 +61,12 @@
             # array to store parsed components
             list = []
 
+            # if an array is passed, use it as it is
+            if Base.util.isArray namespace
+                namespaces = namespace
             # if a string is passed as parameter, convert it to an array
-            namespaces = namespace.split ','    unless Base.util.isArray namespace
+            else if Base.util.isString namespace
+                namespaces = namespace.split ','
 
             # array to store the composed css selector that will look up for
             # component definitions
