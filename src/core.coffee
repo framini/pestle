@@ -5,22 +5,22 @@
 ###
 ((root, factory) ->
 
-    module.exports = root.NGS = factory(root, {})
+    module.exports = root.Pestle = factory(root, {})
 
-)(window, (root, NGS) ->
+)(window, (root, Pestle) ->
 
     Base       = require('./base.coffee')
     ExtManager = require('./util/extmanager.coffee')
 
-    # we'll use the NGS object as the global Event bus
-    NGS = new Base.Events()
+    # we'll use the Pestle object as the global Event bus
+    Pestle = new Base.Events()
 
-    NGS.Module = require('./util/module.coffee')
+    Pestle.Module = require('./util/module.coffee')
 
     # Namespace for module definition
-    NGS.modules = {}
+    Pestle.modules = {}
 
-    class NGS.Core
+    class Pestle.Core
         # current version of the library
         version: "0.0.1"
 
@@ -131,5 +131,5 @@
             @sandbox.getInitializedComponents()
 
 
-    return NGS
+    return Pestle
 )

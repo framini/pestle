@@ -4,7 +4,7 @@ Core = require '../../src/core.coffee'
 
 describe 'Core', ->
 
-    core = new NGS.Core(
+    core = new Pestle.Core(
         extension:
             "ext_deact" :
                 activated : false
@@ -51,14 +51,14 @@ describe 'Core', ->
     core.addExtension(ext2)
     core.addExtension(ext_deact)
 
-    it 'should use NGS as the global object', ->
-        NGS.should.be.an 'object'
+    it 'should use Pestle as the global object', ->
+        Pestle.should.be.an 'object'
 
     it 'should define the \'modules\' namespace', ->
-        NGS.modules.should.be.an 'object'
+        Pestle.modules.should.be.an 'object'
 
     it 'should have a Core class', ->
-        NGS.Core.should.be.a 'function'
+        Pestle.Core.should.be.a 'function'
 
     # right now is setted to "lodges". It needs to be changed
     it.skip 'shoul provide "platform" as the default namespace', ->
@@ -145,63 +145,63 @@ describe 'Core', ->
             ext2.afterAppInitialized.should.have.been.calledAfter ext.afterAppStarted
             ext2.afterAppInitialized.should.have.been.calledAfter ext2.afterAppStarted
 
-    describe 'NGS Event Bus', ->
+    describe 'Pestle Event Bus', ->
 
         describe 'Suscribing methods', ->
 
             it 'should provide an \'addListener\' method', ->
-                NGS.addListener.should.be.a 'function'
+                Pestle.addListener.should.be.a 'function'
 
             it 'should provide an \'addOnceListener\' method', ->
-                NGS.addOnceListener.should.be.a 'function'
+                Pestle.addOnceListener.should.be.a 'function'
 
             it 'should provide an \'on\' method', ->
-                NGS.on.should.be.a 'function'
+                Pestle.on.should.be.a 'function'
 
             it 'should provide an \'once\' method', ->
-                NGS.once.should.be.a 'function'
+                Pestle.once.should.be.a 'function'
 
         describe 'Defining events methods', ->
 
             it 'should provide an \'defineEvent\' method', ->
-                NGS.defineEvent.should.be.a 'function'
+                Pestle.defineEvent.should.be.a 'function'
 
             it 'should provide an \'defineEvents\' method', ->
-                NGS.defineEvents.should.be.a 'function'
+                Pestle.defineEvents.should.be.a 'function'
 
         describe 'Removing events methods', ->
 
             it 'should provide an \'removeEvent\' method', ->
-                NGS.removeEvent.should.be.a 'function'
+                Pestle.removeEvent.should.be.a 'function'
 
         describe 'Unscribing methods', ->
 
             it 'should provide an \'removeListener\' method', ->
-                NGS.removeListener.should.be.a 'function'
+                Pestle.removeListener.should.be.a 'function'
 
             it 'should provide an \'off\' method', ->
-                NGS.off.should.be.a 'function'
+                Pestle.off.should.be.a 'function'
 
         describe 'Bulk suscribing methods', ->
 
             it 'should provide an \'addListeners\' method', ->
-                NGS.addListeners.should.be.a 'function'
+                Pestle.addListeners.should.be.a 'function'
 
         describe 'Bulk unsuscribing methods', ->
 
             it 'should provide an \'removeListeners\' method', ->
-                NGS.removeListeners.should.be.a 'function'
+                Pestle.removeListeners.should.be.a 'function'
 
         describe 'Triggering methods', ->
 
             it 'should provide an \'emitEvent\' method', ->
-                NGS.emitEvent.should.be.a 'function'
+                Pestle.emitEvent.should.be.a 'function'
 
             it 'should provide an \'trigger\' method', ->
-                NGS.trigger.should.be.a 'function'
+                Pestle.trigger.should.be.a 'function'
 
             it 'should provide an \'emit\' method', ->
-                NGS.emit.should.be.a 'function'
+                Pestle.emit.should.be.a 'function'
 
 
     describe 'Base libraries', ->

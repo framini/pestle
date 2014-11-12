@@ -1,4 +1,4 @@
-module.exports = NGS.Module.add 'Example1',
+module.exports = Pestle.Module.add 'Example1',
 
     events:
         'click .boton': 'customHandler'

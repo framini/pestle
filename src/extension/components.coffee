@@ -20,7 +20,7 @@
          * @param  {[type]} selector = 'body'. CSS selector to tell the app where to look for components
          * @return {[type]}
         ###
-        @startAll: (selector = 'body', app, namespace = NGS.modules) ->
+        @startAll: (selector = 'body', app, namespace = Pestle.modules) ->
 
             components = Component.parse(selector, app.config.namespace)
 
@@ -39,7 +39,7 @@
 
             # grab a reference of all the module defined using the Module.add
             # method.
-            Base.util.extend namespace, NGS.Module.list
+            Base.util.extend namespace, Pestle.Module.list
 
             Component.instantiate(components, app)
 
@@ -150,8 +150,8 @@
                 # Check if the modules are defined using the modules namespace
                 # TODO: Provide an alternate way to define the
                 # global object that is gonna hold the module definition
-                if not Base.util.isEmpty(NGS.modules) and NGS.modules[m.name] and m.options
-                    mod = NGS.modules[m.name]
+                if not Base.util.isEmpty(Pestle.modules) and Pestle.modules[m.name] and m.options
+                    mod = Pestle.modules[m.name]
 
                     # create a new sandbox for this module
                     sb = app.createSandbox(m.name)

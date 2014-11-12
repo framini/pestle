@@ -7,7 +7,7 @@
 
     module.exports = factory(root, {})
 
-)(window, (root, NGS) ->
+)(window, (root, ExtManager) ->
 
     Base = require('../base.coffee')
 

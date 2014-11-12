@@ -73,14 +73,14 @@ describe 'Components Extension', ->
                 sinon.spy def.prototype, 'initialize'
 
             after ->
-                delete NGS.modules.dummy
-                delete NGS.modules.dummy2
-                delete NGS.modules.dummy3
+                delete Pestle.modules.dummy
+                delete Pestle.modules.dummy2
+                delete Pestle.modules.dummy3
 
             it 'should only start components that belongs to the passed selector', ->
 
                 # Starts all the components present in the 'dummycontainer-1'
-                initializedComponents = cmp.startAll('.dummycontainer-1', new NGS.Core())
+                initializedComponents = cmp.startAll('.dummycontainer-1', new Pestle.Core())
 
                 # in the fixture there are 3 components defined within dummycontainer-1
                 # and 2 in dummycontainer-2
@@ -91,7 +91,7 @@ describe 'Components Extension', ->
                     $(m.options.el).data('platform-component').should.be.not.equal 'dummy5'
 
 
-                initializedComponents2 = cmp.startAll('.dummycontainer-2', new NGS.Core())
+                initializedComponents2 = cmp.startAll('.dummycontainer-2', new Pestle.Core())
 
                 _.size(initializedComponents.all).should.be.equal 5
                 _.size(initializedComponents2.all).should.be.equal 5
@@ -102,8 +102,8 @@ describe 'Components Extension', ->
                     $(m.options.el).data('platform-component').should.be.not.equal 'dummy2'
                     $(m.options.el).data('platform-component').should.be.not.equal 'dummy3'
 
-            it 'should ensure that all modules definition within NGS.modules extends from class Module', ->
-                _.each NGS.modules, (m, i) ->
+            it 'should ensure that all modules definition within Pestle.modules extends from class Module', ->
+                _.each Pestle.modules, (m, i) ->
                     # TODO: right we are checking that it is a function, not that extends from Module
                     # we'll have to find a better way to check this
                     m.should.be.a 'function'
