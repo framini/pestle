@@ -107,7 +107,7 @@
 
                     if ext
 
-                        if Base.util.isFunction ext.afterAppStarted
+                        if Base.util.isFunction(ext.afterAppStarted) and ext.activated
                             # since the component extension is the entry point
                             # for initializing the app, we'll give it special
                             # treatment and give it the ability to receive an
@@ -118,7 +118,7 @@
                             else
                                 ext.afterAppStarted(@)
 
-                        if Base.util.isFunction ext.afterAppInitialized
+                        if Base.util.isFunction(ext.afterAppInitialized) and ext.activated
                             cb.add ext.afterAppInitialized
 
                 # Call the .afterAppInitialized callbacks with @ as parameter
