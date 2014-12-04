@@ -20,3 +20,6 @@ Pestle.Module.extend 'Example4',
         console.log "Forth example"
     , 'Example3'
 
+# Example of defining the behavior in a separate file
+example5 = require './module/example5.coffee'
+Pestle.Module.add 'Example5', example5

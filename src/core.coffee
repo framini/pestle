@@ -33,15 +33,12 @@
             extension: {} # define the namespace to define extension specific settings
 
         constructor: (config = {}) ->
-
-            @config = Base.util.defaults config, @cfg
+            # initialize the config object
+            @setConfig(config)
 
             # this will track the state of the Core. When it is
             # true, it means the "start()" has been called
             @started = false
-
-            # Set the logging level for the app
-            Base.log.setLevel(@config.debug.logLevel)
 
             # The extension manager will be on charge of loading extensions
             # and make its functionality available to the stack
@@ -73,7 +70,32 @@
                 Base.log.error("The Core has already been started. You can not add new extensions at this point.")
                 throw new Error('You can not add extensions when the Core has already been started.')
 
+        # provides a way for setting up configs
+        # after Pestle has been instantiated
+        setConfig: (config) ->
+            unless @started
+                if Base.util.isObject config
+                    # if we enter here it means Pestle has been already initialized
+                    # during instantiation, so we'll use the config object as a
+                    # provider for default value
+                    unless Base.util.isEmpty @config
+                        @config = Base.util.defaults config, @config
+                    # if it is empty, it means we are going setting up Pestle for
+                    # the first time
+                    else
+                        @config = Base.util.defaults config, @cfg
+                else
+                    msg = "[setConfig method] only accept an object as a parameter and you're passing: " + typeof config
+                    Base.log.error(msg)
+                    throw new Error(msg)
+            else
+                Base.log.error("The Core has already been started. You can not add new extensions at this point.")
+                throw new Error('You can not add extensions when the Core has already been started.')
+
         start: (selector = '') ->
+
+            # Set the logging level for the app
+            Base.log.setLevel(@config.debug.logLevel)
 
             # this will let us initialize components at a later stage
             if @started and selector isnt ''

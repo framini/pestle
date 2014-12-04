@@ -1,4 +1,4 @@
-module.exports = Pestle.Module.add 'Example1',
+Pestle.Module.add 'Example1',
 
     events:
         'click .boton': 'customHandler'
