@@ -54,10 +54,10 @@
 
             Base.log.info "[ext] Responsive Images Extension creating a new Imager instance"
 
-            new Base.Imager( options.selector or @config.defaultSelector,
-                availableWidths: options.availableWidths or @config.availableWidths,
-                availablePixelRatios: options.availablePixelRatios or @config.availablePixelRatios
-            )
+            selector = options.selector or @config.defaultSelector
+            opts = if not Base.util.isEmpty options then options else @config
+
+            new Base.Imager(selector, opts)
 
     # returns an object with the initialize method that will be used to
     # init the extension
@@ -65,13 +65,13 @@
 
         Base.log.info "[ext] Responsive Images Extension initialized"
 
+        config = {}
+
+        # Check if the extension has a custom config to use
+        if app.config.extension and app.config.extension[@optionKey]
+            config = Base.util.defaults {}, app.config.extension[@optionKey]
+
         app.sandbox.responsiveimages = () ->
-
-            config = {}
-
-            # Check if the extension has a custom config to use
-            if app.config.extension and app.config.extension[@optionKey]
-                config = Base.util.defaults {}, app.config.extension[@optionKey]
 
             rp = new ResponsiveImages(config)
 
