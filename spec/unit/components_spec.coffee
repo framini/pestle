@@ -73,9 +73,7 @@ describe 'Components Extension', ->
                 sinon.spy def.prototype, 'initialize'
 
             after ->
-                delete Pestle.modules.dummy
-                delete Pestle.modules.dummy2
-                delete Pestle.modules.dummy3
+                cmp.initializedComponents = {}
 
             it 'should only start components that belongs to the passed selector', ->
 
