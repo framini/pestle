@@ -5,39 +5,38 @@
 </head>
 <body>
 
-    <div class="pepe">
-
+    <div class="container-1">
         <div data-platform-component="Example1" 
         data-platform-dataset='[{"itemId": "1","title": "Lizard Island","nearby": "Australia","leadImage": "http://lorempixel.com/g/200/200/","path": "http://lizard.com"},{"itemId": "2","title": "Homewood Suites","nearby": "United States","leadImage": "http://lorempixel.com/g/200/200/","path": ""}]' data-platform-single="no"><span class="boton">X</span></div>
     </div>
 
-    <div class="pepe2">
-        <div data-platform-component="Example2" 
-        data-platform-dataset='[{"itemId": "1","title": "Lizard Island","nearby": "Australia","leadImage": "http://lorempixel.com/g/200/200/","path": "http://lizard.com"},{"itemId": "2","title": "Homewood Suites","nearby": "United States","leadImage": "http://lorempixel.com/g/200/200/","path": ""}]' data-platform-single="no"><span class="boton">X</span></div>
+    <div class="container-2">
+        <div data-platform-component="Example2"><span class="boton">X</span></div>
 
-        <div data-platform-component="Example4" 
-        data-platform-dataset='[{"itemId": "1","title": "Lizard Island","nearby": "Australia","leadImage": "http://lorempixel.com/g/200/200/","path": "http://lizard.com"},{"itemId": "2","title": "Homewood Suites","nearby": "United States","leadImage": "http://lorempixel.com/g/200/200/","path": ""}]' data-platform-single="no"><span class="boton">X</span></div>
+        <div data-platform-component="Example4"><span class="boton">X</span></div>
     </div>
 
-    <!-- <div data-platform-component="Example2" 
-    data-platform-dataset='[{"itemId": "3","title": "Lizard Island 2","nearby": "Australia 2","leadImage": "http://lorempixel.com/g/200/200?as=asd","path": "http://lizard.com"},{"itemId": "4","title": "Homewood Suites 2","nearby": "United States 2","leadImage": "http://lorempixel.com/g/200/200?asds=dsds","path": ""}]' data-platform-single="no"><span class="boton">X</span></div> -->
-    
+    <div class="container-3">
+        <div data-platform-component="Example5" data-platform-title="This is a title for Example number 5"><span class="title"></span> <span class="boton">X</span></div>
+    </div>
+
     <div style="width:200px">
         <div class="delayed-image-load" data-src="http://kids.nationalgeographic.com/content/dam/kids/photos/articles/Other Explore Photos/H-P/International Photography Contest/IPC-amazing-AlexV2003.jpg/{width}/{pixel_ratio}"></div>
     </div>
 
+    <!-- DEPENDENCIES -->
     <script src="node_modules/jquery/dist/jquery.js"></script>
     <script src="node_modules/underscore/underscore.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.js"></script>
+    <!-- END DEPENDENCIES -->
 
     <script src="build/pestle.js"></script>
 
+    <!-- Example on how to instantiate Pestle without browserify -->
     <script>
         (function() {
-          NGS.instance = new NGS.Core({
+          Pestle.instance = new Pestle.Core({
             debug: {
-              logLevel: 0
+              logLevel: 5
             },
             extension: {
               "responsiveimages": {
@@ -46,15 +45,25 @@
             }
           });
 
+          // Set the config settings
+          // In this case, its overwritting the values pased above to the constructor
+          // when instantiating Pestle. Usually here is where you should define
+          // and set the config value.
+          Pestle.instance.setConfig({
+            debug: {
+              logLevel: 0
+            }
+          });
         }).call(this);
     </script>
-
+    
+    <!-- MODULES -->
     <script src="build/main.js"></script>
 
     <script>
         (function() {
 
-          NGS.instance.start();
+          Pestle.instance.start();
 
         }).call(this);
     </script>

@@ -9,31 +9,35 @@ describe 'Module', ->
 
     @dummycomponent = fixture.load 'examplecomponents.html'
 
-    $('body').append(@dummycomponent)
-
-    # Old way of defining modules
-    Modules.Example1 =
-        initialize : sinon.spy (app) ->
-
-    Module.add 'Example2',
-        initialize : sinon.spy (app) ->
-
-    Module.add 'Example3',
-        initialize : sinon.spy (app) ->
-
-    Module.extend 'Example4', {
-        initialize: sinon.spy (app) ->
-            @_super_()
-        }, 'Example3'
-
-    cmp = Component.classes
     # object that will store initialized components
     initializedComponents = {}
-    # Starts all the components present in the 'body'
-    initializedComponents = cmp.startAll('body', new NGS.Core(), Modules)
+    # Reference of the Component class
+    cmp = Component.classes
+
+    $('body').append(@dummycomponent)
+
+    before ->
+        # Old way of defining modules
+        Modules.Example1 =
+            initialize : sinon.spy (app) ->
+
+        Module.add 'Example2',
+            initialize : sinon.spy (app) ->
+
+        Module.add 'Example3',
+            initialize : sinon.spy (app) ->
+
+        Module.extend 'Example4', {
+            initialize: sinon.spy (app) ->
+                @_super_()
+            }, 'Example3'
+
+        # Starts all the components present in the 'body'
+        initializedComponents = cmp.startAll('body', new Pestle.Core(), Modules)
 
     after ->
         fixture.cleanup()
+        cmp.initializedComponents = {}
 
     it 'should expose an add method', ->
         Module.add.should.be.a 'function'
@@ -49,7 +53,7 @@ describe 'Module', ->
 
     describe 'extend method', ->
 
-        it 'should add the modules definitions to NGS.modules', ->
+        it 'should add the modules definitions to Pestle.modules', ->
             Modules['Example1'].should.be.a 'function'
             Modules['Example2'].should.be.a 'function'
             Modules['Example3'].should.be.a 'function'

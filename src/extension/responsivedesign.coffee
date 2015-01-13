@@ -66,7 +66,7 @@
             # triggers a windowsresize event so this way we have a centralized
             # way to listen for the resize event on the windows and the componens
             # can listen directly to this event instead of defining a new listener
-            NGS.emit "rwd:windowresize"
+            Pestle.emit "rwd:windowresize"
 
             @detectDevice()
 
@@ -110,7 +110,7 @@
                     Base.log.info "[ext] Responsive Design extension is triggering the following"
                     Base.log.info evt
 
-                    NGS.emit evt
+                    Pestle.emit evt
 
                     # Store the current device
                     @device = vpd.name.toLowerCase()

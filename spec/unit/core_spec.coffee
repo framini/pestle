@@ -4,7 +4,10 @@ Core = require '../../src/core.coffee'
 
 describe 'Core', ->
 
-    core = new NGS.Core(
+    core = new Pestle.Core(
+        debug:
+            logLevel: 5
+
         extension:
             "ext_deact" :
                 activated : false
@@ -43,6 +46,8 @@ describe 'Core', ->
 
         afterAppStarted: sinon.spy()
 
+        afterAppInitialized: sinon.spy()
+
         optionKey: 'ext_deact'
 
         name: "Second Testing Extension"
@@ -51,21 +56,23 @@ describe 'Core', ->
     core.addExtension(ext2)
     core.addExtension(ext_deact)
 
-    it 'should use NGS as the global object', ->
-        NGS.should.be.an 'object'
+    it 'should use Pestle as the global object', ->
+        Pestle.should.be.an 'object'
 
     it 'should define the \'modules\' namespace', ->
-        NGS.modules.should.be.an 'object'
+        Pestle.modules.should.be.an 'object'
 
     it 'should have a Core class', ->
-        NGS.Core.should.be.a 'function'
+        Pestle.Core.should.be.a 'function'
 
-    # right now is setted to "lodges". It needs to be changed
-    it.skip 'shoul provide "platform" as the default namespace', ->
+    it 'should provide "platform" as the default namespace', ->
         core.config.namespace.should.be.equal 'platform'
 
     it 'shoul provide a default logging level between 0 and 5', ->
         core.config.debug.logLevel.should.be.at.least(0).and.below(6)
+
+    it 'should have a setConfig Method', ->
+        core.setConfig.should.be.a 'function'
 
     it 'should have a start Method', ->
         core.start.should.be.a 'function'
@@ -79,9 +86,28 @@ describe 'Core', ->
     it 'should have a addExtension Method', ->
         core.addExtension.should.be.a 'function'
 
-    it 'should throw an error if an extensions is added after the Core has been started', ->
-        state = () => core.addExtension( initialize: () -> )
-        state.should.throw(Error)
+    describe 'setting up Pestle', ->
+
+        it 'should only accept objects as a parameter', ->
+            state2 = () => core.setConfig('string')
+            state2.should.throw(Error)
+
+            state = () => core.setConfig(2)
+            state.should.throw(Error)
+
+            state = () => core.setConfig(undefined)
+            state.should.throw(Error)
+
+            state = () => core.setConfig({})
+            state.should.not.throw(Error)
+
+        it 'should overwrite values passed during the instantiation of Pestle', ->
+            logLevel = core.config.debug.logLevel
+            core.setConfig({
+                debug:
+                    logLevel: 2
+            })
+            logLevel.should.not.be.equal core.config.debug.logLevel
 
     describe 'starting the app', ->
 
@@ -95,7 +121,11 @@ describe 'Core', ->
         sinon.spy(respimgExt[0], "initialize")
 
         # starts the app
-        core.start()
+        before -> core.start()
+
+        it 'should throw an error if an extension is added after the Core has been started', ->
+            state = () => core.addExtension( initialize: () -> )
+            state.should.throw(Error)
 
         it 'should change its state of started to true', ->
             core.started.should.be.equal true
@@ -132,6 +162,12 @@ describe 'Core', ->
         it 'should NOT call the initialize method on deactivated extension', ->
             ext_deact.initialize.should.not.have.been.called
 
+        it 'should NOT call the afterAppStarted method on deactivated extension', ->
+            ext_deact.afterAppStarted.should.not.have.been.called
+
+        it 'should NOT call the afterAppInitialized method on deactivated extension', ->
+            ext_deact.afterAppInitialized.should.not.have.been.called
+
         it 'should pass the core as an argument to the initialize method for extensions', ->
             ext.initialize.should.have.been.calledWith(core)
 
@@ -145,63 +181,63 @@ describe 'Core', ->
             ext2.afterAppInitialized.should.have.been.calledAfter ext.afterAppStarted
             ext2.afterAppInitialized.should.have.been.calledAfter ext2.afterAppStarted
 
-    describe 'NGS Event Bus', ->
+    describe 'Pestle Event Bus', ->
 
         describe 'Suscribing methods', ->
 
             it 'should provide an \'addListener\' method', ->
-                NGS.addListener.should.be.a 'function'
+                Pestle.addListener.should.be.a 'function'
 
             it 'should provide an \'addOnceListener\' method', ->
-                NGS.addOnceListener.should.be.a 'function'
+                Pestle.addOnceListener.should.be.a 'function'
 
             it 'should provide an \'on\' method', ->
-                NGS.on.should.be.a 'function'
+                Pestle.on.should.be.a 'function'
 
             it 'should provide an \'once\' method', ->
-                NGS.once.should.be.a 'function'
+                Pestle.once.should.be.a 'function'
 
         describe 'Defining events methods', ->
 
             it 'should provide an \'defineEvent\' method', ->
-                NGS.defineEvent.should.be.a 'function'
+                Pestle.defineEvent.should.be.a 'function'
 
             it 'should provide an \'defineEvents\' method', ->
-                NGS.defineEvents.should.be.a 'function'
+                Pestle.defineEvents.should.be.a 'function'
 
         describe 'Removing events methods', ->
 
             it 'should provide an \'removeEvent\' method', ->
-                NGS.removeEvent.should.be.a 'function'
+                Pestle.removeEvent.should.be.a 'function'
 
         describe 'Unscribing methods', ->
 
             it 'should provide an \'removeListener\' method', ->
-                NGS.removeListener.should.be.a 'function'
+                Pestle.removeListener.should.be.a 'function'
 
             it 'should provide an \'off\' method', ->
-                NGS.off.should.be.a 'function'
+                Pestle.off.should.be.a 'function'
 
         describe 'Bulk suscribing methods', ->
 
             it 'should provide an \'addListeners\' method', ->
-                NGS.addListeners.should.be.a 'function'
+                Pestle.addListeners.should.be.a 'function'
 
         describe 'Bulk unsuscribing methods', ->
 
             it 'should provide an \'removeListeners\' method', ->
-                NGS.removeListeners.should.be.a 'function'
+                Pestle.removeListeners.should.be.a 'function'
 
         describe 'Triggering methods', ->
 
             it 'should provide an \'emitEvent\' method', ->
-                NGS.emitEvent.should.be.a 'function'
+                Pestle.emitEvent.should.be.a 'function'
 
             it 'should provide an \'trigger\' method', ->
-                NGS.trigger.should.be.a 'function'
+                Pestle.trigger.should.be.a 'function'
 
             it 'should provide an \'emit\' method', ->
-                NGS.emit.should.be.a 'function'
+                Pestle.emit.should.be.a 'function'
 
 
     describe 'Base libraries', ->

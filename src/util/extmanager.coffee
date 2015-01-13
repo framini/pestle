@@ -7,7 +7,7 @@
 
     module.exports = factory(root, {})
 
-)(window, (root, NGS) ->
+)(window, (root, ExtManager) ->
 
     Base = require('../base.coffee')
 
@@ -45,9 +45,15 @@
             @_extensions.push(ext)
 
         init : (context) ->
-            Base.log.info @_extensions
+            xtclone = Base.util.clone @_extensions
+
+            Base.log.info "Added extensions (still not initialized):"
+            Base.log.debug xtclone
 
             @_initExtension(@_extensions, context)
+
+            Base.log.info "Initialized extensions:"
+            Base.log.debug @_initializedExtensions
 
         _initExtension : (extensions, context) ->
 
@@ -56,11 +62,21 @@
                 xt = extensions.shift()
 
                 # Call extensions constructor
-                xt.initialize(context) if @_isExtensionAllowedToBeActivated(xt, context.config)
+                if @_isExtensionAllowedToBeActivated(xt, context.config)
+                    # this state could tell to the rest of the world if
+                    # extensions has been initialized or not
+                    xt.activated = true
 
-                # Keep track of the initialized extensions for future reference
-                @_initializedExtensions.push xt
+                    # call to the extension initialize method
+                    xt.initialize(context)
 
+                    # Keep track of the initialized extensions for future reference
+                    @_initializedExtensions.push xt
+                else
+                    xt.activated = false
+
+                # call this method recursively until there are no more
+                # elements in the array
                 @_initExtension(extensions, context)
 
         _isExtensionAllowedToBeActivated: (xt, config) ->

@@ -48,7 +48,7 @@
         _createListeners: () ->
             # this gives the ability to create responsive images
             # by trigger this event with optional attributes
-            NGS.on 'responsiveimages:create', @_createInstance
+            Pestle.on 'responsiveimages:create', @_createInstance
 
         _createInstance : (options = {}) ->
 
@@ -77,7 +77,7 @@
 
             # trigger the event to let everybody knows that this extension finished
             # its initialization
-            NGS.emit 'responsiveimages:initialized'
+            Pestle.emit 'responsiveimages:initialized'
 
     # this method is meant to be executed after components have been
     # initialized
