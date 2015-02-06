@@ -74,6 +74,9 @@ describe 'Core', ->
     it 'should have a setConfig Method', ->
         core.setConfig.should.be.a 'function'
 
+    it 'should have a setComponentConfig Method', ->
+        core.setComponentConfig.should.be.a 'function'
+
     it 'should have a start Method', ->
         core.start.should.be.a 'function'
 

@@ -159,6 +159,8 @@
                     # generates an unique guid for the module
                     m.options.guid = Base.util.uniqueId(m.name + "_")
 
+                    m.options.__defaults__ = app.config.component[m.name]
+
                     # inject the sandbox and the options in the module proto
                     # Base.util.extend mod, sandbox : sb, options: m.options
                     modx = new mod(sandbox : sb, options: m.options)
