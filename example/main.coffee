@@ -18,6 +18,7 @@ Pestle.Module.extend 'Example4',
     initialize: () ->
         @_super_()
         console.log "Forth example"
+        console.log @options
     , 'Example3'
 
 # Example of defining the behavior in a separate file

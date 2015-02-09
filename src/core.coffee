@@ -94,20 +94,26 @@
                 Base.log.error("Pestle has already been started. You can not set up configs at this point.")
                 throw new Error('You can not set up configs when Pestle has already started.')
 
-        setComponentConfig: (config) ->
+        setComponentConfig: (comp, config) ->
             unless @started
+    
+                unless comp and Base.util.isString comp
+                    msg = "[setComponentConfig method] 1st param should be a string, you're passing:" + typeof config
+                    Base.log.error(msg)
+                    throw new Error(msg)
+
                 if Base.util.isObject config
                     # if we enter here it means Pestle has been already initialized
                     # during instantiation, so we'll use the config object as a
                     # provider for default value
                     unless Base.util.isEmpty @config
-                        @config.component = Base.util.defaults config, @config.component
+                        @config.component[comp] = Base.util.defaults config, @config.component[comp]
 
                     else
                         @config = @config or {}
-                        @config.component = Base.util.defaults config, @cfg.component
+                        @config.component[comp] = Base.util.defaults config, @cfg.component[comp]
                 else
-                    msg = "[setComponentConfig method] only accepts an param object and you're passing:" + typeof config
+                    msg = "[setComponentConfig method] 2nd param should be an object & you're passing:" + typeof config
                     Base.log.error(msg)
                     throw new Error(msg)
             else

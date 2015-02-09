@@ -43,6 +43,7 @@ describe 'Components Extension', ->
 
             settings = {}
             initializedComponents = []
+            instance = {}
 
             before ->
 
@@ -83,13 +84,26 @@ describe 'Components Extension', ->
                 def = Module.get('dummy')
                 sinon.spy def.prototype, 'initialize'
 
+                # Pestle instance
+                instance = new Pestle.Core(settings)
+
+                # Provide default settings for 'dummy'
+                instance.setComponentConfig('dummy', {
+                    prop5: 'val5',
+                    prop6: ['val6', 'val7']
+                })
+
+                instance.setComponentConfig('dummy2', {
+                    prop1: 'val1'
+                })
+
             after ->
                 cmp.initializedComponents = {}
 
             it 'should only start components that belongs to the passed selector', ->
 
                 # Starts all the components present in the 'dummycontainer-1'
-                initializedComponents = cmp.startAll('.dummycontainer-1', new Pestle.Core(settings))
+                initializedComponents = cmp.startAll('.dummycontainer-1', instance)
 
                 # in the fixture there are 3 components defined within dummycontainer-1
                 # and 2 in dummycontainer-2
@@ -100,7 +114,7 @@ describe 'Components Extension', ->
                     $(m.options.el).data('platform-component').should.be.not.equal 'dummy5'
 
 
-                initializedComponents2 = cmp.startAll('.dummycontainer-2', new Pestle.Core(settings))
+                initializedComponents2 = cmp.startAll('.dummycontainer-2', instance)
 
                 _.size(initializedComponents.all).should.be.equal 5
                 _.size(initializedComponents2.all).should.be.equal 5
@@ -118,6 +132,11 @@ describe 'Components Extension', ->
                         m.options.__defaults__.prop1.should.be.a 'string'
                         m.options.__defaults__.prop3.should.be.an 'array'
                         m.options.__defaults__.prop4.should.be.an 'object'
+                        m.options.__defaults__.prop5.should.be.a 'string'
+                        m.options.__defaults__.prop6.should.be.an 'array'
+                    else if $(m.options.el).data('platform-component') == "dummy2"
+                        m.options.__defaults__.should.be.an 'object'
+                        m.options.__defaults__.prop1.should.be.a 'string'
                     else
                         (typeof m.options.__defaults__).should.equal 'undefined'
 

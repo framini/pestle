@@ -59,6 +59,12 @@
               logLevel: 0
             }
           });
+
+          // Set default options (available within Example under this.__defaults__)
+          Pestle.instance.setComponentConfig('Example4', {
+            foo: "bar" // Default config option for all Example4 instances
+          });
+
         }).call(this);
     </script>
     
