@@ -41,6 +41,10 @@ describe 'Components Extension', ->
 
         describe 'Starting multiple components', ->
 
+            settings = {}
+            initializedComponents = []
+            instance = {}
+
             before ->
 
                 Module.add 'dummy',
@@ -68,9 +72,30 @@ describe 'Components Extension', ->
 
                     afterAppStarted: sinon.spy()
 
+                settings = 
+                    component:
+                        'dummy':
+                            prop1: 'val1'
+                            prop2: 'val2'
+                            prop3: ['val3', 'val4']
+                            prop4: { bar: 'baz' }
+
                 # example for spying in existing methods
                 def = Module.get('dummy')
                 sinon.spy def.prototype, 'initialize'
+
+                # Pestle instance
+                instance = new Pestle.Core(settings)
+
+                # Provide default settings for 'dummy'
+                instance.setComponentConfig('dummy', {
+                    prop5: 'val5',
+                    prop6: ['val6', 'val7']
+                })
+
+                instance.setComponentConfig('dummy2', {
+                    prop1: 'val1'
+                })
 
             after ->
                 cmp.initializedComponents = {}
@@ -78,7 +103,7 @@ describe 'Components Extension', ->
             it 'should only start components that belongs to the passed selector', ->
 
                 # Starts all the components present in the 'dummycontainer-1'
-                initializedComponents = cmp.startAll('.dummycontainer-1', new Pestle.Core())
+                initializedComponents = cmp.startAll('.dummycontainer-1', instance)
 
                 # in the fixture there are 3 components defined within dummycontainer-1
                 # and 2 in dummycontainer-2
@@ -89,7 +114,7 @@ describe 'Components Extension', ->
                     $(m.options.el).data('platform-component').should.be.not.equal 'dummy5'
 
 
-                initializedComponents2 = cmp.startAll('.dummycontainer-2', new Pestle.Core())
+                initializedComponents2 = cmp.startAll('.dummycontainer-2', instance)
 
                 _.size(initializedComponents.all).should.be.equal 5
                 _.size(initializedComponents2.all).should.be.equal 5
@@ -99,6 +124,21 @@ describe 'Components Extension', ->
                     $(m.options.el).data('platform-component').should.be.not.equal 'dummy'
                     $(m.options.el).data('platform-component').should.be.not.equal 'dummy2'
                     $(m.options.el).data('platform-component').should.be.not.equal 'dummy3'
+
+            it 'should provision the component with default options (if any)', ->
+                _.each initializedComponents.all, (m, i) ->
+                    if $(m.options.el).data('platform-component') == "dummy"
+                        m.options.__defaults__.should.be.an 'object'
+                        m.options.__defaults__.prop1.should.be.a 'string'
+                        m.options.__defaults__.prop3.should.be.an 'array'
+                        m.options.__defaults__.prop4.should.be.an 'object'
+                        m.options.__defaults__.prop5.should.be.a 'string'
+                        m.options.__defaults__.prop6.should.be.an 'array'
+                    else if $(m.options.el).data('platform-component') == "dummy2"
+                        m.options.__defaults__.should.be.an 'object'
+                        m.options.__defaults__.prop1.should.be.a 'string'
+                    else
+                        (typeof m.options.__defaults__).should.equal 'undefined'
 
             it 'should ensure that all modules definition within Pestle.modules extends from class Module', ->
                 _.each Pestle.modules, (m, i) ->
