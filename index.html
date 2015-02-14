@@ -42,6 +42,11 @@
               "responsiveimages": {
                 "availableWidths": [133, 152, 162, 225, 210, 224, 280, 352, 470, 536, 590, 676, 710, 768, 885, 945, 1190]
               }
+            },
+            component: {
+              "Example4": {
+                bar: "baz" // Default config option for all Example4 instances
+              }
             }
           });
 
@@ -54,6 +59,12 @@
               logLevel: 0
             }
           });
+
+          // Set default options (available within Example under this.__defaults__)
+          Pestle.instance.setComponentConfig('Example4', {
+            foo: "bar" // Default config option for all Example4 instances
+          });
+
         }).call(this);
     </script>
     
