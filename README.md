@@ -116,7 +116,7 @@ Pestle.Module.add(ExampleModule, {
       // more cool stuff
    }
 });
-```javascript
+```
 
 #### Citing Backbone’s documentation:
 Uses jQuery's on function to provide declarative callbacks for DOM events within a view. If an events hash is not passed directly, uses this.events as the source. Events are written in the format {"event selector": "callback"}. The callback may be either the name of a method on the view, or a direct function body. Omitting the selectorcauses the event to be bound to the view's root element (this.el). By default,delegateEvents is called within the View's constructor for you, so if you have a simpleevents hash, all of your DOM events will always already be connected, and you will never have to call this function yourself.
